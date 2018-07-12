@@ -25,9 +25,10 @@ def receiveWebhook(request):
 
 
         spaces = area.hangoutsSpaces.all()
-        print(spaces)
+        print("spaces: " + spaces)
 
         for space in spaces:
+            print("here")
             print(space.HangoutsSpace)
             sendMessage(body, space.HangoutsSpace)
 
