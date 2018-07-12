@@ -68,8 +68,10 @@ def cards():
                                                 }
                                             ]
                                         }
-                                    },
-                                },
+                                    }
+                                }
+                            },
+                            {
                                 "keyValue": {
                                     "content": "MyFirstProject\\other area",
                                     "onClick": {
@@ -82,8 +84,8 @@ def cards():
                                                 }
                                             ]
                                         }
-                                    },
-                                },
+                                    }
+                                }
                             }
                         ]
                     }
