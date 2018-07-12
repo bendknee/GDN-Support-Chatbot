@@ -13,21 +13,28 @@ from oauth2client.service_account import ServiceAccountCredentials
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
 def receiveWebhook(request):
-    event = json.loads(request.body)
-    print(event)
+    try:
+        event = json.loads(request.body)
+        print(event)
 
-    body = generateBody(event)
+        body = generateBody(event)
 
-    # get all spaces subscribed to area
-    area = VstsArea.objects.filter(name=event['resource']['fields']['System.AreaPath'])
-    spaces = area.hangoutsSpaces.all()
-    print(spaces)
+        # get all spaces subscribed to area
 
-    for space in spaces:
-        print(space.hangoutsSpaces)
-        sendMessage(body, space.hangoutsSpaces)
+        area = VstsArea.objects.get(name=event['resource']['fields']['System.AreaPath'])
 
-    return JsonResponse({"text": "success!"}, content_type='application/json')
+
+        spaces = area.hangoutsSpaces.all()
+        print(spaces)
+
+        for space in spaces:
+            print(space.hangoutsSpaces)
+            sendMessage(body, space.hangoutsSpaces)
+
+        return JsonResponse({"text": "success!"}, content_type='application/json')
+
+    except:
+        return JsonResponse({"text": "failed!"}, content_type='application/json')
 
 def sendMessage(body, space):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
