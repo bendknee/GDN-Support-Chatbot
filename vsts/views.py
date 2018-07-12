@@ -32,7 +32,7 @@ def receiveWebhook(request):
 
         for space in spaces:
             print("each space")
-            print(space)
+            print("ini string or what?" + space)
             sendMessage(body, space)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
