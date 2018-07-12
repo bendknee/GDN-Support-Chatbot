@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from hangouts.models import VstsArea, HangoutsSpace
 
 
 #----------------------- receive message from Hangouts -----------------------#
@@ -22,8 +23,16 @@ def receiveMessage(request):
             else:
                 message = event['message']['argumentText']
 
-            message = 'You said: `%s`' % message
+            if message == 'Subscribe':
+                message = cards()
+            else:
+                message = 'You said: `%s`' % message
             response = text(message)
+
+        elif event['type'] == 'CARD_CLICKED':
+            # response can be text or card, depending on action
+            response = handleAction(event)
+
 
         else:
             return
@@ -50,14 +59,14 @@ def cards():
                                 "buttons": [
                                     {
                                         "textButton": {
-                                            "text": "One",
+                                            "text": "MyFirstProject\\team 2",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": "choose",
+                                                    "actionMethodName": "chooseArea",
                                                     "parameters": [
                                                         {
-                                                            "key": "number",
-                                                            "value": "1"
+                                                            "key": "area",
+                                                            "value": "MyFirstProject\\team 2"
                                                         }
                                                     ]
                                                 }
@@ -66,14 +75,14 @@ def cards():
                                     },
                                     {
                                         "textButton": {
-                                            "text": "Two",
+                                            "text": "MyFirstProject\\other area",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": "choose",
+                                                    "actionMethodName": "chooseArea",
                                                     "parameters": [
                                                         {
-                                                            "key": "number",
-                                                            "value": "2"
+                                                            "key": "area",
+                                                            "value": "MyFirstProject\\other area"
                                                         }
                                                     ]
                                                 }
@@ -89,3 +98,24 @@ def cards():
         ]
     }
     return response
+
+def handleAction(event):
+    action = event['action']
+    if action['actionMethodName'] == "chooseArea":
+        # response as text
+        response = text(chooseArea(action['parameters'], event['space']))
+    else:
+        return
+
+    return response
+
+
+def chooseArea(parameters, space):
+    area = parameters[0]['area']
+    space = space['name']
+
+    spaceObject = HangoutsSpace.objects.create(name=space)
+    areaObject = VstsArea.objects.create(name=area)
+    areaObject.hangoutsSpaces.add(spaceObject)
+
+    return "Subscribed to area " + space
