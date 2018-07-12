@@ -8,6 +8,7 @@ from hangouts.models import VstsArea, HangoutsSpace
 from httplib2 import Http
 import json
 from oauth2client.service_account import ServiceAccountCredentials
+import traceback
 
 
 #----------------------- receive webhook from VSTS -----------------------#
@@ -36,6 +37,7 @@ def receiveWebhook(request):
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
     except:
+        traceback.print_exc()
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
 def sendMessage(body, space):
