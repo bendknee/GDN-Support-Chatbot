@@ -28,8 +28,8 @@ def receiveWebhook(request):
         print(spaces)
 
         for space in spaces:
-            print(space.hangoutsSpaces)
-            sendMessage(body, space.hangoutsSpace)
+            print(space.HangoutsSpace)
+            sendMessage(body, space.HangoutsSpace)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
