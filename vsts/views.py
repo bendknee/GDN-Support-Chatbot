@@ -102,3 +102,4 @@ def generateBody(message):
                 }
               ]
             }
+    return body
