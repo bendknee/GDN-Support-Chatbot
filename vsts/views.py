@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from googleapiclient.discovery import build
-from hangouts.models import VstsArea, HangoutsSpace
+from hangouts.models import VstsArea
 from httplib2 import Http
 import json
 from oauth2client.service_account import ServiceAccountCredentials
@@ -46,6 +46,8 @@ def sendMessage(body, space):
     resp = chat.spaces().messages().create(
         parent=space,
         body=body).execute()
+
+    print(resp)
 
 def generateBody(message):
     body = {

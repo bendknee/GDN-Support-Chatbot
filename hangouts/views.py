@@ -72,7 +72,9 @@ def cards():
                                                 }
                                             }
                                         }
-                                    },
+                                    }
+                                ],
+                                "buttons": [
                                     {
                                         "textButton": {
                                             "text": "MyFirstProject\\other area",
@@ -114,7 +116,7 @@ def chooseArea(parameters, space):
     area = parameters[0]['value']
     space = space['name']
 
-    spaceObject, created = HangoutsSpace.objects.get_or_create(name=space)
+    spaceObject, created = HangoutsSpace.objects.get_or_create(name=space) # get_or_create() returns tuple
     areaObject, created = VstsArea.objects.get_or_create(name=area)
     areaObject.hangoutsSpaces.add(spaceObject)
 
