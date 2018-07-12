@@ -15,6 +15,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 def receiveWebhook(request):
     try:
         event = json.loads(request.body)
+        print("here")
         print(event)
 
         body = generateBody(event)
@@ -38,6 +39,7 @@ def receiveWebhook(request):
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
 def sendMessage(body, space):
+    print("masuk sendmessage")
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'project-id-2458129994854391868-7fe6d3521132.json', scopes)
