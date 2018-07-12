@@ -24,10 +24,10 @@ def receiveMessage(request):
                 message = event['message']['argumentText']
 
             if message == 'Subscribe':
-                message = cards()
+                response = cards()
             else:
                 message = 'You said: `%s`' % message
-            response = text(message)
+                response = text(message)
 
         elif event['type'] == 'CARD_CLICKED':
             # response can be text or card, depending on action
