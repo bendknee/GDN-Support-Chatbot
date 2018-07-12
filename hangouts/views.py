@@ -115,8 +115,7 @@ def chooseArea(parameters, space):
     space = space['name']
 
     spaceObject = HangoutsSpace.objects.get_or_create(name=space)
-    areaObject = VstsArea.objects.get_or_create(name=area)
-    print(areaObject)
+    areaObject, created = VstsArea.objects.get_or_create(name=area)
     areaObject.hangoutsSpaces.add(spaceObject)
 
     return "Subscribed to area " + area
