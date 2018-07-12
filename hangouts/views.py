@@ -23,7 +23,7 @@ def receiveMessage(request):
             else:
                 message = event['message']['argumentText']
 
-            if message == 'Subscribe':
+            if message.lower() == 'Subscribe'.lower():
                 response = cards()
             else:
                 message = 'You said: `%s`' % message
