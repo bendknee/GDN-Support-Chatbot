@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from googleapiclient.discovery import build
+from hangouts.models import VstsArea, HangoutsSpace
 from httplib2 import Http
 import json
 from oauth2client.service_account import ServiceAccountCredentials
@@ -14,16 +15,33 @@ from oauth2client.service_account import ServiceAccountCredentials
 def receiveWebhook(request):
     event = json.loads(request.body)
     print(event)
-    sendMessage(event)
+
+    body = generateBody(event)
+
+    # get all spaces subscribed to area
+    area = VstsArea.objects.filter(name=event['resource']['fields']['System.AreaPath'])
+    spaces = area.hangoutsSpaces.all()
+    print(spaces)
+
+    for space in spaces:
+        print(space.hangoutsSpaces)
+        sendMessage(body, space.hangoutsSpaces)
+
     return JsonResponse({"text": "success!"}, content_type='application/json')
 
-def sendMessage(message):
+def sendMessage(body, space):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'project-id-2458129994854391868-7fe6d3521132.json', scopes)
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
+    body = body
+    resp = chat.spaces().messages().create(
+        parent=space,
+        body=body).execute()
+
+def generateBody(message):
     body = {
               "cards": [
                 {
@@ -71,6 +89,3 @@ def sendMessage(message):
                 }
               ]
             }
-    resp = chat.spaces().messages().create(
-        parent='spaces/AAAAxvB-jOA',
-        body=body).execute()

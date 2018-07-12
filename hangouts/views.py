@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import json
 from hangouts.models import VstsArea, HangoutsSpace
+import json
 
 
 #----------------------- receive message from Hangouts -----------------------#
@@ -118,4 +118,4 @@ def chooseArea(parameters, space):
     areaObject = VstsArea.objects.create(name=area)
     areaObject.hangoutsSpaces.add(spaceObject)
 
-    return "Subscribed to area " + space
+    return "Subscribed to area " + area
