@@ -111,7 +111,7 @@ def handleAction(event):
 
 
 def chooseArea(parameters, space):
-    area = parameters[0]['area']
+    area = parameters[0]['value']
     space = space['name']
 
     spaceObject = HangoutsSpace.objects.create(name=space)
