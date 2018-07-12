@@ -50,48 +50,40 @@ def cards():
         "cards": [
             {
                 "header": {
-                    "title": "Choose number!"
+                    "title": "Choose area"
                 },
                 "sections": [
                     {
                         "widgets": [
                             {
-                                "buttons": [
-                                    {
-                                        "textButton": {
-                                            "text": "MyFirstProject\\team 2",
-                                            "onClick": {
-                                                "action": {
-                                                    "actionMethodName": "chooseArea",
-                                                    "parameters": [
-                                                        {
-                                                            "key": "area",
-                                                            "value": "MyFirstProject\\team 2"
-                                                        }
-                                                    ]
+                                "keyValue": {
+                                    "content": "MyFirstProject\\team 2",
+                                    "onClick": {
+                                        "action": {
+                                            "actionMethodName": "chooseArea",
+                                            "parameters": [
+                                                {
+                                                    "key": "area",
+                                                    "value": "MyFirstProject\\team 2"
                                                 }
-                                            }
+                                            ]
                                         }
-                                    }
-                                ],
-                                "buttons": [
-                                    {
-                                        "textButton": {
-                                            "text": "MyFirstProject\\other area",
-                                            "onClick": {
-                                                "action": {
-                                                    "actionMethodName": "chooseArea",
-                                                    "parameters": [
-                                                        {
-                                                            "key": "area",
-                                                            "value": "MyFirstProject\\other area"
-                                                        }
-                                                    ]
+                                    },
+                                },
+                                "keyValue": {
+                                    "content": "MyFirstProject\\other area",
+                                    "onClick": {
+                                        "action": {
+                                            "actionMethodName": "chooseArea",
+                                            "parameters": [
+                                                {
+                                                    "key": "area",
+                                                    "value": "MyFirstProject\\other area"
                                                 }
-                                            }
+                                            ]
                                         }
-                                    }
-                                ]
+                                    },
+                                },
                             }
                         ]
                     }
