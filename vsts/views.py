@@ -23,9 +23,7 @@ def receiveWebhook(request):
 
         area = VstsArea.objects.get(name=event['resource']['fields']['System.AreaPath'])
 
-
         spaces = area.hangoutsSpaces.all()
-
         for space in spaces:
             sendMessage(body, space.__str__())
 
