@@ -40,7 +40,7 @@ def receiveMessage(request):
     else:
         return
 
-    return JsonResponse(response, content_type='application/json')
+    return JsonResponse(response, content_type='application/json', safe=False)
 
 def text(message):
     response = {"text": message}
