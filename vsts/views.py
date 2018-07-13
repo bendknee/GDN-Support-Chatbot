@@ -3,13 +3,14 @@ from __future__ import unicode_literals
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from googleapiclient.discovery import build
 from hangouts.models import VstsArea
-from httplib2 import Http
+from hangouts.views import generateBody, sendMessage
+
 import json
-from oauth2client.service_account import ServiceAccountCredentials
+import requests
 import traceback
 
+VSTS_PERSONAL_ACCESS_TOKEN = 'OjIzcml2YWtzbml0NzRhaDNxd29pemlpNTZud2g0cnN5NHJqZXV1ZXBudzdlN29ocjVjc3E='
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
@@ -33,66 +34,37 @@ def receiveWebhook(request):
         traceback.print_exc()
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
-def sendMessage(body, space):
-    scopes = ['https://www.googleapis.com/auth/chat.bot']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        'project-id-2458129994854391868-7fe6d3521132.json', scopes)
-    http = Http()
-    credentials.authorize(http)
-    chat = build('chat', 'v1', http=http)
-    body = body
-    resp = chat.spaces().messages().create(
-        parent=space,
-        body=body).execute()
+def getProjects():
+    project_list = set()
+    url = 'https://gramediadigital.visualstudio.com/_apis/projecthistory?api-version=4.1-preview.2'
+    headers = {'Authorization', 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
+    req = requests.get(url, headers=headers)
+    response = json.loads(req.json())
+    for obj in response["value"]:
+        project_list.add(obj["name"])
+    return project_list
 
-    print(resp)
+#----------------------- get all areas from VSTS -----------------------#
+def getAreas():
+    areas_list = []
+    url = 'https://gramediadigital.visualstudio.com/{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
+    headers = {'Authorization', 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
+    for project in getProjects():
+        req = requests.get(url.replace("{{Project}}", project), headers=headers)
+        response = json.loads(req.json())
+        for obj in response["value"]:
+            if obj["structureType"] == "area":
+                areas_list += recursive_area(obj, areas_list=areas_list)
 
-def generateBody(message):
-    body = {
-              "cards": [
-                {
-                  "header": {
-                    "title": message['resource']['fields']['System.Title'],
-                    "subtitle": "created by " + message['resource']['fields']['System.CreatedBy'],
-                    "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
-                  },
-                  "sections": [
-                    {
-                      "widgets": [
-                          {
-                              "keyValue": {
-                                  "topLabel": "Priority",
-                                  "content": str(message['resource']['fields']['Microsoft.VSTS.Common.Priority'])
-                              }
-                          },
-                          {
-                              "keyValue": {
-                                  "topLabel": "Repro Steps",
-                                  "content": message['resource']['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                              }
-                          }
-                      ]
-                    },
-                    {
-                      "widgets": [
-                          {
-                              "buttons": [
-                                {
-                                  "textButton": {
-                                    "text": "MORE",
-                                    "onClick": {
-                                      "openLink": {
-                                        "url": message['resource']['_links']['html']['href']
-                                      }
-                                    }
-                                  }
-                                }
-                              ]
-                          }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-    return body
+    return areas_list
+
+def recursive_area(area, parent_path='', areas_list=[]):
+    if area["hasChildren"]:
+        if parent_path != '':
+            areas_list.append((parent_path + area["name"]))
+        for child in area["children"]:
+            recursive_area(child, parent_path + area["name"] + "\\", areas_list)
+    else:
+        areas_list.append((parent_path + area["name"]))
+    return areas_list
+
