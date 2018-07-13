@@ -55,17 +55,19 @@ def getAreas():
         try:
             for obj in response["value"]:
                 if obj["structureType"] == "area":
-                    areas_list += recursive_area(obj, areas_list=areas_list)
+                    areas_list += recursive_path_maker(obj)
         except KeyError:
             continue
     return areas_list
 
-def recursive_area(area, parent_path='', areas_list=[]):
+def recursive_path_maker(area, parent_path='', areas_list=None):
+    if areas_list is None:
+        areas_list = []
     if area["hasChildren"]:
         if parent_path != '':
             areas_list.append((parent_path + area["name"]))
         for child in area["children"]:
-            recursive_area(child, parent_path + area["name"] + "\\", areas_list)
+            recursive_path_maker(child, parent_path + area["name"] + "\\", areas_list)
     else:
         areas_list.append((parent_path + area["name"]))
     return areas_list
