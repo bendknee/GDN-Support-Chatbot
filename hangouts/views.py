@@ -29,11 +29,11 @@ def receive_message(request):
             else:
                 message = event['message']['argumentText']
 
-            if message.lower() == 'Subscribe'.lower():
-                response = areas_card(vsts.views.get_all_areas(), "subscribe")
+            if message.lower() == 'subscribe':
+                response = areas_response(vsts.views.get_all_areas(), "subscribe")
                 print(response)
-            elif message.lower() == 'Unsubscribe'.lower():
-                response = areas_card(get_areas(), "unsubscribe")
+            elif message.lower() == 'unsubscribe':
+                response = areas_response(get_areas(event['space']['name']), "unsubscribe")
                 print(response)
             else:
                 message = 'You said: `%s`' % message
@@ -87,12 +87,16 @@ def unsubscribe(parameters, space):
 
     return "Unsubscribed to area " + area
 
-def get_areas():
-    areas = VstsArea.objects.all()
+def get_areas(space):
+    space_object = HangoutsSpace.objects.get(name=space)
+    areas = space_object.vstsarea_set.all()
     areas_list = [area.__str__() for area in areas]
     return areas_list
 
-def areas_card(areas_list, method):
+def areas_response(areas_list, method):
+    if areas_list == []:
+        return text("You did not subscribe to any area.")
+
     card = {
         "cards": [
             {
@@ -159,8 +163,14 @@ def generate_body(message):
                       "widgets": [
                           {
                               "keyValue": {
+                                  "topLabel": "Area Path",
+                                  "content": message['resource']['fields']['System.AreaPath']
+                              }
+                          },
+                          {
+                              "keyValue": {
                                   "topLabel": "Priority",
-                                  "content": str(message['resource']['fields']['Microsoft.VSTS.Common.Priority'])
+                                  "content": message['resource']['fields']['Microsoft.VSTS.Common.Severity']
                               }
                           },
                           {
@@ -169,6 +179,7 @@ def generate_body(message):
                                   "content": message['resource']['fields']['Microsoft.VSTS.TCM.ReproSteps']
                               }
                           }
+
                       ]
                     },
                     {
