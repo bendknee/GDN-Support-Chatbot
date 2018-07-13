@@ -25,7 +25,7 @@ def receiveMessage(request):
                 message = event['message']['argumentText']
 
             if message.lower() == 'Subscribe'.lower():
-                response = getAreas()
+                response = allAreasCard(getAreas())
                 print(response)
             else:
                 message = 'You said: `%s`' % message
@@ -74,9 +74,7 @@ def getAreas():
 
     areas_list = ['MyFirstProject\\team 2', 'MyFirstProject\\other area']
 
-    areas = {"cards": [{"header": {"title": "Choose area"}, "sections": [{"widgets": [{"keyValue": {"content": "MyFirstProject\\team 2", "onClick": {"action": {"actionMethodName": "chooseArea", "parameters": [{"key": "area", "value": "MyFirstProject\\team 2"}]}}}}, {"keyValue": {"content": "MyFirstProject\\other area", "onClick": {"action": {"actionMethodName": "chooseArea", "parameters": [{"key": "area", "value": "MyFirstProject\\other area"}]}}}}]}]}]}
-
-    return areas
+    return areas_list
 
 def allAreasCard(areas_list):
     card = {
@@ -95,7 +93,6 @@ def allAreasCard(areas_list):
         ]
     }
 
-    # card = json.loads(response)
     for area in areas_list:
         area_widget = {
                         "keyValue": {
@@ -114,7 +111,6 @@ def allAreasCard(areas_list):
                         }
                     }
 
-        # area_widget = json.loads(area_widget)
         card['cards'][0]['sections'][0]['widgets'].append(area_widget)
 
-    return json.dumps(card)
+    return card
