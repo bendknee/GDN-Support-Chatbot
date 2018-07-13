@@ -10,7 +10,9 @@ import json
 import requests
 import traceback
 
-VSTS_PERSONAL_ACCESS_TOKEN = 'OjIzcml2YWtzbml0NzRhaDNxd29pemlpNTZud2g0cnN5NHJqZXV1ZXBudzdlN29ocjVjc3E='
+VSTS_PERSONAL_ACCESS_TOKEN = 'Ont7VG9rZW59fQ=='
+BASE_URL = 'https://{{account_name}}.visualstudio.com/'
+ACCOUNT_NAME = 'quicstartbot'
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
@@ -36,7 +38,7 @@ def receive_webhook(request):
 
 def get_projects():
     project_list = set()
-    url = 'https://gramediadigital.visualstudio.com/_apis/projecthistory?api-version=4.1-preview.2'
+    url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '_apis/projecthistory?api-version=4.1-preview.2'
     headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
     req = requests.get(url, headers=headers)
     response = req.json()
@@ -47,7 +49,7 @@ def get_projects():
 #----------------------- get all areas from VSTS -----------------------#
 def get_all_areas():
     areas_list = []
-    url = 'https://gramediadigital.visualstudio.com/{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
+    url = BASE_URL.replace('{{account_name}}', ACCOUNT_NAME) + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
     headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
     for project in get_projects():
         req = requests.get(url.replace("{{Project}}", project), headers=headers)
