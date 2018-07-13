@@ -7,7 +7,8 @@ from googleapiclient.discovery import build
 from hangouts.models import VstsArea, HangoutsSpace
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
-from vsts.views import getAreas
+import vsts.views
+
 import json
 
 
@@ -28,7 +29,7 @@ def receiveMessage(request):
                 message = event['message']['argumentText']
 
             if message.lower() == 'Subscribe'.lower():
-                response = allAreasCard(getAreas())
+                response = allAreasCard(vsts.views.getAreas())
                 print(response)
             else:
                 message = 'You said: `%s`' % message
