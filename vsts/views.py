@@ -14,11 +14,11 @@ VSTS_PERSONAL_ACCESS_TOKEN = 'OjIzcml2YWtzbml0NzRhaDNxd29pemlpNTZud2g0cnN5NHJqZX
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
-def receiveWebhook(request):
+def receive_webhook(request):
     try:
         event = json.loads(request.body)
 
-        body = hangouts.views.generateBody(event)
+        body = hangouts.views.generate_body(event)
 
         # get all spaces subscribed to area
 
@@ -26,7 +26,7 @@ def receiveWebhook(request):
 
         spaces = area.hangoutsSpaces.all()
         for space in spaces:
-            hangouts.views.sendMessage(body, space.__str__())
+            hangouts.views.send_message(body, space.__str__())
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
@@ -34,7 +34,7 @@ def receiveWebhook(request):
         traceback.print_exc()
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
-def getProjects():
+def get_projects():
     project_list = set()
     url = 'https://gramediadigital.visualstudio.com/_apis/projecthistory?api-version=4.1-preview.2'
     headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
@@ -45,11 +45,11 @@ def getProjects():
     return project_list
 
 #----------------------- get all areas from VSTS -----------------------#
-def getAreas():
+def get_all_areas():
     areas_list = []
     url = 'https://gramediadigital.visualstudio.com/{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
     headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
-    for project in getProjects():
+    for project in get_projects():
         req = requests.get(url.replace("{{Project}}", project), headers=headers)
         response = req.json()
         try:

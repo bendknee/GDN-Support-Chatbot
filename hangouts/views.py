@@ -15,7 +15,7 @@ import json
 
 #----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
-def receiveMessage(request):
+def receive_message(request):
     event = json.loads(request.body)
     print(event)
     if event['token'] == 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw=':
@@ -30,7 +30,10 @@ def receiveMessage(request):
                 message = event['message']['argumentText']
 
             if message.lower() == 'Subscribe'.lower():
-                response = allAreasCard(vsts.views.getAreas())
+                response = areas_card(vsts.views.get_all_areas(), "subscribe")
+                print(response)
+            elif message.lower() == 'Unsubscribe'.lower():
+                response = areas_card(get_areas(), "unsubscribe")
                 print(response)
             else:
                 message = 'You said: `%s`' % message
@@ -38,7 +41,7 @@ def receiveMessage(request):
 
         elif event['type'] == 'CARD_CLICKED':
             # response can be text or card, depending on action
-            response = handleAction(event)
+            response = handle_action(event)
 
 
         else:
@@ -52,28 +55,32 @@ def text(message):
     response = {"text": message}
     return response
 
-def handleAction(event):
+def handle_action(event):
     action = event['action']
-    if action['actionMethodName'] == "chooseArea":
+    if action['actionMethodName'] == "subscribe":
         # response as text
-        response = text(chooseArea(action['parameters'], event['space']))
+        response = text(subscribe(action['parameters'], event['space']))
     else:
         return
 
     return response
 
-def chooseArea(parameters, space):
+def subscribe(parameters, space):
     area = parameters[0]['value']
     space = space['name']
 
-    spaceObject, created = HangoutsSpace.objects.get_or_create(name=space) # get_or_create() returns tuple
-    areaObject, created = VstsArea.objects.get_or_create(name=area)
-    areaObject.hangoutsSpaces.add(spaceObject)
+    space_object, created = HangoutsSpace.objects.get_or_create(name=space) # get_or_create() returns tuple
+    area_object, created = VstsArea.objects.get_or_create(name=area)
+    area_object.hangoutsSpaces.add(space_object)
 
     return "Subscribed to area " + area
 
+def get_areas():
+    areas = VstsArea.objects.all()
+    areas_list = list(areas)
+    return areas_list
 
-def allAreasCard(areas_list):
+def areas_card(areas_list, method):
     card = {
         "cards": [
             {
@@ -96,7 +103,7 @@ def allAreasCard(areas_list):
                             "content": area,
                             "onClick": {
                                 "action": {
-                                    "actionMethodName": "chooseArea",
+                                    "actionMethodName": method,
                                     "parameters": [
                                         {
                                             "key": "area",
@@ -112,7 +119,7 @@ def allAreasCard(areas_list):
 
     return card
 
-def sendMessage(body, space):
+def send_message(body, space):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'project-id-2458129994854391868-7fe6d3521132.json', scopes)
@@ -126,7 +133,7 @@ def sendMessage(body, space):
 
     print(resp)
 
-def generateBody(message):
+def generate_body(message):
     body = {
               "cards": [
                 {

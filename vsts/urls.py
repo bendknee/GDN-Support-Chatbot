@@ -1,9 +1,9 @@
 from django.conf.urls import url
-from .views import receiveWebhook
+from .views import receive_webhook
 #url for app
 
 app_name = 'vsts'
 
 urlpatterns = [
-    url(r'^$', receiveWebhook, name='vsts'),
+    url(r'^$', receive_webhook, name='vsts'),
 ]
