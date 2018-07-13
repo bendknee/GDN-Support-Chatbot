@@ -8,6 +8,7 @@ from hangouts.models import VstsArea, HangoutsSpace
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 from vsts.views import getAreas
+
 import json
 
 

@@ -37,7 +37,7 @@ def receiveWebhook(request):
 def getProjects():
     project_list = set()
     url = 'https://gramediadigital.visualstudio.com/_apis/projecthistory?api-version=4.1-preview.2'
-    headers = {'Authorization', 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
+    headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
     req = requests.get(url, headers=headers)
     response = json.loads(req.json())
     for obj in response["value"]:
@@ -48,7 +48,7 @@ def getProjects():
 def getAreas():
     areas_list = []
     url = 'https://gramediadigital.visualstudio.com/{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
-    headers = {'Authorization', 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
+    headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
     for project in getProjects():
         req = requests.get(url.replace("{{Project}}", project), headers=headers)
         response = json.loads(req.json())
