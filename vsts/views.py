@@ -39,7 +39,7 @@ def getProjects():
     url = 'https://gramediadigital.visualstudio.com/_apis/projecthistory?api-version=4.1-preview.2'
     headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
     req = requests.get(url, headers=headers)
-    response = json.loads(req.json())
+    response = req.json()
     for obj in response["value"]:
         project_list.add(obj["name"])
     return project_list
@@ -51,7 +51,7 @@ def getAreas():
     headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
     for project in getProjects():
         req = requests.get(url.replace("{{Project}}", project), headers=headers)
-        response = json.loads(req.json())
+        response = req.json()
         for obj in response["value"]:
             if obj["structureType"] == "area":
                 areas_list += recursive_area(obj, areas_list=areas_list)
