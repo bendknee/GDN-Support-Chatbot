@@ -25,7 +25,7 @@ def receiveMessage(request):
                 message = event['message']['argumentText']
 
             if message.lower() == 'Subscribe'.lower():
-                response = allAreasCard()
+                response = allAreasCard(getAreas())
             else:
                 message = 'You said: `%s`' % message
                 response = text(message)
