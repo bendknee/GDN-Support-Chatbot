@@ -10,9 +10,9 @@ import json
 import requests
 import traceback
 
-VSTS_PERSONAL_ACCESS_TOKEN = 'Ont7VG9rZW59fQ=='
+VSTS_PERSONAL_ACCESS_TOKEN = 'OnloaXNzeWVuNXFsanV1dG1jZGVzcjN3M292MnNhajZ1amhzcW5yN2Rza3ZreGE2cmhxNWE='
 BASE_URL = 'https://{{account_name}}.visualstudio.com/'
-ACCOUNT_NAME = 'quicstartbot'
+ACCOUNT_NAME = 'quickstartbot'
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
