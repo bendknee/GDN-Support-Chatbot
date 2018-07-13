@@ -77,7 +77,7 @@ def subscribe(parameters, space):
 
 def get_areas():
     areas = VstsArea.objects.all()
-    areas_list = list(areas)
+    areas_list = [area.__str__() for area in areas]
     return areas_list
 
 def areas_card(areas_list, method):
