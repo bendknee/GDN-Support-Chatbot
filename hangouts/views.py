@@ -68,8 +68,8 @@ def chooseArea(parameters, space):
 
 #----------------------- get all areas from VSTS -----------------------#
 def getAreas():
-    r = requests.get('https://api.github.com/events')
-    areas_json = r.json()
+    # r = requests.get('https://api.github.com/events')
+    # areas_json = r.json()
 
     areas_list = ['MyFirstProject\\team 2', 'MyFirstProject\\other area']
 
