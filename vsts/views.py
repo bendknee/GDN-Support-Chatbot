@@ -52,10 +52,12 @@ def getAreas():
     for project in getProjects():
         req = requests.get(url.replace("{{Project}}", project), headers=headers)
         response = req.json()
-        for obj in response["value"]:
-            if obj["structureType"] == "area":
-                areas_list += recursive_area(obj, areas_list=areas_list)
-
+        try:
+            for obj in response["value"]:
+                if obj["structureType"] == "area":
+                    areas_list += recursive_area(obj, areas_list=areas_list)
+        except KeyError:
+            continue
     return areas_list
 
 def recursive_area(area, parent_path='', areas_list=[]):
