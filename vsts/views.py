@@ -6,11 +6,13 @@ from django.views.decorators.csrf import csrf_exempt
 from hangouts.models import VstsArea
 import hangouts.views
 
+import base64
 import json
 import requests
 import traceback
 
-VSTS_PERSONAL_ACCESS_TOKEN = 'OnloaXNzeWVuNXFsanV1dG1jZGVzcjN3M292MnNhajZ1amhzcW5yN2Rza3ZreGE2cmhxNWE='
+VSTS_PERSONAL_ACCESS_TOKEN = 'yhissyen5qljuutmcdesr3w3ov2saj6ujhsqnr7dskvkxa6rhq5a'
+ENCODED_PAT = str(base64.b64encode(b':' + bytes(VSTS_PERSONAL_ACCESS_TOKEN, 'utf-8'))).replace("b'", '').replace("'", '')
 BASE_URL = 'https://{{account_name}}.visualstudio.com/'
 ACCOUNT_NAME = 'quickstartbot'
 
@@ -39,7 +41,7 @@ def receive_webhook(request):
 def get_projects():
     project_list = set()
     url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '_apis/projecthistory?api-version=4.1-preview.2'
-    headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
+    headers = {'Authorization': 'Basic ' + ENCODED_PAT}
     req = requests.get(url, headers=headers)
     response = req.json()
     for obj in response["value"]:
@@ -50,7 +52,7 @@ def get_projects():
 def get_all_areas():
     areas_list = []
     url = BASE_URL.replace('{{account_name}}', ACCOUNT_NAME) + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
-    headers = {'Authorization': 'Basic ' + VSTS_PERSONAL_ACCESS_TOKEN}
+    headers = {'Authorization': 'Basic ' + ENCODED_PAT}
     for project in get_projects():
         req = requests.get(url.replace("{{Project}}", project), headers=headers)
         response = req.json()
