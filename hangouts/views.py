@@ -114,4 +114,6 @@ def allAreasCard(areas_list):
         # area_widget = json.loads(area_widget)
         card['cards'][0]['sections'][0]['widgets'].append(area_widget)
 
+        print(json.dumps(card))
+
     return json.dumps(card)
