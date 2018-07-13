@@ -33,7 +33,7 @@ def receive_message(request):
                 response = areas_card(vsts.views.get_all_areas(), "subscribe")
                 print(response)
             elif message.lower() == 'Unsubscribe'.lower():
-                response = areas_card(get_areas(event['sapce']['name']), "unsubscribe")
+                response = areas_card(get_areas(event['space']['name']), "unsubscribe")
                 print(response)
             else:
                 message = 'You said: `%s`' % message
