@@ -76,7 +76,7 @@ def getAreas():
     return areas_list
 
 def allAreasCard(areas_list):
-    response = {
+    card = {
         "cards": [
             {
                 "header": {
@@ -92,7 +92,7 @@ def allAreasCard(areas_list):
         ]
     }
 
-    card = json.loads(response)
+    # card = json.loads(response)
     for area in areas_list:
         area_widget = {
                         "keyValue": {
@@ -111,7 +111,7 @@ def allAreasCard(areas_list):
                         }
                     }
 
-        area_widget = json.loads(area_widget)
+        # area_widget = json.loads(area_widget)
         card['cards']['sections']['widgets'].append(area_widget)
 
     return json.dumps(card)
