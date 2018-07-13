@@ -163,8 +163,14 @@ def generate_body(message):
                       "widgets": [
                           {
                               "keyValue": {
+                                  "topLabel": "Area Path",
+                                  "content": message['resource']['fields']['System.AreaPath']
+                              }
+                          },
+                          {
+                              "keyValue": {
                                   "topLabel": "Priority",
-                                  "content": str(message['resource']['fields']['Microsoft.VSTS.Common.Priority'])
+                                  "content": message['resource']['fields']['Microsoft.VSTS.Common.Severity']
                               }
                           },
                           {
@@ -173,6 +179,7 @@ def generate_body(message):
                                   "content": message['resource']['fields']['Microsoft.VSTS.TCM.ReproSteps']
                               }
                           }
+
                       ]
                     },
                     {
