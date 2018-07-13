@@ -89,7 +89,7 @@ def unsubscribe(parameters, space):
 
 def get_areas(space):
     space_object = HangoutsSpace.objects.get(name=space)
-    areas = space_object.VstsArea_set.all()
+    areas = space_object.vstsarea_set.all()
     areas_list = [area.__str__() for area in areas]
     return areas_list
 
