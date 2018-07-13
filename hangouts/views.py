@@ -25,7 +25,7 @@ def receiveMessage(request):
                 message = event['message']['argumentText']
 
             if message.lower() == 'Subscribe'.lower():
-                response = allAreasCard(getAreas())
+                response = getAreas()
                 print(response)
             else:
                 message = 'You said: `%s`' % message
@@ -74,7 +74,9 @@ def getAreas():
 
     areas_list = ['MyFirstProject\\team 2', 'MyFirstProject\\other area']
 
-    return areas_list
+    areas = {"cards": [{"header": {"title": "Choose area"}, "sections": [{"widgets": [{"keyValue": {"content": "MyFirstProject\\team 2", "onClick": {"action": {"actionMethodName": "chooseArea", "parameters": [{"key": "area", "value": "MyFirstProject\\team 2"}]}}}}, {"keyValue": {"content": "MyFirstProject\\other area", "onClick": {"action": {"actionMethodName": "chooseArea", "parameters": [{"key": "area", "value": "MyFirstProject\\other area"}]}}}}]}]}]}
+
+    return areas
 
 def allAreasCard(areas_list):
     card = {
