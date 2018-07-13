@@ -26,6 +26,7 @@ def receiveMessage(request):
 
             if message.lower() == 'Subscribe'.lower():
                 response = allAreasCard(getAreas())
+                print(response)
             else:
                 message = 'You said: `%s`' % message
                 response = text(message)
@@ -113,7 +114,5 @@ def allAreasCard(areas_list):
 
         # area_widget = json.loads(area_widget)
         card['cards'][0]['sections'][0]['widgets'].append(area_widget)
-
-        print(json.dumps(card))
 
     return json.dumps(card)
