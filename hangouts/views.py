@@ -60,6 +60,8 @@ def handle_action(event):
     if action['actionMethodName'] == "subscribe":
         # response as text
         response = text(subscribe(action['parameters'], event['space']))
+    elif action['actionMethodName'] == "unsubscribe":
+        response = text(unsubscribe(action['parameters'], event['space']))
     else:
         return
 
@@ -74,6 +76,16 @@ def subscribe(parameters, space):
     area_object.hangoutsSpaces.add(space_object)
 
     return "Subscribed to area " + area
+
+def unsubscribe(parameters, space):
+    area = parameters[0]['value']
+    space = space['name']
+
+    space_object, created = HangoutsSpace.objects.get_or_create(name=space) # get_or_create() returns tuple
+    area_object, created = VstsArea.objects.get_or_create(name=area)
+    area_object.hangoutsSpaces.remove(space_object)
+
+    return "Unsubscribed to area " + area
 
 def get_areas():
     areas = VstsArea.objects.all()
