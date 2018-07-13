@@ -33,7 +33,7 @@ def receive_message(request):
                 response = areas_card(vsts.views.get_all_areas(), "subscribe")
                 print(response)
             elif message.lower() == 'Unsubscribe'.lower():
-                response = areas_card(get_areas(), "unsubscribe")
+                response = areas_card(get_areas(event['sapce']['name']), "unsubscribe")
                 print(response)
             else:
                 message = 'You said: `%s`' % message
@@ -87,8 +87,9 @@ def unsubscribe(parameters, space):
 
     return "Unsubscribed to area " + area
 
-def get_areas():
-    areas = VstsArea.objects.all()
+def get_areas(space):
+    space_object = HangoutsSpace.objects.get(name=space)
+    areas = space_object.VstsArea_set.all()
     areas_list = [area.__str__() for area in areas]
     return areas_list
 
