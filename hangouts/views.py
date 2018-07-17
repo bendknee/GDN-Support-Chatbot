@@ -12,13 +12,14 @@ import vsts.views
 
 import json
 
+HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
 
 #----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
 def receive_message(request):
     event = json.loads(request.body)
     print(event)
-    if event['token'] == 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw=':
+    if event['token'] == HANGOUTS_CHAT_API_TOKEN:
         if event['type'] == 'ADDED_TO_SPACE' and event['space']['type'] == 'ROOM':
             message = 'Thanks for adding me to "%s"!' % event['space']['displayName']
             response = text(message)
@@ -39,26 +40,25 @@ def receive_message(request):
 
 
 def initial_state(event):
+    global current_function
     message = event['message']['argumentText']
     if event['space']['type'] == 'ROOM':
         message = message[1:]
 
     if message.lower() == 'subscribe':
+        current_function = initial_state
         return areas_response(vsts.views.get_all_areas(), "subscribe")
-        print(response)
     elif message.lower() == 'unsubscribe':
+        current_function = initial_state
         return areas_response(get_areas(event['space']['name']), "unsubscribe")
-        print(response)
     elif message.lower() == 'bug':
         message = 'Title:'
-        global current_function
         current_function = title_state
         return text(message)
     else:
+        current_function = initial_state
         message = 'You said: `%s`' % message
         return text(message)
-
-current_function = initial_state
 
 def title_state(event):
     message = event['message']['argumentText']
@@ -66,7 +66,7 @@ def title_state(event):
         message = message[1:]
     global current_function
     current_function = initial_state
-    return text('Your title' + message)
+    return text('Your title: ' + message)
 
 def text(message):
     return {"text": message}
@@ -131,21 +131,21 @@ def areas_response(areas_list, method):
 
     for area in areas_list:
         area_widget = {
-                        "keyValue": {
-                            "content": area,
-                            "onClick": {
-                                "action": {
-                                    "actionMethodName": method,
-                                    "parameters": [
-                                        {
-                                            "key": "area",
-                                            "value": area
-                                        }
-                                    ]
-                                }
+            "keyValue": {
+                "content": area,
+                "onClick": {
+                    "action": {
+                        "actionMethodName": method,
+                        "parameters": [
+                            {
+                                "key": "area",
+                                "value": area
                             }
-                        }
+                        ]
                     }
+                }
+            }
+        }
 
         card['cards'][0]['sections'][0]['widgets'].append(area_widget)
 
@@ -167,59 +167,61 @@ def send_message(body, space):
 
 def generate_body(message):
     body = {
-              "cards": [
-                {
-                  "header": {
-                    "title": message['fields']['System.Title'],
-                    "subtitle": "created by " + message['fields']['System.CreatedBy'],
-                    "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+      "cards": [
+        {
+          "header": {
+            "title": message['fields']['System.Title'],
+            "subtitle": "created by " + message['fields']['System.CreatedBy'],
+            "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+          },
+          "sections": [
+            {
+              "widgets": [
+                  {
+                      "keyValue": {
+                          "topLabel": "Area Path",
+                          "content": message['fields']['System.AreaPath']
+                      }
                   },
-                  "sections": [
-                    {
-                      "widgets": [
-                          {
-                              "keyValue": {
-                                  "topLabel": "Area Path",
-                                  "content": message['fields']['System.AreaPath']
-                              }
-                          },
-                          {
-                              "keyValue": {
-                                  "topLabel": "Severity",
-                                  "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                              }
-                          },
-                          {
-                              "keyValue": {
-                                  "topLabel": "Repro Steps",
-                                  "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                              }
-                          }
+                  {
+                      "keyValue": {
+                          "topLabel": "Severity",
+                          "content": message['fields']['Microsoft.VSTS.Common.Severity']
+                      }
+                  },
+                  {
+                      "keyValue": {
+                          "topLabel": "Repro Steps",
+                          "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
+                      }
+                  }
 
-                      ]
-                    },
-                    {
-                      "widgets": [
-                          {
-                              "buttons": [
-                                {
-                                  "textButton": {
-                                    "text": "MORE",
-                                    "onClick": {
-                                      "openLink": {
-                                        "url": message['_links']['html']['href']
-                                      }
-                                    }
-                                  }
-                                }
-                              ]
+              ]
+            },
+            {
+              "widgets": [
+                  {
+                      "buttons": [
+                        {
+                          "textButton": {
+                            "text": "MORE",
+                            "onClick": {
+                              "openLink": {
+                                "url": message['_links']['html']['href']
+                              }
+                            }
                           }
+                        }
                       ]
-                    }
-                  ]
-                }
+                  }
               ]
             }
+          ]
+        }
+      ]
+    }
     return body
 
+
+current_function = initial_state
 bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}
