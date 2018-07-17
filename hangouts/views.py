@@ -38,32 +38,38 @@ def receive_message(request):
     return JsonResponse(response, content_type='application/json')
 
 
-def something(event):
+def initial_state(event):
+    message = event['message']['argumentText']
     if event['space']['type'] == 'ROOM':
-        message = event['message']['argumentText'][1:]
-    else:
-        message = event['message']['argumentText']
+        message = message[1:]
 
     if message.lower() == 'subscribe':
-        response = areas_response(vsts.views.get_all_areas(), "subscribe")
+        return areas_response(vsts.views.get_all_areas(), "subscribe")
         print(response)
     elif message.lower() == 'unsubscribe':
-        response = areas_response(get_areas(event['space']['name']), "unsubscribe")
+        return areas_response(get_areas(event['space']['name']), "unsubscribe")
         print(response)
     elif message.lower() == 'bug':
         message = 'Title:'
-        response = text(message)
+        global current_function
+        current_function = title_state
+        return text(message)
     else:
         message = 'You said: `%s`' % message
-        response = text(message)
+        return text(message)
 
-    return response
+current_function = initial_state
 
-current_function = something
+def title_state(event):
+    message = event['message']['argumentText']
+    if event['space']['type'] == 'ROOM':
+        message = message[1:]
+    global current_function
+    current_function = initial_state
+    return text('Your title' + message)
 
 def text(message):
-    response = {"text": message}
-    return response
+    return {"text": message}
 
 def handle_action(event):
     action = event['action']
