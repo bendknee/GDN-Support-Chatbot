@@ -13,6 +13,7 @@ import vsts.views
 import json
 
 HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
+global current_function
 
 #----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
