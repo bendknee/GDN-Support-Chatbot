@@ -24,28 +24,11 @@ def receive_message(request):
             response = text(message)
 
         elif event['type'] == 'MESSAGE':
-            if event['space']['type'] == 'ROOM':
-                message = event['message']['argumentText'][1:]
-            else:
-                message = event['message']['argumentText']
-
-            if message.lower() == 'subscribe':
-                response = areas_response(vsts.views.get_all_areas(), "subscribe")
-                print(response)
-            elif message.lower() == 'unsubscribe':
-                response = areas_response(get_areas(event['space']['name']), "unsubscribe")
-                print(response)
-            elif message.lower() == 'bug':
-                message = 'W'
-                print(response)
-            else:
-                message = 'You said: `%s`' % message
-                response = text(message)
+            response = current_function(event)
 
         elif event['type'] == 'CARD_CLICKED':
             # response can be text or card, depending on action
             response = handle_action(event)
-
 
         else:
             return
@@ -53,6 +36,30 @@ def receive_message(request):
         return
 
     return JsonResponse(response, content_type='application/json')
+
+
+def something(event):
+    if event['space']['type'] == 'ROOM':
+        message = event['message']['argumentText'][1:]
+    else:
+        message = event['message']['argumentText']
+
+    if message.lower() == 'subscribe':
+        response = areas_response(vsts.views.get_all_areas(), "subscribe")
+        print(response)
+    elif message.lower() == 'unsubscribe':
+        response = areas_response(get_areas(event['space']['name']), "unsubscribe")
+        print(response)
+    elif message.lower() == 'bug':
+        message = 'Title:'
+        response = text(message)
+    else:
+        message = 'You said: `%s`' % message
+        response = text(message)
+
+    return response
+
+current_function = something
 
 def text(message):
     response = {"text": message}
@@ -172,7 +179,7 @@ def generate_body(message):
                           },
                           {
                               "keyValue": {
-                                  "topLabel": "Priority",
+                                  "topLabel": "Severity",
                                   "content": message['fields']['Microsoft.VSTS.Common.Severity']
                               }
                           },
