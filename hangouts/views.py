@@ -13,7 +13,7 @@ import vsts.views
 import json
 
 HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
-current_function = None
+current_state = "initial"
 
 #----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
@@ -27,9 +27,7 @@ def receive_message(request):
             response = text(message)
 
         elif event['type'] == 'MESSAGE':
-            if current_function is None:
-                current_function = initial_state
-            response = current_function(event)
+            response = current_function[current_state](event)
 
         elif event['type'] == 'CARD_CLICKED':
             # response can be text or card, depending on action
@@ -44,7 +42,7 @@ def receive_message(request):
 
 
 def initial_state(event):
-    global current_function
+    global current_function, current_state
     message = event['message']['argumentText']
     if event['space']['type'] == 'ROOM':
         message = message[1:]
@@ -55,7 +53,7 @@ def initial_state(event):
         return areas_response(get_areas(event['space']['name']), "unsubscribe")
     elif message.lower() == 'bug':
         message = 'Title:'
-        current_function = title_state
+        current_state = "title"
         return text(message)
     else:
         message = 'You said: `%s`' % message
@@ -65,9 +63,9 @@ def title_state(event):
     message = event['message']['argumentText']
     if event['space']['type'] == 'ROOM':
         message = message[1:]
-    global current_function
-    current_function = initial_state
-    return text('Your title: ' + message)
+    global current_state
+    current_state = "initial"
+    return text('Your title: `%s`' % message)
 
 def text(message):
     return {"text": message}
@@ -92,7 +90,7 @@ def subscribe(parameters, space):
     area_object, created = VstsArea.objects.get_or_create(name=area)
     area_object.hangoutsSpaces.add(space_object)
 
-    return "Subscribed to area " + area
+    return "Subscribed to area `%s`" % area
 
 def unsubscribe(parameters, space):
     area = parameters[0]['value']
@@ -102,7 +100,7 @@ def unsubscribe(parameters, space):
     area_object, created = VstsArea.objects.get_or_create(name=area)
     area_object.hangoutsSpaces.remove(space_object)
 
-    return "Unsubscribed to area " + area
+    return "Unsubscribed to area `%s`" % area
 
 def get_areas(space):
     space_object = HangoutsSpace.objects.get(name=space)
@@ -224,4 +222,5 @@ def generate_body(message):
     return body
 
 
+current_function = {"initial": initial_state, "title": title_state}
 bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}
