@@ -35,6 +35,9 @@ def receive_message(request):
             elif message.lower() == 'unsubscribe':
                 response = areas_response(get_areas(event['space']['name']), "unsubscribe")
                 print(response)
+            elif message.lower() == 'bug':
+                message = 'W'
+                print(response)
             else:
                 message = 'You said: `%s`' % message
                 response = text(message)

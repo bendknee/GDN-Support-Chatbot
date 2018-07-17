@@ -17,18 +17,24 @@ ENCODED_PAT = str(base64.b64encode(b':' + bytes(VSTS_PERSONAL_ACCESS_TOKEN, 'utf
 BASE_URL = 'https://{{account_name}}.visualstudio.com/'
 ACCOUNT_NAME = 'quickstartbot'
 
-def create_bug():
+bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}
+def create_bug(bug_dict, space):
     url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Bug?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
-    payload = [
-        {
+    payload = []
+
+    for key, value in bug_dict.items():
+        field = {
             "op": "add",
-            "path": "/fields/System.Title",
-            "value": "Sample changed"
+            "path": key,
+            "value": value
         }
-    ]
+        payload.append(field)
+
+
     req = requests.post(url.replace("{{Project}}", "MyFirstProject"), headers=headers, data=json.dumps(payload))
-    print(req.json())
+    body = hangouts.views.generate_body(req.json())
+    hangouts.views.send_message(body, space)
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
@@ -51,6 +57,8 @@ def receive_webhook(request):
     except:
         traceback.print_exc()
         return JsonResponse({"text": "failed!"}, content_type='application/json')
+
+create_bug(bug_dict, 'spaces/AAAAxvB-jOA')
 
 def get_projects():
     project_list = set()
