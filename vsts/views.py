@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from hangouts.models import VstsArea
+
 import hangouts.views
 
 import base64
@@ -15,6 +16,19 @@ VSTS_PERSONAL_ACCESS_TOKEN = 'yhissyen5qljuutmcdesr3w3ov2saj6ujhsqnr7dskvkxa6rhq
 ENCODED_PAT = str(base64.b64encode(b':' + bytes(VSTS_PERSONAL_ACCESS_TOKEN, 'utf-8'))).replace("b'", '').replace("'", '')
 BASE_URL = 'https://{{account_name}}.visualstudio.com/'
 ACCOUNT_NAME = 'quickstartbot'
+
+def create_bug():
+    url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Bug?api-version=4.1'
+    headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
+    payload = [
+        {
+            "op": "add",
+            "path": "/fields/System.Title",
+            "value": "Sample changed"
+        }
+    ]
+    req = requests.post(url.replace("{{Project}}", "MyFirstProject"), headers=headers, data=json.dumps(payload))
+    print(req.json())
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
