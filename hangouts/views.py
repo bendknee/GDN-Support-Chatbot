@@ -223,5 +223,4 @@ def generate_body(message):
     return body
 
 
-current_function = None
 bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}
