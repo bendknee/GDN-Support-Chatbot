@@ -17,6 +17,7 @@ HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
 #----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
 def receive_message(request):
+    global current_function
     event = json.loads(request.body)
     print(event)
     if event['token'] == HANGOUTS_CHAT_API_TOKEN:
@@ -25,6 +26,8 @@ def receive_message(request):
             response = text(message)
 
         elif event['type'] == 'MESSAGE':
+            if current_function is None:
+                current_function = initial_state
             response = current_function(event)
 
         elif event['type'] == 'CARD_CLICKED':
@@ -46,17 +49,14 @@ def initial_state(event):
         message = message[1:]
 
     if message.lower() == 'subscribe':
-        current_function = initial_state
         return areas_response(vsts.views.get_all_areas(), "subscribe")
     elif message.lower() == 'unsubscribe':
-        current_function = initial_state
         return areas_response(get_areas(event['space']['name']), "unsubscribe")
     elif message.lower() == 'bug':
         message = 'Title:'
         current_function = title_state
         return text(message)
     else:
-        current_function = initial_state
         message = 'You said: `%s`' % message
         return text(message)
 
@@ -223,5 +223,5 @@ def generate_body(message):
     return body
 
 
-current_function = initial_state
+current_function = None
 bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}
