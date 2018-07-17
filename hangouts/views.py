@@ -157,8 +157,8 @@ def generate_body(message):
               "cards": [
                 {
                   "header": {
-                    "title": message['resource']['fields']['System.Title'],
-                    "subtitle": "created by " + message['resource']['fields']['System.CreatedBy'],
+                    "title": message['fields']['System.Title'],
+                    "subtitle": "created by " + message['fields']['System.CreatedBy'],
                     "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
                   },
                   "sections": [
@@ -167,19 +167,19 @@ def generate_body(message):
                           {
                               "keyValue": {
                                   "topLabel": "Area Path",
-                                  "content": message['resource']['fields']['System.AreaPath']
+                                  "content": message['fields']['System.AreaPath']
                               }
                           },
                           {
                               "keyValue": {
                                   "topLabel": "Priority",
-                                  "content": message['resource']['fields']['Microsoft.VSTS.Common.Severity']
+                                  "content": message['fields']['Microsoft.VSTS.Common.Severity']
                               }
                           },
                           {
                               "keyValue": {
                                   "topLabel": "Repro Steps",
-                                  "content": message['resource']['fields']['Microsoft.VSTS.TCM.ReproSteps']
+                                  "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
                               }
                           }
 
@@ -194,7 +194,7 @@ def generate_body(message):
                                     "text": "MORE",
                                     "onClick": {
                                       "openLink": {
-                                        "url": message['resource']['_links']['html']['href']
+                                        "url": message['_links']['html']['href']
                                       }
                                     }
                                   }
@@ -208,3 +208,5 @@ def generate_body(message):
               ]
             }
     return body
+
+bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}

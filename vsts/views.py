@@ -17,7 +17,8 @@ ENCODED_PAT = str(base64.b64encode(b':' + bytes(VSTS_PERSONAL_ACCESS_TOKEN, 'utf
 BASE_URL = 'https://{{account_name}}.visualstudio.com/'
 ACCOUNT_NAME = 'quickstartbot'
 
-bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}
+
+#----------------------- post bug to VSTS -----------------------#
 def create_bug(bug_dict, space):
     url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Bug?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
@@ -42,7 +43,7 @@ def receive_webhook(request):
     try:
         event = json.loads(request.body)
 
-        body = hangouts.views.generate_body(event)
+        body = hangouts.views.generate_body(event['resource'])
 
         # get all spaces subscribed to area
 
@@ -58,7 +59,7 @@ def receive_webhook(request):
         traceback.print_exc()
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
-create_bug(bug_dict, 'spaces/AAAAxvB-jOA')
+
 
 def get_projects():
     project_list = set()
