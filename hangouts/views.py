@@ -12,13 +12,15 @@ import vsts.views
 
 import json
 
+HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
 
 #----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
 def receive_message(request):
+    global current_function
     event = json.loads(request.body)
     print(event)
-    if event['token'] == 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw=':
+    if event['token'] == HANGOUTS_CHAT_API_TOKEN:
         if event['type'] == 'ADDED_TO_SPACE' and event['space']['type'] == 'ROOM':
             message = 'Thanks for adding me to "%s"!' % event['space']['displayName']
             response = text(message)
@@ -46,7 +48,6 @@ def receive_message(request):
         elif event['type'] == 'CARD_CLICKED':
             # response can be text or card, depending on action
             response = handle_action(event)
-
         else:
             return
     else:
@@ -54,36 +55,8 @@ def receive_message(request):
 
     return JsonResponse(response, content_type='application/json')
 
-# def something(event):
-#     if event['space']['type'] == 'ROOM':
-#         message = event['message']['argumentText'][1:]
-#     else:
-#         message = event['message']['argumentText']
-#
-#     if message.lower() == 'subscribe':
-#         response = areas_response(vsts.views.get_all_areas(), "subscribe")
-#         print(response)
-#     elif message.lower() == 'unsubscribe':
-#         response = areas_response(get_areas(event['space']['name']), "unsubscribe")
-#         print(response)
-#     elif message.lower() == 'bug':
-#         message = 'Title:'
-#         response = text(message)
-#         current_function = receive_title
-#     else:
-#         message = 'You said: `%s`' % message
-#         response = text(message)
-#
-#     return response
-
-# def receive_title(message):
-#     return "something"
-
-# current_function = something
-
 def text(message):
-    response = {"text": message}
-    return response
+    return {"text": message}
 
 def handle_action(event):
     action = event['action']
@@ -105,7 +78,7 @@ def subscribe(parameters, space):
     area_object, created = VstsArea.objects.get_or_create(name=area)
     area_object.hangoutsSpaces.add(space_object)
 
-    return "Subscribed to area " + area
+    return "Subscribed to area `%s`" % area
 
 def unsubscribe(parameters, space):
     area = parameters[0]['value']
@@ -115,7 +88,7 @@ def unsubscribe(parameters, space):
     area_object, created = VstsArea.objects.get_or_create(name=area)
     area_object.hangoutsSpaces.remove(space_object)
 
-    return "Unsubscribed to area " + area
+    return "Unsubscribed to area `%s`" % area
 
 def get_areas(space):
     space_object = HangoutsSpace.objects.get(name=space)
@@ -145,21 +118,21 @@ def areas_response(areas_list, method):
 
     for area in areas_list:
         area_widget = {
-                        "keyValue": {
-                            "content": area,
-                            "onClick": {
-                                "action": {
-                                    "actionMethodName": method,
-                                    "parameters": [
-                                        {
-                                            "key": "area",
-                                            "value": area
-                                        }
-                                    ]
-                                }
+            "keyValue": {
+                "content": area,
+                "onClick": {
+                    "action": {
+                        "actionMethodName": method,
+                        "parameters": [
+                            {
+                                "key": "area",
+                                "value": area
                             }
-                        }
+                        ]
                     }
+                }
+            }
+        }
 
         card['cards'][0]['sections'][0]['widgets'].append(area_widget)
 
@@ -181,59 +154,59 @@ def send_message(body, space):
 
 def generate_body(message):
     body = {
-              "cards": [
-                {
-                  "header": {
-                    "title": message['fields']['System.Title'],
-                    "subtitle": "created by " + message['fields']['System.CreatedBy'],
-                    "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+      "cards": [
+        {
+          "header": {
+            "title": message['fields']['System.Title'],
+            "subtitle": "created by " + message['fields']['System.CreatedBy'],
+            "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+          },
+          "sections": [
+            {
+              "widgets": [
+                  {
+                      "keyValue": {
+                          "topLabel": "Area Path",
+                          "content": message['fields']['System.AreaPath']
+                      }
                   },
-                  "sections": [
-                    {
-                      "widgets": [
-                          {
-                              "keyValue": {
-                                  "topLabel": "Area Path",
-                                  "content": message['fields']['System.AreaPath']
-                              }
-                          },
-                          {
-                              "keyValue": {
-                                  "topLabel": "Severity",
-                                  "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                              }
-                          },
-                          {
-                              "keyValue": {
-                                  "topLabel": "Repro Steps",
-                                  "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                              }
-                          }
+                  {
+                      "keyValue": {
+                          "topLabel": "Severity",
+                          "content": message['fields']['Microsoft.VSTS.Common.Severity']
+                      }
+                  },
+                  {
+                      "keyValue": {
+                          "topLabel": "Repro Steps",
+                          "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
+                      }
+                  }
 
-                      ]
-                    },
-                    {
-                      "widgets": [
-                          {
-                              "buttons": [
-                                {
-                                  "textButton": {
-                                    "text": "MORE",
-                                    "onClick": {
-                                      "openLink": {
-                                        "url": message['_links']['html']['href']
-                                      }
-                                    }
-                                  }
-                                }
-                              ]
+              ]
+            },
+            {
+              "widgets": [
+                  {
+                      "buttons": [
+                        {
+                          "textButton": {
+                            "text": "MORE",
+                            "onClick": {
+                              "openLink": {
+                                "url": message['_links']['html']['href']
+                              }
+                            }
                           }
+                        }
                       ]
-                    }
-                  ]
-                }
+                  }
               ]
             }
+          ]
+        }
+      ]
+    }
     return body
 
 bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}
