@@ -24,7 +24,24 @@ def receive_message(request):
             response = text(message)
 
         elif event['type'] == 'MESSAGE':
-            response = current_function(event)
+            if event['space']['type'] == 'ROOM':
+                message = event['message']['argumentText'][1:]
+            else:
+                message = event['message']['argumentText']
+
+            if message.lower() == 'subscribe':
+                response = areas_response(vsts.views.get_all_areas(), "subscribe")
+                print(response)
+            elif message.lower() == 'unsubscribe':
+                response = areas_response(get_areas(event['space']['name']), "unsubscribe")
+                print(response)
+            elif message.lower() == 'bug':
+                message = 'Title:'
+                response = text(message)
+                current_function = receive_title
+            else:
+                message = 'You said: `%s`' % message
+                response = text(message)
 
         elif event['type'] == 'CARD_CLICKED':
             # response can be text or card, depending on action
@@ -37,29 +54,32 @@ def receive_message(request):
 
     return JsonResponse(response, content_type='application/json')
 
+# def something(event):
+#     if event['space']['type'] == 'ROOM':
+#         message = event['message']['argumentText'][1:]
+#     else:
+#         message = event['message']['argumentText']
+#
+#     if message.lower() == 'subscribe':
+#         response = areas_response(vsts.views.get_all_areas(), "subscribe")
+#         print(response)
+#     elif message.lower() == 'unsubscribe':
+#         response = areas_response(get_areas(event['space']['name']), "unsubscribe")
+#         print(response)
+#     elif message.lower() == 'bug':
+#         message = 'Title:'
+#         response = text(message)
+#         current_function = receive_title
+#     else:
+#         message = 'You said: `%s`' % message
+#         response = text(message)
+#
+#     return response
 
-def something(event):
-    if event['space']['type'] == 'ROOM':
-        message = event['message']['argumentText'][1:]
-    else:
-        message = event['message']['argumentText']
+# def receive_title(message):
+#     return "something"
 
-    if message.lower() == 'subscribe':
-        response = areas_response(vsts.views.get_all_areas(), "subscribe")
-        print(response)
-    elif message.lower() == 'unsubscribe':
-        response = areas_response(get_areas(event['space']['name']), "unsubscribe")
-        print(response)
-    elif message.lower() == 'bug':
-        message = 'Title:'
-        response = text(message)
-    else:
-        message = 'You said: `%s`' % message
-        response = text(message)
-
-    return response
-
-current_function = something
+# current_function = something
 
 def text(message):
     response = {"text": message}
