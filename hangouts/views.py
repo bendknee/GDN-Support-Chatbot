@@ -38,7 +38,7 @@ def receive_message(request):
             elif message.lower() == 'bug':
                 message = 'Title:'
                 response = text(message)
-                current_function = receive_title
+                # current_function = receive_title
             else:
                 message = 'You said: `%s`' % message
                 response = text(message)
