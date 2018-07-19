@@ -15,7 +15,8 @@ import json
 HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
 current_state = "initial"
 
-#----------------------- receive message from Hangouts -----------------------#
+
+# ----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
 def receive_message(request):
     global current_function
@@ -59,6 +60,7 @@ def initial_state(event):
         message = 'You said: `%s`' % message
         return text(message)
 
+
 def title_state(event):
     message = event['message']['argumentText']
     if event['space']['type'] == 'ROOM':
@@ -67,8 +69,10 @@ def title_state(event):
     current_state = "initial"
     return text('Your title: `%s`' % message)
 
+
 def text(message):
     return {"text": message}
+
 
 def handle_action(event):
     action = event['action']
@@ -82,31 +86,35 @@ def handle_action(event):
 
     return response
 
+
 def subscribe(parameters, space):
     area = parameters[0]['value']
     space = space['name']
 
-    space_object, created = HangoutsSpace.objects.get_or_create(name=space) # get_or_create() returns tuple
+    space_object, created = HangoutsSpace.objects.get_or_create(name=space)  # get_or_create() returns tuple
     area_object, created = VstsArea.objects.get_or_create(name=area)
     area_object.hangoutsSpaces.add(space_object)
 
     return "Subscribed to area `%s`" % area
 
+
 def unsubscribe(parameters, space):
     area = parameters[0]['value']
     space = space['name']
 
-    space_object, created = HangoutsSpace.objects.get_or_create(name=space) # get_or_create() returns tuple
+    space_object, created = HangoutsSpace.objects.get_or_create(name=space)  # get_or_create() returns tuple
     area_object, created = VstsArea.objects.get_or_create(name=area)
     area_object.hangoutsSpaces.remove(space_object)
 
     return "Unsubscribed to area `%s`" % area
+
 
 def get_areas(space):
     space_object = HangoutsSpace.objects.get(name=space)
     areas = space_object.vstsarea_set.all()
     areas_list = [area.__str__() for area in areas]
     return areas_list
+
 
 def areas_response(areas_list, method):
     if areas_list == []:
@@ -150,6 +158,7 @@ def areas_response(areas_list, method):
 
     return card
 
+
 def send_message(body, space):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -164,60 +173,61 @@ def send_message(body, space):
 
     print(resp)
 
+
 def generate_body(message):
     body = {
-      "cards": [
-        {
-          "header": {
-            "title": message['fields']['System.Title'],
-            "subtitle": "created by " + message['fields']['System.CreatedBy'],
-            "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
-          },
-          "sections": [
+        "cards": [
             {
-              "widgets": [
-                  {
-                      "keyValue": {
-                          "topLabel": "Area Path",
-                          "content": message['fields']['System.AreaPath']
-                      }
-                  },
-                  {
-                      "keyValue": {
-                          "topLabel": "Severity",
-                          "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                      }
-                  },
-                  {
-                      "keyValue": {
-                          "topLabel": "Repro Steps",
-                          "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                      }
-                  }
-
-              ]
-            },
-            {
-              "widgets": [
-                  {
-                      "buttons": [
-                        {
-                          "textButton": {
-                            "text": "MORE",
-                            "onClick": {
-                              "openLink": {
-                                "url": message['_links']['html']['href']
-                              }
+                "header": {
+                    "title": message['fields']['System.Title'],
+                    "subtitle": "created by " + message['fields']['System.CreatedBy'],
+                    "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+                },
+                "sections": [
+                    {
+                        "widgets": [
+                            {
+                                "keyValue": {
+                                    "topLabel": "Area Path",
+                                    "content": message['fields']['System.AreaPath']
+                                }
+                            },
+                            {
+                                "keyValue": {
+                                    "topLabel": "Severity",
+                                    "content": message['fields']['Microsoft.VSTS.Common.Severity']
+                                }
+                            },
+                            {
+                                "keyValue": {
+                                    "topLabel": "Repro Steps",
+                                    "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
+                                }
                             }
-                          }
-                        }
-                      ]
-                  }
-              ]
+
+                        ]
+                    },
+                    {
+                        "widgets": [
+                            {
+                                "buttons": [
+                                    {
+                                        "textButton": {
+                                            "text": "MORE",
+                                            "onClick": {
+                                                "openLink": {
+                                                    "url": message['_links']['html']['href']
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
             }
-          ]
-        }
-      ]
+        ]
     }
     return body
 
