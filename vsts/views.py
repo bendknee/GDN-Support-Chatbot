@@ -12,14 +12,14 @@ import json
 import requests
 import traceback
 
-VSTS_PERSONAL_TOKEN = 'yhissyen5qljuutmcdesr3w3ov2saj6ujhsqnr7dskvkxa6rhq5a'
-ENCODED_PAT = str(base64.b64encode(b':' + bytes(VSTS_PERSONAL_TOKEN, 'utf-8'))).replace("b'", '').replace("'", '')
+VSTS_PERSONAL_ACCESS_TOKEN = 'yhissyen5qljuutmcdesr3w3ov2saj6ujhsqnr7dskvkxa6rhq5a'
+ENCODED_PAT = str(base64.b64encode(b':' + bytes(VSTS_PERSONAL_ACCESS_TOKEN, 'utf-8'))).replace("b'", '').replace("'", '')
 BASE_URL = 'https://{{account_name}}.visualstudio.com/'
 ACCOUNT_NAME = 'quickstartbot'
 
 
-# ----------------------- post bug to VSTS -----------------------#
-def create_bug(bug_dict, space):
+#----------------------- post bug to VSTS -----------------------#
+def create_work_item(bug_dict, space):
     url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Bug?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
     payload = []
@@ -32,18 +32,17 @@ def create_bug(bug_dict, space):
         }
         payload.append(field)
 
+
     req = requests.post(url.replace("{{Project}}", "MyFirstProject"), headers=headers, data=json.dumps(payload))
-    body = hangouts.views.generate_body(req.json())
-    hangouts.views.send_message(body, space)
+    return req.json()
 
-
-# ----------------------- receive webhook from VSTS -----------------------#
+#----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
 def receive_webhook(request):
     try:
         event = json.loads(request.body)
 
-        body = hangouts.views.generate_body(event['resource'])
+        body = hangouts.views.generate_bug(event['resource'])
 
         # get all spaces subscribed to area
 
@@ -60,6 +59,7 @@ def receive_webhook(request):
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
 
+
 def get_projects():
     project_list = set()
     url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '_apis/projecthistory?api-version=4.1-preview.2'
@@ -70,12 +70,10 @@ def get_projects():
         project_list.add(obj["name"])
     return project_list
 
-
-# ----------------------- get all areas from VSTS -----------------------#
+#----------------------- get all areas from VSTS -----------------------#
 def get_all_areas():
     areas_list = []
-    url = BASE_URL.replace('{{account_name}}',
-                           ACCOUNT_NAME) + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
+    url = BASE_URL.replace('{{account_name}}', ACCOUNT_NAME) + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT}
     for project in get_projects():
         req = requests.get(url.replace("{{Project}}", project), headers=headers)
@@ -87,7 +85,6 @@ def get_all_areas():
         except KeyError:
             continue
     return areas_list
-
 
 def recursive_path_maker(area, parent_path='', areas_list=None):
     if areas_list is None:
