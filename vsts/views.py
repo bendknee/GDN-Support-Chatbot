@@ -19,7 +19,7 @@ ACCOUNT_NAME = 'quickstartbot'
 
 
 #----------------------- post bug to VSTS -----------------------#
-def create_bug(bug_dict, space):
+def create_work_item(bug_dict, space):
     url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Bug?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
     payload = []
@@ -34,8 +34,7 @@ def create_bug(bug_dict, space):
 
 
     req = requests.post(url.replace("{{Project}}", "MyFirstProject"), headers=headers, data=json.dumps(payload))
-    body = hangouts.views.generate_body(req.json())
-    hangouts.views.send_message(body, space)
+    return req.json()
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
@@ -43,7 +42,7 @@ def receive_webhook(request):
     try:
         event = json.loads(request.body)
 
-        body = hangouts.views.generate_body(event['resource'])
+        body = hangouts.views.generate_bug(event['resource'])
 
         # get all spaces subscribed to area
 
@@ -98,4 +97,3 @@ def recursive_path_maker(area, parent_path='', areas_list=None):
     else:
         areas_list.append((parent_path + area["name"]))
     return areas_list
-

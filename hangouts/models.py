@@ -15,7 +15,7 @@ class HangoutsSpace(models.Model):
     name = models.CharField(max_length=30)
     hardware_support = models.ForeignKey(HardwareSupport, on_delete=models.CASCADE, null=True)
     software_support = models.ForeignKey(SoftwareSupport, on_delete=models.CASCADE, null=True)
-    state = models.CharField
+    state = models.CharField(default='initial_state')
 
     def __str__(self):
         return self.name
