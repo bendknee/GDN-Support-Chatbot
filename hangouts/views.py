@@ -25,6 +25,11 @@ def receive_message(request):
             message = 'Thanks for adding me to "%s"!' % event['space']['displayName']
             response = text(message)
 
+        space_object, created = HangoutsSpace.objects.get_or_create(name=event['space']['name'])
+        state = space_object.state
+
+        elif state == ''
+
         elif event['type'] == 'MESSAGE':
             if event['space']['type'] == 'ROOM':
                 message = event['message']['argumentText'][1:]
@@ -37,10 +42,8 @@ def receive_message(request):
             elif message.lower() == 'unsubscribe':
                 response = areas_response(get_areas(event['space']['name']), "unsubscribe")
                 print(response)
-            elif message.lower() == 'bug':
-                message = 'Title:'
-                response = text(message)
-                # current_function = receive_title
+            elif message.lower() == 'support':
+                response = support_card()
             else:
                 message = 'You said: `%s`' % message
                 response = text(message)
@@ -65,10 +68,16 @@ def handle_action(event):
         response = text(subscribe(action['parameters'], event['space']))
     elif action['actionMethodName'] == "unsubscribe":
         response = text(unsubscribe(action['parameters'], event['space']))
+    elif action['actionMethodName'] == "choose_support_type":
+
+        response = text('Please enter title')
+
     else:
         return
 
     return response
+
+def hardware_support:
 
 def subscribe(parameters, space):
     area = parameters[0]['value']
@@ -209,4 +218,53 @@ def generate_body(message):
     }
     return body
 
-bug_dict = {'/fields/System.Title': 'Titlenya', '/fields/Microsoft.VSTS.TCM.ReproSteps': 'Reprostepsnya'}
+def support_card():
+    card = {
+        "cards": [
+            {
+                "header": {
+                    "title": "Choose area"
+                },
+                "sections": [
+                    {
+                        "widgets": [
+                            {
+                                "keyValue": {
+                                    "content": "Hardware Support",
+                                    "onClick": {
+                                        "action": {
+                                            "actionMethodName": "choose_support_type",
+                                            "parameters": [
+                                                {
+                                                    "key": "type",
+                                                    "value": "Hardware Support"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "keyValue": {
+                                    "content": "Software Support",
+                                    "onClick": {
+                                        "action": {
+                                            "actionMethodName": "choose_support_type",
+                                            "parameters": [
+                                                {
+                                                    "key": "type",
+                                                    "value": "Software Support"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+    return card
