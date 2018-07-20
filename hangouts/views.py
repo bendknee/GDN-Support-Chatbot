@@ -169,8 +169,8 @@ def generate_body(message):
                         "topLabel": "Area Path",
                         "content": message['fields']['System.AreaPath'],
                         "button": {
-                            "textButton": {
-                                "text": "Edit",
+                            "imageButton": {
+                                "iconUrl": "https://www.freeiconspng.com/uploads/edit-editor-pen-pencil-write-icon--4.png",
                                 "onClick": {
                                     "action": {
                                         "actionMethodName": "Edit area path",
