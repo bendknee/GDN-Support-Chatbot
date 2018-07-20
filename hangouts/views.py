@@ -165,13 +165,12 @@ def generate_body(message):
             {
               "widgets": [
                   {
-                        "keyValue": {
-                          "topLabel": "Area Path",
-                          "content": message['fields']['System.AreaPath']
-                        },
+                    "keyValue": {
+                        "topLabel": "Area Path",
+                        "content": message['fields']['System.AreaPath'],
                         "button": {
                             "textButton": {
-                               "text": "Edit",
+                                "text": "Edit",
                                 "onClick": {
                                     "action": {
                                         "actionMethodName": "Edit area path",
@@ -183,18 +182,17 @@ def generate_body(message):
                                         ]
                                     }
                                 }
-                              }
-                         }
-
+                            }
+                        }
+                    }
                   },
                   {
-                        "keyValue": {
-                          "topLabel": "Severity",
-                          "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                        },
+                    "keyValue": {
+                        "topLabel": "Severity",
+                        "content": message['fields']['Microsoft.VSTS.Common.Severity'],
                         "button": {
                             "textButton": {
-                               "text": "Edit",
+                                "text": "Edit",
                                 "onClick": {
                                     "action": {
                                         "actionMethodName": "Edit area path",
@@ -206,17 +204,17 @@ def generate_body(message):
                                         ]
                                     }
                                 }
-                              }
-                         }
+                            }
+                        }
+                    }
                   },
                   {
-                        "keyValue": {
-                          "topLabel": "Repro Steps",
-                          "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                        },
+                    "keyValue": {
+                        "topLabel": "Repro Steps",
+                        "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps'],
                         "button": {
                             "textButton": {
-                               "text": "Edit",
+                                "text": "Edit",
                                 "onClick": {
                                     "action": {
                                         "actionMethodName": "Edit area path",
@@ -228,8 +226,9 @@ def generate_body(message):
                                         ]
                                     }
                                 }
-                              }
-                         }
+                            }
+                        }
+                    }
                   }
 
               ]
