@@ -191,8 +191,8 @@ def generate_body(message):
                         "topLabel": "Severity",
                         "content": message['fields']['Microsoft.VSTS.Common.Severity'],
                         "button": {
-                            "textButton": {
-                                "text": "Edit",
+                            "imageButton": {
+                                "iconUrl": "https://www.freeiconspng.com/uploads/edit-editor-pen-pencil-write-icon--4.png",
                                 "onClick": {
                                     "action": {
                                         "actionMethodName": "Edit area path",
@@ -213,8 +213,8 @@ def generate_body(message):
                         "topLabel": "Repro Steps",
                         "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps'],
                         "button": {
-                            "textButton": {
-                                "text": "Edit",
+                            "imageButton": {
+                                "iconUrl": "https://www.freeiconspng.com/uploads/edit-editor-pen-pencil-write-icon--4.png",
                                 "onClick": {
                                     "action": {
                                         "actionMethodName": "Edit area path",
