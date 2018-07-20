@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from .states import *
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from googleapiclient.discovery import build
@@ -17,16 +18,15 @@ HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
 
 # ----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
-def receive_message(request):
-    global current_function
-    event = json.loads(request.body)
+def receive_message(payload):
+    event = json.loads(payload.body)
     print(event)
     if event['token'] == HANGOUTS_CHAT_API_TOKEN:
         user_object, created = User.objects.get_or_create(name=event['space']['name'])
-        state = user_object.state
+        state = states_list[user_object.state]
         if event['type'] == 'ADDED_TO_SPACE' and event['space']['type'] == 'ROOM':
             message = 'Thanks for adding me to "%s"!' % event['space']['displayName']
-            response = text(message)
+            response = text_format(message)
 
         elif event['type'] == 'MESSAGE':
             # room or direct message
@@ -34,12 +34,13 @@ def receive_message(request):
                 message = event['message']['argumentText'][1:]
             else:
                 message = event['message']['argumentText']
-
-            response = current_function[state](message, event)
+            if state.is_waiting_text():
+                response = locals()[state.label()](message, event)
 
         elif event['type'] == 'CARD_CLICKED':
-            # response can be text or card, depending on action
-            response = handle_action(event)
+            if not state.is_waiting_text():
+                # response can be text or card, depending on action
+                response = handle_action(event)
         else:
             return
     else:
@@ -51,40 +52,43 @@ def receive_message(request):
 def initial_state(message, event):
     if message.lower() == 'support':
         response = generate_choices("Choose work item type", ["Hardware Support", "Software Support"], "choose_type")
+        change_state(event['space']['name'])
     else:
         message = 'You said: `%s`' % message
-        response = text(message)
+        response = text_format(message)
 
     return response
 
 
-def text(message):
+def text_format(message):
     return {"text": message}
 
 
 def handle_action(event):
     action = event['action']
     if action['actionMethodName'] == "choose_type":
-        work_item_choice(action['parameters'][0]['value'], event['space'])
-        response = text("Please enter title")
-    elif action['actionMethodName'] == "hardware_type":
-        response = set_hardware_type(action['parameters'][0]['value'], event['space'])
+        chosen = work_item_choice(action['parameters'][0]['value'], event['space'])
+        response = text_format("You've chosen '%s'\nPlease enter title" % chosen)
+    # elif action['actionMethodName'] == "hardware_type":
+    #     response = set_hardware_type(action['parameters'][0]['value'], event['space'])
     elif action['actionMethodName'] == "3rd_party_app":
         return
 
+    change_state(event['space']['name'])
     return response
 
 
 # ----------------------- create work item -----------------------#
-def work_item_choice(type, space):
-    if type == 'Hardware Support':
+def work_item_choice(item_type, space):
+    if item_type == 'Hardware Support':
         hardware_object, created = HardwareSupport.objects.create()
         User.objects.update_or_create(name=space['name'], state='title',
                                       work_item=hardware_object)
-    elif type == 'Software Support':
+    elif item_type == 'Software Support':
         software_object, created = SoftwareSupport.objects.create()
         User.objects.update_or_create(name=space['name'], state='title',
                                       work_item=software_object)
+    return item_type
 
 
 def set_title(message, event):
@@ -94,36 +98,36 @@ def set_title(message, event):
     work_item.title = message
     work_item.save()
 
-    User.objects.update_or_create(name=event['space']['name'], state='description')  # update state
+    change_state(event['space']['name'])
     # hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
     # response = generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
 
-    return text("Please enter description")
+    return text_format("Please enter description")
 
 
 def set_description(message, event):
-    space_object, created = User.objects.get_or_create(name=event['space']['name'])
+    user_object, created = User.objects.get_or_create(name=event['space']['name'])
 
-    hardware_object = space_object.hardware_support
-    hardware_object.description = message
-    hardware_object.save()
+    work_item = user_object.work_item
+    work_item.description = message
+    work_item.save()
 
-    User.objects.update_or_create(name=event['space']['name'], state='initial')  # update state
+    change_state(event['space']['name'])
 
-    return
+    return text_format("yeahhhhhhhhh")
 
 
-def set_hardware_type(type, space):
-    space_object, created = User.objects.get_or_create(name=space['name'])
-
-    hardware_object = space_object.hardware_support
-    hardware_object.hardware_type = type
-    hardware_object.save()
-
-    User.objects.update_or_create(name=space['name'], state='hardware_desc_state')  # update state
-    response = text("Please enter description")
-
-    return response
+# def set_hardware_type(type, space):
+#     space_object, created = User.objects.get_or_create(name=space['name'])
+#
+#     hardware_object = space_object.hardware_support
+#     hardware_object.hardware_type = type
+#     hardware_object.save()
+#
+#     User.objects.update_or_create(name=space['name'], state='hardware_desc_state')  # update state
+#     response = text_format("Please enter description")
+#
+#     return response
 
 
 # ----------------------- send message asynchronously -----------------------#
@@ -134,7 +138,6 @@ def send_message(body, space):
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
-    body = body
     resp = chat.spaces().messages().create(parent=space, body=body).execute()
 
     print(resp)
@@ -143,7 +146,7 @@ def send_message(body, space):
 # ----------------------- card generators -----------------------#
 def generate_choices(title, list, method):
     if list == [] and method == 'unsubscribe':
-        return text("You did not subscribe to any area.")
+        return text_format("You did not subscribe to any area.")
 
     card = {
         "cards": [
@@ -298,7 +301,3 @@ def generate_hardware_support(message):
         ]
     }
     return body
-
-
-current_function = {"initial": initial_state, "title": set_title,
-                    "description": set_description}
