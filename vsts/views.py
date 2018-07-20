@@ -33,7 +33,7 @@ def create_work_item(bug_dict, space):
         payload.append(field)
 
 
-    req = requests.post(url.replace("{{Project}}", "MyFirstProject"), headers=headers, data=json.dumps(payload))
+    req = requests.post(url.replace("{{Project}}", "Support"), headers=headers, data=json.dumps(payload))
     return req.json()
 
 #----------------------- receive webhook from VSTS -----------------------#
