@@ -165,22 +165,71 @@ def generate_body(message):
             {
               "widgets": [
                   {
-                      "keyValue": {
+                        "keyValue": {
                           "topLabel": "Area Path",
                           "content": message['fields']['System.AreaPath']
-                      }
+                        },
+                        "button": {
+                            "textButton": {
+                               "text": "Edit",
+                                "onClick": {
+                                    "action": {
+                                        "actionMethodName": "Edit area path",
+                                        "parameters": [
+                                            {
+                                                "key": "sunny summer!",
+                                                "value": "hey"
+                                            }
+                                        ]
+                                    }
+                                }
+                              }
+                         }
+
                   },
                   {
-                      "keyValue": {
+                        "keyValue": {
                           "topLabel": "Severity",
                           "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                      }
+                        },
+                        "button": {
+                            "textButton": {
+                               "text": "Edit",
+                                "onClick": {
+                                    "action": {
+                                        "actionMethodName": "Edit area path",
+                                        "parameters": [
+                                            {
+                                                "key": "sunny summer!",
+                                                "value": "hey"
+                                            }
+                                        ]
+                                    }
+                                }
+                              }
+                         }
                   },
                   {
-                      "keyValue": {
+                        "keyValue": {
                           "topLabel": "Repro Steps",
                           "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                      }
+                        },
+                        "button": {
+                            "textButton": {
+                               "text": "Edit",
+                                "onClick": {
+                                    "action": {
+                                        "actionMethodName": "Edit area path",
+                                        "parameters": [
+                                            {
+                                                "key": "sunny summer!",
+                                                "value": "hey"
+                                            }
+                                        ]
+                                    }
+                                }
+                              }
+                         }
                   }
 
               ]
@@ -191,7 +240,7 @@ def generate_body(message):
                       "buttons": [
                         {
                           "textButton": {
-                            "text": "MORE",
+                            "text": "SAVE",
                             "onClick": {
                               "openLink": {
                                 "url": message['_links']['html']['href']
