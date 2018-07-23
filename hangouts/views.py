@@ -36,7 +36,7 @@ def receive_message(payload):
                 message = event['message']['argumentText']
             if state.is_waiting_text():
                 print(state.label())
-                response = locals()[state.label()](message, event)
+                response = globals()[state.label()](message, event)
             else:
                 response = text_format("Please complete above Card action first")
 
