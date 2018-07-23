@@ -91,7 +91,6 @@ def work_item_choice(item_type, space):
         work_item_object = SoftwareSupport.objects.create()
 
     user_object.work_item = work_item_object
-    user_object.state = 'title'
     user_object.save()
     return item_type
 
