@@ -127,6 +127,7 @@ def display_work_item(work_item):
     image = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
     # kalo ini honestly gatau harus gimana
     fields_dict = {'Description': work_item.description}
+    print(work_item.__dict__)
     return generate_edit_work_item(work_item, image, work_item.__dict__)
 
 def save_work_item(event):
