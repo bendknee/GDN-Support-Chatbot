@@ -193,7 +193,7 @@ def generate_choices(title, list, method):
     return card
 
 
-def generate_bug(message):
+def generate_work_item(message, image, dict):
     body = {
         "cards": [
             {

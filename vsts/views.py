@@ -42,7 +42,8 @@ def receive_webhook(request):
     try:
         event = json.loads(request.body)
 
-        body = hangouts.views.generate_bug(event['resource'])
+        list = []
+        body = hangouts.views.generate_bug(event['resource'], "https://www.iconspng.com/uploads/bad-bug/bad-bug.png", list)
 
         # get all spaces subscribed to area
 
