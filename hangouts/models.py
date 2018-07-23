@@ -18,7 +18,7 @@ class SoftwareSupport(WorkItem):
 class User(models.Model):
     name = models.CharField(max_length=40)
     work_item = models.ForeignKey(WorkItem, on_delete=models.CASCADE, null=True)
-    state = models.CharField(default='initial', max_length=30)
+    state = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name
