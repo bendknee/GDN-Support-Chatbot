@@ -2,7 +2,7 @@ from django.db import models
 
 
 class WorkItem(models.Model):
-    title = models.CharField(null=False, max_length=50)
+    title = models.CharField(max_length=50)
     description = models.TextField()
 
 
@@ -17,7 +17,7 @@ class SoftwareSupport(WorkItem):
 
 class User(models.Model):
     name = models.CharField(max_length=30)
-    work_item = models.ForeignKey(WorkItem, on_delete=models.CASCADE)
+    work_item = models.ForeignKey(WorkItem, on_delete=models.CASCADE, null=True)
     state = models.CharField(default='initial_state', max_length=30)
 
     def __str__(self):
