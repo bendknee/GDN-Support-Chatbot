@@ -126,7 +126,9 @@ def set_description(message, event):
 def display_work_item(work_item):
     # imagenya nanti jadiin work_item.image aja atau apa gitu
     image = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
-    return generate_edit_work_item(work_item, image, model_to_dict(work_item))
+    fields_dict = model_to_dict(work_item)
+    del fields_dict["id"]
+    return generate_edit_work_item(work_item, image, fields_dict)
 
 def save_work_item(event):
     work_item_dict = {} # ini belum tau gimana
