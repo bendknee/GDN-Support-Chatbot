@@ -55,6 +55,12 @@ def initial_state(message, event):
     if message.lower() == 'support':
         response = generate_choices("Choose work item type", ["Hardware Support", "Software Support"], "choose_type")
         change_state(event['space']['name'])
+    elif message.lower() == 'subscribe':
+        response = generate_choices("Subscribe", vsts.views.get_all_areas(), "subscribe")
+        print(response)
+    elif message.lower() == 'unsubscribe':
+        response = generate_choices("Unsubscribe", get_areas(event['space']['name']), "unsubscribe")
+        print(response)
     else:
         message = 'You said: `%s`' % message
         response = text_format(message)
@@ -74,6 +80,8 @@ def handle_action(event):
     # elif action['actionMethodName'] == "hardware_type":
     #     response = set_hardware_type(action['parameters'][0]['value'], event['space'])
     elif action['actionMethodName'] == "3rd_party_app":
+        return
+    else:
         return
 
     change_state(event['space']['name'])
@@ -303,3 +311,32 @@ def generate_hardware_support(message):
         ]
     }
     return body
+
+
+def subscribe(parameters, space):
+    area = parameters[0]['value']
+    space = space['name']
+
+    space_object, created = User.objects.get_or_create(name=space) # get_or_create() returns tuple
+    area_object, created = VstsArea.objects.get_or_create(name=area)
+    area_object.hangoutsSpaces.add(space_object)
+
+    return "Subscribed to area `%s`" % area
+
+
+def unsubscribe(parameters, space):
+    area = parameters[0]['value']
+    space = space['name']
+
+    space_object, created = User.objects.get_or_create(name=space) # get_or_create() returns tuple
+    area_object, created = VstsArea.objects.get_or_create(name=area)
+    area_object.hangoutsSpaces.remove(space_object)
+
+    return "Unsubscribed to area `%s`" % area
+
+
+def get_areas(space):
+    space_object = User.objects.get(name=space)
+    areas = space_object.vstsarea_set.all()
+    areas_list = [area.__str__() for area in areas]
+    return areas_list
