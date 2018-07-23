@@ -70,9 +70,9 @@ def handle_action(event):
     action = event['action']
     if action['actionMethodName'] == "choose_type":
         chosen = work_item_choice(action['parameters'][0]['value'], event['space'])
-        response = text_format("You've chosen '%s'\nPlease enter title" % chosen)
+        response = text_format("You have chosen '%s'\nPlease enter title" % chosen)
     elif action['actionMethodName'] == "save_work_item":
-        response = "Belum bisa"
+        response = text_format("Belum bisa")
     elif action['actionMethodName'] == "edit_work_item":
         response = text_format("Belum bisa")
     elif action['actionMethodName'] == "3rd_party_app":
@@ -122,6 +122,7 @@ def set_description(message, event):
 
     # imagenya nanti jadiin work_item.image aja atau apa gitu
     image = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
+    # kalo ini honestly gatau harus gimana
     fields_dict = {'Description': work_item.description}
     return generate_edit_work_item(work_item, image, fields_dict)
 
