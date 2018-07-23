@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from .states import *
+from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from googleapiclient.discovery import build
@@ -127,8 +128,8 @@ def display_work_item(work_item):
     image = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
     # kalo ini honestly gatau harus gimana
     fields_dict = {'Description': work_item.description}
-    print(work_item.__dict__)
-    return generate_edit_work_item(work_item, image, work_item.__dict__)
+    print(model_to_dict(work_item))
+    return generate_edit_work_item(work_item, image, model_to_dict(work_item))
 
 def save_work_item(event):
     work_item_dict = {}
