@@ -85,12 +85,15 @@ def handle_action(event):
 
 # ----------------------- create work item -----------------------#
 def work_item_choice(item_type, space):
+    user_object = User.objects.get(name=space['name'])
     if item_type == 'Hardware Support':
-        hardware_object, created = HardwareSupport.objects.create()
-        User.objects.update(name=space['name'], state='title', work_item=hardware_object)
+        work_item_object, created = HardwareSupport.objects.create()
     elif item_type == 'Software Support':
-        software_object, created = SoftwareSupport.objects.create()
-        User.objects.update(name=space['name'], state='title', work_item=software_object)
+        work_item_object, created = SoftwareSupport.objects.create()
+
+    user_object.work_item = work_item_object
+    user_object.state = 'title'
+    user_object.save()
     return item_type
 
 
