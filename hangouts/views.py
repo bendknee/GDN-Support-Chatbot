@@ -75,6 +75,8 @@ def handle_action(event):
     #     response = set_hardware_type(action['parameters'][0]['value'], event['space'])
     elif action['actionMethodName'] == "3rd_party_app":
         return
+    else:
+        return
 
     change_state(event['space']['name'])
     return response
