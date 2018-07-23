@@ -24,9 +24,9 @@ class User(models.Model):
         return self.name
 
 
-# class VstsArea(models.Model):
-#     name = models.CharField(max_length=30)
-#     hangoutsSpaces = models.ManyToManyField(User)
-#
-#     def __str__(self):
-#         return self.name
+class VstsArea(models.Model):
+    name = models.CharField(max_length=30)
+    hangoutsSpaces = models.ManyToManyField(User)
+
+    def __str__(self):
+        return self.name
