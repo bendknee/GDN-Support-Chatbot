@@ -6,7 +6,7 @@ def change_state(space_name):
     user_object = User.objects.get(name=space_name)
     current_state = states_list[user_object.state]
     next_state = states_list[current_state.next_state()]
-    User.objects.update(name=space_name, state=next_state)  # update state
+    User.objects.update(name=space_name, state=next_state.label())  # update state
 
 
 class State(metaclass=abc.ABCMeta):
@@ -25,11 +25,6 @@ class State(metaclass=abc.ABCMeta):
     def next_state():
         pass
 
-    @staticmethod
-    @abc.abstractmethod
-    def previous_state():
-        pass
-
 
 class InitialState(State):
     @staticmethod
@@ -43,10 +38,6 @@ class InitialState(State):
     @staticmethod
     def next_state():
         return "choice"
-
-    @staticmethod
-    def previous_state():
-        return "initial"
 
 
 class ChoiceState(State):
@@ -62,10 +53,6 @@ class ChoiceState(State):
     def next_state():
         return "title"
 
-    @staticmethod
-    def previous_state():
-        return "initial"
-
 
 class TitleState(State):
     @staticmethod
@@ -80,10 +67,6 @@ class TitleState(State):
     def next_state():
         return "description"
 
-    @staticmethod
-    def previous_state():
-        return "choice"
-
 
 class DescriptionState(State):
     @staticmethod
@@ -97,10 +80,6 @@ class DescriptionState(State):
     @staticmethod
     def next_state():
         return "initial"
-
-    @staticmethod
-    def previous_state():
-        return "title"
 
 
 states_list = {"initial": InitialState, "choice": ChoiceState, "title": TitleState,
