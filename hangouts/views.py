@@ -120,12 +120,20 @@ def set_description(message, event):
 
     change_state(event['space']['name'])
 
+    return display_work_item(work_item)
+
+def display_work_item(work_item):
     # imagenya nanti jadiin work_item.image aja atau apa gitu
     image = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
     # kalo ini honestly gatau harus gimana
     fields_dict = {'Description': work_item.description}
-    return generate_edit_work_item(work_item, image, fields_dict)
+    return generate_edit_work_item(work_item, image, work_item.__dict__)
 
+def save_work_item(event):
+    work_item_dict = {}
+    message = vsts.views.create_work_item(work_item_dict)
+    # cardnya mau dari response apa dari models aja?
+    generate_work_item(message, )
 
 # ----------------------- send message asynchronously -----------------------#
 def send_message(body, space):
