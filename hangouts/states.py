@@ -45,7 +45,7 @@ class InitialState(State):
 class ChoiceState(State):
     @staticmethod
     def label():
-        return None
+        return "choice"
 
     @staticmethod
     def is_waiting_text():
