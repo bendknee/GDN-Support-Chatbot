@@ -71,8 +71,10 @@ def handle_action(event):
     if action['actionMethodName'] == "choose_type":
         chosen = work_item_choice(action['parameters'][0]['value'], event['space'])
         response = text_format("You've chosen '%s'\nPlease enter title" % chosen)
-    # elif action['actionMethodName'] == "hardware_type":
-    #     response = set_hardware_type(action['parameters'][0]['value'], event['space'])
+    elif action['actionMethodName'] == "save_work_item":
+        response = "Belum bisa"
+    elif action['actionMethodName'] == "edit_work_item":
+        response = text_format("Belum bisa")
     elif action['actionMethodName'] == "3rd_party_app":
         return
     else:
@@ -118,22 +120,10 @@ def set_description(message, event):
 
     change_state(event['space']['name'])
 
-    # delete soon
-    reply = user_object.name + '\n' + user_object.state + '\n'
-    return text_format(reply + user_object.work_item.title + '\n' + user_object.work_item.description)
-
-
-# def set_hardware_type(type, space):
-#     space_object, created = User.objects.get_or_create(name=space['name'])
-#
-#     hardware_object = space_object.hardware_support
-#     hardware_object.hardware_type = type
-#     hardware_object.save()
-#
-#     User.objects.update_or_create(name=space['name'], state='hardware_desc_state')  # update state
-#     response = text_format("Please enter description")
-#
-#     return response
+    # imagenya nanti jadiin work_item.image aja atau apa gitu
+    image = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
+    fields_dict = {'Description': work_item.description}
+    return generate_edit_work_item(work_item, image, fields_dict)
 
 
 # ----------------------- send message asynchronously -----------------------#
@@ -192,38 +182,18 @@ def generate_choices(title, list, method):
 
     return card
 
-
-def generate_work_item(message, image, dict):
-    body = {
+def generate_work_item(message, image, fields_dict):
+    card = {
         "cards": [
             {
                 "header": {
                     "title": message['fields']['System.Title'],
                     "subtitle": "created by " + message['fields']['System.CreatedBy'],
-                    "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+                    "imageUrl": image
                 },
                 "sections": [
                     {
                         "widgets": [
-                            {
-                                "keyValue": {
-                                    "topLabel": "Area Path",
-                                    "content": message['fields']['System.AreaPath']
-                                }
-                            },
-                            {
-                                "keyValue": {
-                                    "topLabel": "Severity",
-                                    "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                                }
-                            },
-                            {
-                                "keyValue": {
-                                    "topLabel": "Repro Steps",
-                                    "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                                }
-                            }
-
                         ]
                     },
                     {
@@ -248,40 +218,31 @@ def generate_work_item(message, image, dict):
             }
         ]
     }
-    return body
 
 
-def generate_hardware_support(message):
-    body = {
+    for label, content in fields_dict.items():
+        item_widget = {
+            "keyValue": {
+                "topLabel": label,
+                "content": message['fields'][content]
+            }
+        }
+
+        card['cards'][0]['sections'][0]['widgets'].append(item_widget)
+
+    return card
+
+def generate_edit_work_item(work_item, image, fields_dict):
+    card = {
         "cards": [
             {
                 "header": {
-                    "title": message['fields']['System.Title'],
-                    "subtitle": "created by " + message['fields']['System.CreatedBy'],
-                    "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+                    "title": work_item.title,
+                    "imageUrl": image
                 },
                 "sections": [
                     {
                         "widgets": [
-                            {
-                                "keyValue": {
-                                    "topLabel": "Area Path",
-                                    "content": message['fields']['System.AreaPath']
-                                }
-                            },
-                            {
-                                "keyValue": {
-                                    "topLabel": "Severity",
-                                    "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                                }
-                            },
-                            {
-                                "keyValue": {
-                                    "topLabel": "Repro Steps",
-                                    "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                                }
-                            }
-
                         ]
                     },
                     {
@@ -290,10 +251,10 @@ def generate_hardware_support(message):
                                 "buttons": [
                                     {
                                         "textButton": {
-                                            "text": "MORE",
+                                            "text": "SAVE",
                                             "onClick": {
-                                                "openLink": {
-                                                    "url": message['_links']['html']['href']
+                                                "action": {
+                                                    "actionMethodName": "save_work_item",
                                                 }
                                             }
                                         }
@@ -306,4 +267,33 @@ def generate_hardware_support(message):
             }
         ]
     }
-    return body
+
+
+    for label, content in fields_dict.items():
+        item_widget = {
+            "keyValue": {
+                "topLabel": label,
+                "content": content,
+                "button": {
+                    "textButton": {
+                        "text": "Edit",
+                        "onClick": {
+                            "action": {
+                                "actionMethodName": "edit_work_item",
+                                "parameters": [
+                                    {
+                                        "key": "field",
+                                        "value": label
+                                    }
+                                ]
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        card['cards'][0]['sections'][0]['widgets'].append(item_widget)
+
+    return card

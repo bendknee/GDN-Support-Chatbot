@@ -19,7 +19,7 @@ ACCOUNT_NAME = 'quickstartbot'
 
 
 #----------------------- post bug to VSTS -----------------------#
-def create_work_item(bug_dict, space):
+def create_work_item(bug_dict):
     url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Bug?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
     payload = []
@@ -42,8 +42,8 @@ def receive_webhook(request):
     try:
         event = json.loads(request.body)
 
-        list = []
-        body = hangouts.views.generate_bug(event['resource'], "https://www.iconspng.com/uploads/bad-bug/bad-bug.png", list)
+        fields_dict = {'Area Path':'System.AreaPath', 'Severity':'Microsoft.VSTS.Common.Severity', 'Repro Steps':'Microsoft.VSTS.TCM.ReproSteps'}
+        body = hangouts.views.generate_bug(event['resource'], "https://www.iconspng.com/uploads/bad-bug/bad-bug.png", fields_dict)
 
         # get all spaces subscribed to area
 
