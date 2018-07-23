@@ -36,6 +36,8 @@ def receive_message(payload):
                 message = event['message']['argumentText']
             if state.is_waiting_text():
                 response = locals()[state.label()](message, event)
+            else:
+                response = text_format("Please complete above Card action first")
 
         elif event['type'] == 'CARD_CLICKED':
             if not state.is_waiting_text():
@@ -82,12 +84,10 @@ def handle_action(event):
 def work_item_choice(item_type, space):
     if item_type == 'Hardware Support':
         hardware_object, created = HardwareSupport.objects.create()
-        User.objects.update_or_create(name=space['name'], state='title',
-                                      work_item=hardware_object)
+        User.objects.update(name=space['name'], state='title', work_item=hardware_object)
     elif item_type == 'Software Support':
         software_object, created = SoftwareSupport.objects.create()
-        User.objects.update_or_create(name=space['name'], state='title',
-                                      work_item=software_object)
+        User.objects.update(name=space['name'], state='title', work_item=software_object)
     return item_type
 
 
@@ -114,7 +114,9 @@ def set_description(message, event):
 
     change_state(event['space']['name'])
 
-    return text_format("yeahhhhhhhhh")
+    # delete soon
+    reply = user_object.name + '\n' + user_object.state + '\n'
+    return text_format(reply + user_object.work_item.title + '\n' + user_object.work_item.description)
 
 
 # def set_hardware_type(type, space):

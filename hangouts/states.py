@@ -96,7 +96,7 @@ class DescriptionState(State):
 
     @staticmethod
     def next_state():
-        return "work_item"
+        return "initial"
 
     @staticmethod
     def previous_state():
