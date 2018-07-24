@@ -4,18 +4,18 @@ from django.db import models
 class WorkItem(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
-    # path_dict = {"title": "System.Title", "description": "System.Descriotion", "severity": "Microsoft.VSTS.Common.Severity"}
-    path_dict = {"title": "System.Title", "description": "System.Description"}
+    path_dict = {"title": "System.Title", "description": "System.Description", "severity": "Microsoft.VSTS.Common.Severity"}
 
 
 class HardwareSupport(WorkItem):
     hardware_type = models.CharField(max_length=30)
-    # path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Ticketing.HardwareType"})
+    path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Ticketing.HardwareType"})
 
 
 class SoftwareSupport(WorkItem):
     requested_by = models.CharField(max_length=30)
     third_party = models.CharField(max_length=30)
+    # path_dict = dict(WorkItem.path_dict, **{"requested_by": "Ticketing.HardwareType"})
 
 
 class User(models.Model):

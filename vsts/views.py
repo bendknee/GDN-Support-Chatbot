@@ -41,6 +41,7 @@ def create_work_item(work_item_dict):
 def receive_webhook(request):
     try:
         event = json.loads(request.body)
+        print(event)
 
         fields_dict = {'Area Path':'System.AreaPath', 'Severity':'Microsoft.VSTS.Common.Severity', 'Repro Steps':'Microsoft.VSTS.TCM.ReproSteps'}
         body = hangouts.views.generate_bug(event['resource'], "https://www.iconspng.com/uploads/bad-bug/bad-bug.png", fields_dict)
