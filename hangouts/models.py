@@ -36,6 +36,16 @@ class User(models.Model):
     def __str__(self):
         return self.name
 
+    def get_work_item(self):
+        try:
+            return self.field.hardwaresupport
+        except HardwareSupport.DoesNotExist:
+            pass
+        try:
+            return self.field.softwaresupport
+        except SoftwareSupport.DoesNotExist:
+            pass
+
 
 class VstsArea(models.Model):
     name = models.CharField(max_length=30)

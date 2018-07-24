@@ -139,7 +139,7 @@ class DescriptionState(State):
     @staticmethod
     def next_state(*args):
         user_object = User.objects.get(name=args[0])
-        work_item = user_object.work_item
+        work_item = user_object.get_work_item()
         print(work_item.__str__())
         if work_item.__str__() == "hardware_support":
             return HardwareChoice.STATE_LABEL
