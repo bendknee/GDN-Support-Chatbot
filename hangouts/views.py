@@ -124,9 +124,25 @@ def set_description(message, event):
     return generate_edit_work_item(work_item)
 
 def save_work_item(event):
-    work_item_dict = {} # ini belum tau gimana
-    message = vsts.views.create_work_item(work_item_dict)
-    # cardnya mau dari response apa dari models aja?
+    user_object, created = User.objects.get_or_create(name=event['space']['name'])
+    work_item = user_object.work_item
+    path_dict = work_item.path_dict
+    fields_dict = generate_fields_dict(work_item)
+
+    work_item_dict = {}
+
+    for key, value in path_dict.items():
+        work_item_dict[value] = fields_dict[key]
+
+    # vsts.views.create_work_item(work_item_dict)
+    print(work_item_dict)
+    return text_format("Your work item has been saved.")
+
+def generate_fields_dict(work_item):
+    dict = model_to_dict(work_item)
+    del dict["id"]
+
+    return dict
 
 # ----------------------- send message asynchronously -----------------------#
 def send_message(body, space):
@@ -184,59 +200,11 @@ def generate_choices(title, list, method):
 
     return card
 
-def generate_work_item(message, image, fields_dict):
-    card = {
-        "cards": [
-            {
-                "header": {
-                    "title": message['fields']['System.Title'],
-                    "subtitle": "created by " + message['fields']['System.CreatedBy'],
-                    "imageUrl": image
-                },
-                "sections": [
-                    {
-                        "widgets": [
-                        ]
-                    },
-                    {
-                        "widgets": [
-                            {
-                                "buttons": [
-                                    {
-                                        "textButton": {
-                                            "text": "MORE",
-                                            "onClick": {
-                                                "openLink": {
-                                                    "url": message['_links']['html']['href']
-                                                }
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-
-
-    for label, content in fields_dict.items():
-        item_widget = {
-            "keyValue": {
-                "topLabel": label,
-                "content": message['fields'][content]
-            }
-        }
-
-        card['cards'][0]['sections'][0]['widgets'].append(item_widget)
-
-    return card
-
 def generate_edit_work_item(work_item):
-    fields_dict = model_to_dict(work_item)
-    del fields_dict["id"]
+    dict = generate_fields_dict(work_item)
+    for old_key in dict.keys():
+        new_key = old_key.replace("_", " ").title()
+        dict[new_key] = dict.pop(old_key)
 
     card = {
         "cards": [
@@ -274,7 +242,7 @@ def generate_edit_work_item(work_item):
     }
 
 
-    for label, content in fields_dict.items():
+    for label, content in dict.items():
         item_widget = {
             "keyValue": {
                 "topLabel": label,
