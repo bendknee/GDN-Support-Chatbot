@@ -9,7 +9,7 @@ class WorkItem(models.Model):
 
 class HardwareSupport(WorkItem):
     hardware_type = models.CharField(max_length=30)
-    severity = models.CharField(max_length=10)
+    severity = models.CharField(max_length=10, null=True)
     self_dict = {"hardware_type": "Support.HardwareType", "severity": "Microsoft.VSTS.Common.Severity"}
     path_dict = dict(WorkItem.path_dict, **self_dict)
 
@@ -17,7 +17,7 @@ class HardwareSupport(WorkItem):
 class SoftwareSupport(WorkItem):
     requested_by = models.CharField(max_length=30)
     third_party = models.CharField(max_length=30)
-    severity = models.CharField(max_length=10)
+    severity = models.CharField(max_length=10, null=True)
     self_dict = {"requested_by": "Ticketing.HardwareType", "severity": "Microsoft.VSTS.Common.Severity"}
     # path_dict = dict(WorkItem.path_dict, **self_dict)
 
