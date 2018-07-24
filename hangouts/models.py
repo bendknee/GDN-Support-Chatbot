@@ -25,7 +25,7 @@ class SoftwareSupport(WorkItem):
     # path_dict = dict(WorkItem.path_dict, **self_dict)
 
     def __str__(self):
-        return "software_support"
+        return self.requested_by
 
 
 class User(models.Model):
