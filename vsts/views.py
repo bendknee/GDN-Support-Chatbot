@@ -19,28 +19,30 @@ ACCOUNT_NAME = 'quickstartbot'
 
 
 #----------------------- post bug to VSTS -----------------------#
-def create_work_item(work_item_dict):
-    url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Bug?api-version=4.1'
+def create_work_item(work_item_dict, url):
+    url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$' + url + '?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
     payload = []
 
     for key, value in work_item_dict.items():
         field = {
             "op": "add",
-            "path": key,
+            "path": "/fields/" + key,
             "value": value
         }
         payload.append(field)
 
 
     req = requests.post(url.replace("{{Project}}", "Support"), headers=headers, data=json.dumps(payload))
-    return req.json()
+    print(req.json())
+    print("ke vsts!")
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
 def receive_webhook(request):
     try:
         event = json.loads(request.body)
+        print(event)
 
         fields_dict = {'Area Path':'System.AreaPath', 'Severity':'Microsoft.VSTS.Common.Severity', 'Repro Steps':'Microsoft.VSTS.TCM.ReproSteps'}
         body = hangouts.views.generate_bug(event['resource'], "https://www.iconspng.com/uploads/bad-bug/bad-bug.png", fields_dict)

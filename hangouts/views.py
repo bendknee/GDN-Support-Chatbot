@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from .states import *
+from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from googleapiclient.discovery import build
@@ -9,7 +10,6 @@ from hangouts.models import User, HardwareSupport, SoftwareSupport
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
-import vsts.views
 
 import json
 
@@ -65,19 +65,13 @@ def text_format(message):
 
 def handle_action(event):
     action = event['action']
-    user_object = User.objects.get(event['space']['name'])
+    user_object = User.objects.get(name=event['space']['name'])
     state = states_list[user_object.state]
-    if action['actionMethodName'] == "choose_type":
-        response = state.action(action['parameters'][0]['value'], event)
-    elif action['actionMethodName'] == "hardware_type":
-        response = state.action(action['parameters'][0]['value'], event)
-    elif action['actionMethodName'] == "software_type":
-        response = state.action(action['parameters'][0]['value'], event)
-    else:
-        return
 
-    change_state(event['space']['name'])
+    response = state.action(action['parameters'][0]['value'], event)
+
     return response
+
 
 
 # ----------------------- send message asynchronously -----------------------#
@@ -136,38 +130,22 @@ def generate_choices(title, list, method):
 
     return card
 
+def generate_edit_work_item(work_item):
+    dict = generate_fields_dict(work_item)
+    for old_key in dict.keys():
+        new_key = old_key.replace("_", " ").title()
+        dict[new_key] = dict.pop(old_key)
 
-def generate_bug(message):
-    body = {
+    card = {
         "cards": [
             {
                 "header": {
-                    "title": message['fields']['System.Title'],
-                    "subtitle": "created by " + message['fields']['System.CreatedBy'],
-                    "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+                    "title": work_item.title,
+                    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
                 },
                 "sections": [
                     {
                         "widgets": [
-                            {
-                                "keyValue": {
-                                    "topLabel": "Area Path",
-                                    "content": message['fields']['System.AreaPath']
-                                }
-                            },
-                            {
-                                "keyValue": {
-                                    "topLabel": "Severity",
-                                    "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                                }
-                            },
-                            {
-                                "keyValue": {
-                                    "topLabel": "Repro Steps",
-                                    "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                                }
-                            }
-
                         ]
                     },
                     {
@@ -176,10 +154,16 @@ def generate_bug(message):
                                 "buttons": [
                                     {
                                         "textButton": {
-                                            "text": "MORE",
+                                            "text": "SAVE",
                                             "onClick": {
-                                                "openLink": {
-                                                    "url": message['_links']['html']['href']
+                                                "action": {
+                                                    "actionMethodName": "save_work_item",
+                                                    "parameters": [
+                                                        {
+                                                            "key": "field",
+                                                            "value": "save"
+                                                        }
+                                                    ]
                                                 }
                                             }
                                         }
@@ -192,62 +176,40 @@ def generate_bug(message):
             }
         ]
     }
-    return body
 
 
-def generate_hardware_support(message):
-    body = {
-        "cards": [
-            {
-                "header": {
-                    "title": message['fields']['System.Title'],
-                    "subtitle": "created by " + message['fields']['System.CreatedBy'],
-                    "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
-                },
-                "sections": [
-                    {
-                        "widgets": [
-                            {
-                                "keyValue": {
-                                    "topLabel": "Area Path",
-                                    "content": message['fields']['System.AreaPath']
-                                }
-                            },
-                            {
-                                "keyValue": {
-                                    "topLabel": "Severity",
-                                    "content": message['fields']['Microsoft.VSTS.Common.Severity']
-                                }
-                            },
-                            {
-                                "keyValue": {
-                                    "topLabel": "Repro Steps",
-                                    "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps']
-                                }
-                            }
-
-                        ]
-                    },
-                    {
-                        "widgets": [
-                            {
-                                "buttons": [
+    for label, content in dict.items():
+        item_widget = {
+            "keyValue": {
+                "topLabel": label,
+                "content": content,
+                "button": {
+                    "textButton": {
+                        "text": "Edit",
+                        "onClick": {
+                            "action": {
+                                "actionMethodName": "edit_work_item",
+                                "parameters": [
                                     {
-                                        "textButton": {
-                                            "text": "MORE",
-                                            "onClick": {
-                                                "openLink": {
-                                                    "url": message['_links']['html']['href']
-                                                }
-                                            }
-                                        }
+                                        "key": "field",
+                                        "value": label
                                     }
                                 ]
                             }
-                        ]
+                        }
+
                     }
-                ]
+                }
             }
-        ]
-    }
-    return body
+        }
+
+        card['cards'][0]['sections'][0]['widgets'].append(item_widget)
+
+    return card
+
+def generate_fields_dict(work_item):
+    dict = model_to_dict(work_item)
+    del dict["id"]
+    del dict["workitem_ptr"]
+
+    return dict
