@@ -41,6 +41,7 @@ def receive_message(payload):
                 response = text_format("Please complete above Card action first")
 
         elif event['type'] == 'CARD_CLICKED':
+            response = handle_action(event)
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 response = handle_action(event)
@@ -73,7 +74,7 @@ def handle_action(event):
         chosen = work_item_choice(action['parameters'][0]['value'], event['space'])
         response = text_format("You have chosen '%s'\nPlease enter title" % chosen)
     elif action['actionMethodName'] == "save_work_item":
-        response = text_format("Belum bisa")
+        response = save_work_item(event)
     elif action['actionMethodName'] == "edit_work_item":
         response = text_format("Belum bisa")
     elif action['actionMethodName'] == "3rd_party_app":
