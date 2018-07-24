@@ -62,7 +62,6 @@ def handle_action(event):
 
     response = state.action(action['parameters'][0]['value'], event)
 
-    change_state(event['space']['name'])
     return response
 
 
