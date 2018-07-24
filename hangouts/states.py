@@ -1,6 +1,6 @@
-from .views import *
 from .models import *
 import abc
+import hangouts.views
 import vsts.views
 
 
@@ -41,12 +41,12 @@ class InitialState(State):
     @staticmethod
     def action(message, event):
         if message.lower() == 'support':
-            response = generate_choices("Choose work item type", ["Hardware Support", "Software Support"],
+            response = hangouts.views.generate_choices("Choose work item type", ["Hardware Support", "Software Support"],
                                         "choose_type")
             change_state(event['space']['name'])
         else:
             message = 'You said: `%s`' % message
-            response = text_format(message)
+            response = hangouts.views.text_format(message)
 
         return response
 
@@ -76,7 +76,7 @@ class ChoiceState(State):
 
         user_object.work_item = work_item_object
         user_object.save()
-        return text_format("You've chosen '%s'\nPlease enter title" % message)
+        return hangouts.views.text_format("You've chosen '%s'\nPlease enter title" % message)
 
     @staticmethod
     def next_state(*args):
@@ -102,7 +102,7 @@ class TitleState(State):
         # hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
         # response = generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
 
-        return text_format("Please enter description")
+        return hangouts.views.text_format("Please enter description")
 
     @staticmethod
     def next_state(*args):
@@ -128,10 +128,10 @@ class DescriptionState(State):
 
         if next_state == HardwareChoice.STATE_LABEL:
             hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-            response = generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
+            response = hangouts.views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
         elif next_state == SoftwareChoice.STATE_LABEL:
             third_party = ["GSuite", "Power BI", "VSTS"]
-            response = generate_choices("Choose 3rd Party Software", third_party, "software_type")
+            response = hangouts.views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
 
         return response
 
@@ -158,7 +158,7 @@ class HardwareChoice(ChoiceState):
 
         change_state(event['space']['name'])
         severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        response = generate_choices("How severe is this issue?", severities, "severity")
+        response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
         return response
 
     @staticmethod
@@ -182,7 +182,7 @@ class SoftwareChoice(ChoiceState):
 
         change_state(event['space']['name'])
         severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        response = generate_choices("How severe is this issue?", severities, "severity")
+        response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
         return response
 
     @staticmethod
@@ -202,7 +202,7 @@ class SeverityChoice(ChoiceState):
         work_item.save()
 
         change_state(event['space']['name'])
-        response = generate_edit_work_item(work_item)
+        response = hangouts.views.generate_edit_work_item(work_item)
         return response
 
     @staticmethod
@@ -220,7 +220,7 @@ class EndState(ChoiceState):
             work_item = user_object.work_item
 
             path_dict = work_item.path_dict
-            fields_dict = generate_fields_dict(work_item)
+            fields_dict = hangouts.views.generate_fields_dict(work_item)
 
             work_item_dict = {}
 
@@ -231,9 +231,9 @@ class EndState(ChoiceState):
             print(work_item_dict)
 
             change_state(event['space']['name'])
-            response = text_format("Your work item has been saved.")
+            response = hangouts.views.text_format("Your work item has been saved.")
         else:
-            response = text_format("Gimana hayo")
+            response = hangouts.views.text_format("Gimana hayo")
 
         return response
 
