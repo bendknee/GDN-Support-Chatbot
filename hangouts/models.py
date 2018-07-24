@@ -9,7 +9,7 @@ class WorkItem(models.Model):
 
 class HardwareSupport(WorkItem):
     hardware_type = models.CharField(max_length=30)
-    path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Ticketing.HardwareType"})
+    path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Support.HardwareType"})
 
 
 class SoftwareSupport(WorkItem):
