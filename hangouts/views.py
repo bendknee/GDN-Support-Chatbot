@@ -57,20 +57,10 @@ def text_format(message):
 
 def handle_action(event):
     action = event['action']
-    user_object = User.objects.get(event['space']['name'])
+    user_object = User.objects.get(name=event['space']['name'])
     state = states_list[user_object.state]
-    if action['actionMethodName'] == "choose_type":
-        response = state.action(action['parameters'][0]['value'], event)
-    elif action['actionMethodName'] == "hardware_type":
-        response = state.action(action['parameters'][0]['value'], event)
-    elif action['actionMethodName'] == "software_type":
-        response = state.action(action['parameters'][0]['value'], event)
-    elif action['actionMethodName'] == "edit_work_item":
-        response = state.action(action['parameters'][0]['value'], event)
-    elif action['actionMethodName'] == "save_work_item":
-        response = state.action(action['actionMethodName'], event)
-    else:
-        return
+
+    response = state.action(action['parameters'][0]['value'], event)
 
     change_state(event['space']['name'])
     return response
@@ -161,6 +151,12 @@ def generate_edit_work_item(work_item):
                                             "onClick": {
                                                 "action": {
                                                     "actionMethodName": "save_work_item",
+                                                    "parameters": [
+                                                        {
+                                                            "key": "field",
+                                                            "value": "save"
+                                                        }
+                                                    ]
                                                 }
                                             }
                                         }

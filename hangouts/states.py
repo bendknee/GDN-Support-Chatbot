@@ -215,7 +215,7 @@ class EndState(ChoiceState):
 
     @staticmethod
     def action(message, event):
-        if message == "save_work_item":
+        if message == "save":
             user_object = User.objects.get(name=event['space']['name'])
             work_item = user_object.work_item
 
