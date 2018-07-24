@@ -233,6 +233,10 @@ class SeverityChoice(ChoiceState):
     def next_state(*args):
         return EndState.STATE_LABEL
 
+    @staticmethod
+    def where():
+        return "You're on Choose Severity. Please select this issue's severity level from the card above."
+
 
 class EndState(ChoiceState):
     STATE_LABEL = "end"
@@ -275,6 +279,11 @@ class EndState(ChoiceState):
     @staticmethod
     def next_state(*args):
         return InitialState.STATE_LABEL
+
+    @staticmethod
+    def where():
+        return "You're near the finish line. Please evaluate your issue at the card above and click" \
+               "'save' when you're done."
 
 
 states_list = {InitialState.STATE_LABEL: InitialState, ChoiceState.STATE_LABEL: ChoiceState,
