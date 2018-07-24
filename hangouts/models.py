@@ -38,11 +38,11 @@ class User(models.Model):
 
     def get_work_item(self):
         try:
-            return self.field.hardwaresupport
+            return self.work_item.hardwaresupport
         except HardwareSupport.DoesNotExist:
             pass
         try:
-            return self.field.softwaresupport
+            return self.work_item.softwaresupport
         except SoftwareSupport.DoesNotExist:
             pass
 
