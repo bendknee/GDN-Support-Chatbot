@@ -34,7 +34,7 @@ def create_work_item(work_item_dict):
 
 
     req = requests.post(url.replace("{{Project}}", "Support"), headers=headers, data=json.dumps(payload))
-    return req.json()
+    print(req.json())
 
 #----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
