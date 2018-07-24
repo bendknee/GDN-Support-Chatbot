@@ -140,10 +140,9 @@ class DescriptionState(State):
     def next_state(*args):
         user_object = User.objects.get(name=args[0])
         work_item = user_object.get_work_item()
-        print(work_item.__str__())
-        if work_item.__str__() == "hardware_support":
+        if isinstance(work_item, HardwareSupport):
             return HardwareChoice.STATE_LABEL
-        elif work_item.__str__() == "software_support":
+        elif isinstance(work_item, SoftwareSupport):
             return SoftwareChoice.STATE_LABEL
 
 
