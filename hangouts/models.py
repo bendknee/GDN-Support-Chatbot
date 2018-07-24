@@ -14,7 +14,7 @@ class HardwareSupport(WorkItem):
     path_dict = dict(WorkItem.path_dict, **self_dict)
 
     def __str__(self):
-        return "hardware_support"
+        return self.severity
 
 
 class SoftwareSupport(WorkItem):
@@ -25,7 +25,7 @@ class SoftwareSupport(WorkItem):
     # path_dict = dict(WorkItem.path_dict, **self_dict)
 
     def __str__(self):
-        return self.requested_by
+        return "software_support"
 
 
 class User(models.Model):
