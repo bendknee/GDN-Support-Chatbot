@@ -42,8 +42,7 @@ def receive_webhook(request):
     try:
         event = json.loads(request.body)
 
-        fields_dict = {'Area Path':'System.AreaPath', 'Severity':'Microsoft.VSTS.Common.Severity', 'Repro Steps':'Microsoft.VSTS.TCM.ReproSteps'}
-        body = hangouts.views.generate_bug(event['resource'], "https://www.iconspng.com/uploads/bad-bug/bad-bug.png", fields_dict)
+        body = hangouts.views.generate_bug(event['resource'])
 
         # get all spaces subscribed to area
 

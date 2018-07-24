@@ -271,3 +271,59 @@ def generate_edit_work_item(work_item):
         card['cards'][0]['sections'][0]['widgets'].append(item_widget)
 
     return card
+
+def generate_bug(message):
+    card = {
+      "cards": [
+        {
+          "header": {
+            "title": message['fields']['System.Title'],
+            "subtitle": "created by " + message['fields']['System.CreatedBy'],
+            "imageUrl": "https://www.iconspng.com/uploads/bad-bug/bad-bug.png"
+          },
+          "sections": [
+            {
+              "widgets": [
+                  {
+                    "keyValue": {
+                        "topLabel": "Area Path",
+                        "content": message['fields']['System.AreaPath'],
+                    }
+                  },
+                  {
+                    "keyValue": {
+                        "topLabel": "Severity",
+                        "content": message['fields']['Microsoft.VSTS.Common.Severity'],
+                    }
+                  },
+                  {
+                    "keyValue": {
+                        "topLabel": "Repro Steps",
+                        "content": message['fields']['Microsoft.VSTS.TCM.ReproSteps'],
+                    }
+                  }
+              ]
+            },
+            {
+              "widgets": [
+                  {
+                      "buttons": [
+                        {
+                          "textButton": {
+                            "text": "MORE",
+                            "onClick": {
+                              "openLink": {
+                                "url": message['_links']['html']['href']
+                              }
+                            }
+                          }
+                        }
+                      ]
+                  }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    return card
