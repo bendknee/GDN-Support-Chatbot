@@ -35,7 +35,7 @@ def receive_message(payload):
             else:
                 message = event['message']['argumentText']
             if state.is_waiting_text():
-                response = globals()[state.label()](message, event)
+                response = state.action(message, event)
             else:
                 response = text_format("Please complete above Card action first")
 
@@ -51,76 +51,25 @@ def receive_message(payload):
     return JsonResponse(response, content_type='application/json')
 
 
-def initial_state(message, event):
-    if message.lower() == 'support':
-        response = generate_choices("Choose work item type", ["Hardware Support", "Software Support"], "choose_type")
-        change_state(event['space']['name'])
-    else:
-        message = 'You said: `%s`' % message
-        response = text_format(message)
-
-    return response
-
-
 def text_format(message):
     return {"text": message}
 
 
 def handle_action(event):
     action = event['action']
+    user_object = User.objects.get(event['space']['name'])
+    state = states_list[user_object.state]
     if action['actionMethodName'] == "choose_type":
-        chosen = work_item_choice(action['parameters'][0]['value'], event['space'])
-        response = text_format("You've chosen '%s'\nPlease enter title" % chosen)
-    # elif action['actionMethodName'] == "hardware_type":
-    #     response = set_hardware_type(action['parameters'][0]['value'], event['space'])
-    elif action['actionMethodName'] == "3rd_party_app":
-        return
+        response = state.action(action['parameters'][0]['value'], event)
+    elif action['actionMethodName'] == "hardware_type":
+        response = state.action(action['parameters'][0]['value'], event)
+    elif action['actionMethodName'] == "software_type":
+        response = state.action(action['parameters'][0]['value'], event)
     else:
         return
 
     change_state(event['space']['name'])
     return response
-
-
-# ----------------------- create work item -----------------------#
-def work_item_choice(item_type, space):
-    user_object = User.objects.get(name=space['name'])
-    if item_type == 'Hardware Support':
-        work_item_object = HardwareSupport.objects.create()
-    elif item_type == 'Software Support':
-        work_item_object = SoftwareSupport.objects.create()
-
-    user_object.work_item = work_item_object
-    user_object.save()
-    return item_type
-
-
-def set_title(message, event):
-    user_object, created = User.objects.get_or_create(name=event['space']['name'])
-
-    work_item = user_object.work_item
-    work_item.title = message
-    work_item.save()
-
-    change_state(event['space']['name'])
-    # hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-    # response = generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
-
-    return text_format("Please enter description")
-
-
-def set_description(message, event):
-    user_object, created = User.objects.get_or_create(name=event['space']['name'])
-
-    work_item = user_object.work_item
-    work_item.description = message
-    work_item.save()
-
-    change_state(event['space']['name'])
-
-    # delete soon
-    reply = user_object.name + '\n' + user_object.state + '\n'
-    return text_format(reply + user_object.work_item.title + '\n' + user_object.work_item.description)
 
 
 # def set_hardware_type(type, space):
