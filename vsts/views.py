@@ -27,7 +27,7 @@ def create_work_item(work_item_dict):
     for key, value in work_item_dict.items():
         field = {
             "op": "add",
-            "path": key,
+            "path": "/fields/" + key,
             "value": value
         }
         payload.append(field)
