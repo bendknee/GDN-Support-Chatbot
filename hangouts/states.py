@@ -154,7 +154,7 @@ class HardwareChoice(ChoiceState):
     def action(message, event):
         user_object = User.objects.get(name=event['space']['name'])
 
-        work_item = user_object.work_item
+        work_item = user_object.get_work_item()
         work_item.hardware_type = message
         work_item.save()
 
@@ -175,7 +175,7 @@ class SoftwareChoice(ChoiceState):
     def action(message, event):
         user_object = User.objects.get(name=event['space']['name'])
 
-        work_item = user_object.work_item
+        work_item = user_object.get_work_item()
         work_item.third_party = message
         user_email = str(event['message']['sender']['email'])
         user_email = user_email.split("@")[0] + 'staff.gramedia.com'
@@ -199,7 +199,7 @@ class SeverityChoice(ChoiceState):
     def action(message, event):
         user_object = User.objects.get(name=event['space']['name'])
 
-        work_item = user_object.work_item
+        work_item = user_object.get_work_item()
         work_item.severity = message
         work_item.save()
 
