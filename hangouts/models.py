@@ -26,6 +26,7 @@ class User(models.Model):
     name = models.CharField(max_length=40)
     work_item = models.OneToOneField(WorkItem, on_delete=models.CASCADE, null=True)
     state = models.CharField(default='initial', max_length=30)
+    final = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

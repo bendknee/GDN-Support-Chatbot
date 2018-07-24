@@ -100,8 +100,6 @@ class TitleState(State):
         work_item.save()
 
         change_state(event['space']['name'])
-        # hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-        # response = generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
 
         return hangouts.views.text_format("Please enter description")
 
@@ -218,6 +216,9 @@ class EndState(ChoiceState):
     def action(message, event):
         if message == "save":
             user_object = User.objects.get(name=event['space']['name'])
+            user_object.final = True
+            user_object.save()
+
             work_item = user_object.get_work_item()
 
             path_dict = work_item.path_dict
@@ -228,11 +229,19 @@ class EndState(ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            vsts.views.create_work_item(work_item_dict)
+            if isinstance(work_item, HardwareSupport):
+                url = "Hardware%20Support"
+            elif isinstance(work_item, SoftwareSupport):
+                url = "Software%20Support"
+
+            vsts.views.create_work_item(work_item_dict, url)
             print(work_item_dict)
+
+            work_item.delete()
 
             change_state(event['space']['name'])
             response = hangouts.views.text_format("Your work item has been saved.")
+
         else:
             response = hangouts.views.text_format("Gimana hayo")
 

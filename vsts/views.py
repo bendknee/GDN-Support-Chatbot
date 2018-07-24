@@ -19,8 +19,8 @@ ACCOUNT_NAME = 'quickstartbot'
 
 
 #----------------------- post bug to VSTS -----------------------#
-def create_work_item(work_item_dict):
-    url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Hardware%20Support?api-version=4.1'
+def create_work_item(work_item_dict, url):
+    url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$' + url + '?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
     payload = []
 
