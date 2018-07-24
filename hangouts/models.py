@@ -8,11 +8,13 @@ class WorkItem(models.Model):
 
 class HardwareSupport(WorkItem):
     hardware_type = models.CharField(max_length=30)
+    image = models.TextField(default="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png", editable=False)
 
 
 class SoftwareSupport(WorkItem):
     requested_by = models.CharField(max_length=30)
     third_party = models.CharField(max_length=30)
+    image = models.TextField(default="")
 
 
 class User(models.Model):

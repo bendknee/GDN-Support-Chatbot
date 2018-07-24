@@ -121,14 +121,7 @@ def set_description(message, event):
 
     change_state(event['space']['name'])
 
-    return display_work_item(work_item)
-
-def display_work_item(work_item):
-    # imagenya nanti jadiin work_item.image aja atau apa gitu
-    image = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
-    fields_dict = model_to_dict(work_item)
-    del fields_dict["id"]
-    return generate_edit_work_item(work_item, image, fields_dict)
+    return generate_edit_work_item(work_item)
 
 def save_work_item(event):
     work_item_dict = {} # ini belum tau gimana
@@ -241,13 +234,16 @@ def generate_work_item(message, image, fields_dict):
 
     return card
 
-def generate_edit_work_item(work_item, image, fields_dict):
+def generate_edit_work_item(work_item):
+    fields_dict = model_to_dict(work_item)
+    del fields_dict["id"]
+
     card = {
         "cards": [
             {
                 "header": {
                     "title": work_item.title,
-                    "imageUrl": image
+                    "imageUrl": work_item.image
                 },
                 "sections": [
                     {
