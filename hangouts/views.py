@@ -211,7 +211,7 @@ def generate_edit_work_item(work_item):
             {
                 "header": {
                     "title": work_item.title,
-                    "imageUrl": work_item.image
+                    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
                 },
                 "sections": [
                     {
