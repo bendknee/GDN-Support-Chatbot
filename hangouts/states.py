@@ -76,6 +76,7 @@ class ChoiceState(State):
 
         user_object.work_item = work_item_object
         user_object.save()
+        change_state(event['space']['name'])
         return hangouts.views.text_format("You've chosen '%s'\nPlease enter title" % message)
 
     @staticmethod
