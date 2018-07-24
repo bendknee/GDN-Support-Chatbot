@@ -7,7 +7,9 @@ import vsts.views
 def change_state(space_name):
     user_object = User.objects.get(name=space_name)
     current_state = states_list[user_object.state]
+    print("current state: " + current_state.STATE_LABEL)
     next_state = current_state.next_state(space_name)
+    print("current state: " + next_state)
     user_object.state = next_state
     user_object.save()
     return next_state
