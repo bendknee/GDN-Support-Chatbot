@@ -143,10 +143,6 @@ def generate_edit_work_item(work_item):
     card = {
         "cards": [
             {
-                "header": {
-                    "title": work_item.title,
-                    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
-                },
                 "sections": [
                     {
                         "widgets": [
