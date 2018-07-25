@@ -9,7 +9,7 @@ class WorkItem(models.Model):
 
 class HardwareSupport(WorkItem):
     hardware_type = models.CharField(max_length=30)
-    severity = models.CharField(max_length=10, null=True)
+    severity = models.CharField(max_length=20, null=True)
     self_dict = {"hardware_type": "Support.HardwareType", "severity": "Microsoft.VSTS.Common.Severity"}
     path_dict = dict(WorkItem.path_dict, **self_dict)
 
