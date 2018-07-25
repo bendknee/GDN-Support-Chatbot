@@ -51,9 +51,7 @@ def receive_message(payload):
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 response = handle_action(event)
-                print("is not waiting text")
 
-            print("is waiting text")
         else:
             return
     else:

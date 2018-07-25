@@ -116,7 +116,7 @@ class TitleState(State):
     def action(message, event):
         user_object = User.objects.get(name=event['space']['name'])
 
-        work_item = user_object.work_item
+        work_item = user_object.get_work_item()
         work_item.title = message
         work_item.save()
 
@@ -147,7 +147,7 @@ class DescriptionState(State):
     def action(message, event):
         user_object = User.objects.get(name=event['space']['name'])
 
-        work_item = user_object.work_item
+        work_item = user_object.get_work_item()
         work_item.description = message
         work_item.save()
 
