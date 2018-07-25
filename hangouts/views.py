@@ -140,7 +140,7 @@ def generate_edit_work_item(work_item):
 
     del work_item_dict["Title"]
 
-    print("hey sunny summer")
+    print("hey")
     print(static('hangouts/svg/hardware_support.svg'))
 
     card = {
