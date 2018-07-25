@@ -51,8 +51,6 @@ def receive_message(payload):
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 response = handle_action(event)
-
-
         else:
             return
     else:
@@ -236,7 +234,7 @@ def generate_edit_work_item(work_item):
 
 def generate_fields_dict(work_item):
     dict = model_to_dict(work_item)
-    print(dict)
+
     del dict["id"]
     del dict["workitem_ptr"]
 
