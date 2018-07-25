@@ -52,6 +52,7 @@ def receive_message(payload):
                 # response can be text or card, depending on action
                 response = handle_action(event)
 
+
         else:
             return
     else:

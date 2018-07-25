@@ -297,7 +297,6 @@ class EndState(ChoiceState):
 
             work_item.delete()
 
-            change_state(event['space']['name'])
             response = hangouts.views.text_format("Your work item has been saved.")
 
         elif message == "Title":
