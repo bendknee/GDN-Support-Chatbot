@@ -302,7 +302,7 @@ class EndState(ChoiceState):
 
         elif message == "Title":
             user_object.state = TitleState.STATE_LABEL
-            response = hangouts.views.text_format("Please enter title" % message)
+            response = hangouts.views.text_format("Please enter your issue Title.")
 
         return response
 
