@@ -141,7 +141,7 @@ def generate_edit_work_item(work_item):
     del work_item_dict["Title"]
 
     print("hey")
-    print(static('hangouts/svg/hardware_support.svg'))
+    print("http://hangouts-vsts.herokuapp.com" + static('png/hardware_support.png'))
 
     card = {
         "cards": [
@@ -152,7 +152,7 @@ def generate_edit_work_item(work_item):
                             {
                                 "keyValue": {
                                     "content": work_item.title,
-                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" + static('svg/hardware_support.png'),
+                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" + static('png/hardware_support.png'),
                                     "button": {
                                         "textButton": {
                                             "text": "Edit",
