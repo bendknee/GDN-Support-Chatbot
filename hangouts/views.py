@@ -34,10 +34,18 @@ def receive_message(payload):
                 message = event['message']['argumentText'][1:]
             else:
                 message = event['message']['argumentText']
-            if state.is_waiting_text():
+            if message == '/help':
+                response = text_format('Type "%s" to know where you are on issuing a new Work Item\n' % '/where'
+                                       + 'Type "%s" to abort all progress on issuing a new Work Item' % '/reset')
+            elif message == '/reset':
+                User.objects.filter(name=event['space']['name']).delete()
+                response = text_format("Your progress has been aborted")
+            elif message == '/where':
+                response = text_format(state.where())
+            elif state.is_waiting_text():
                 response = state.action(message, event)
             else:
-                response = text_format("Please complete above Card action first")
+                response = text_format(state.where())
 
         elif event['type'] == 'CARD_CLICKED':
             if not state.is_waiting_text():
