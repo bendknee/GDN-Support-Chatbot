@@ -7,7 +7,7 @@ from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from googleapiclient.discovery import build
-from hangouts.models import User, HardwareSupport, SoftwareSupport
+from hangouts.models import User
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -152,7 +152,7 @@ def generate_edit_work_item(work_item):
                             {
                                 "keyValue": {
                                     "content": work_item.title,
-                                    "iconUrl": static('hangouts/svg/hardware_support.svg'),
+                                    "iconUrl": static('svg/hardware_support.svg'),
                                     "button": {
                                         "textButton": {
                                             "text": "Edit",
