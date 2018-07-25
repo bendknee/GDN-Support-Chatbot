@@ -138,6 +138,8 @@ def generate_edit_work_item(work_item):
         new_key = old_key.replace("_", " ").title()
         dict[new_key] = dict.pop(old_key)
 
+    del dict["Title"]
+
     card = {
         "cards": [
             {
@@ -241,6 +243,5 @@ def generate_fields_dict(work_item):
     print(dict)
     del dict["id"]
     del dict["workitem_ptr"]
-    del dict["title"]
 
     return dict
