@@ -274,10 +274,11 @@ class EndState(ChoiceState):
     def action(message, event):
         user_object = User.objects.get(name=event['space']['name'])
         work_item = user_object.get_work_item()
-        if message == "save":
-            user_object.final = True
-            user_object.save()
 
+        user_object.final = True
+        user_object.save()
+
+        if message == "save":
             path_dict = work_item.path_dict
             fields_dict = hangouts.views.generate_fields_dict(work_item)
 
