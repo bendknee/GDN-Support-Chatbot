@@ -140,11 +140,6 @@ def generate_edit_work_item(work_item):
 
     del work_item_dict["Title"]
 
-    if isinstance(work_item, HardwareSupport):
-        url = "hardware_support"
-    elif isinstance(work_item, SoftwareSupport):
-        url = "software_support"
-
     card = {
         "cards": [
             {
@@ -154,7 +149,7 @@ def generate_edit_work_item(work_item):
                             {
                                 "keyValue": {
                                     "content": work_item.title,
-                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" + static('png/' + url + '.png'),
+                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" + static('png/' + work_item.__str__() + '.png'),
                                     "button": {
                                         "textButton": {
                                             "text": "Edit",

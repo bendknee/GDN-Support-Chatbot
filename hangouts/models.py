@@ -13,6 +13,9 @@ class HardwareSupport(WorkItem):
     self_dict = {"hardware_type": "Support.HardwareType", "severity": "Microsoft.VSTS.Common.Severity"}
     path_dict = dict(WorkItem.path_dict, **self_dict)
 
+    def __str__(self):
+        return "hardware_support"
+
 
 class SoftwareSupport(WorkItem):
     requested_by = models.CharField(max_length=30)
@@ -20,6 +23,9 @@ class SoftwareSupport(WorkItem):
     severity = models.CharField(max_length=20, null=True)
     self_dict = {"requested_by": "", "severity": "Microsoft.VSTS.Common.Severity"}
     # path_dict = dict(WorkItem.path_dict, **self_dict)
+
+    def __str__(self):
+        return "software_support"
 
 
 class User(models.Model):
