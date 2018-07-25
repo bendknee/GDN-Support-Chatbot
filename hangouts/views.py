@@ -148,6 +148,33 @@ def generate_edit_work_item(work_item):
                 "sections": [
                     {
                         "widgets": [
+                            {
+                                "keyValue": {
+                                    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png",
+                                    "content": work_item.title,
+                                    "button": {
+                                        "textButton": {
+                                            "text": "Edit",
+                                            "onClick": {
+                                                "action": {
+                                                    "actionMethodName": "edit_work_item",
+                                                    "parameters": [
+                                                        {
+                                                            "key": "field",
+                                                            "value": "Title"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "widgets": [
                         ]
                     },
                     {
@@ -205,7 +232,7 @@ def generate_edit_work_item(work_item):
             }
         }
 
-        card['cards'][0]['sections'][0]['widgets'].append(item_widget)
+        card['cards'][0]['sections'][1]['widgets'].append(item_widget)
 
     return card
 
