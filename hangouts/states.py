@@ -7,10 +7,16 @@ import vsts.views
 def change_state(space_name):
     user_object = User.objects.get(name=space_name)
     current_state = states_list[user_object.state]
+
+    if user_object.final:
+        next_state = EndState.STATE_LABEL
+    else:
+        next_state = current_state.next_state(space_name)
+
     print("current state: " + current_state.STATE_LABEL)
-    next_state = current_state.next_state(space_name)
     print("next state:")
     print(next_state)
+
     user_object.state = next_state
     user_object.save()
     return next_state
@@ -76,7 +82,9 @@ class ChoiceState(State):
 
         user_object.work_item = work_item_object
         user_object.save()
+
         change_state(event['space']['name'])
+
         return hangouts.views.text_format("You've chosen '%s'\nPlease enter title" % message)
 
     @staticmethod
@@ -101,7 +109,10 @@ class TitleState(State):
 
         change_state(event['space']['name'])
 
-        return hangouts.views.text_format("Please enter description")
+        if not user_object.final:
+            return hangouts.views.text_format("Please enter description")
+
+        return hangouts.views.generate_edit_work_item(work_item)
 
     @staticmethod
     def next_state(*args):
@@ -131,6 +142,8 @@ class DescriptionState(State):
         elif next_state == SoftwareChoice.STATE_LABEL:
             third_party = ["GSuite", "Power BI", "VSTS"]
             response = hangouts.views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
+        elif next_state == EndState.STATE_LABEL:
+            response = hangouts.views.generate_edit_work_item(work_item)
 
         return response
 
@@ -156,9 +169,13 @@ class HardwareChoice(ChoiceState):
         work_item.save()
 
         change_state(event['space']['name'])
-        severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
-        return response
+
+        if not user_object.final:
+            severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
+            response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
+            return response
+
+        return hangouts.views.generate_edit_work_item(work_item)
 
     @staticmethod
     def next_state(*args):
@@ -180,9 +197,13 @@ class SoftwareChoice(ChoiceState):
         work_item.save()
 
         change_state(event['space']['name'])
-        severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
-        return response
+
+        if not user_object.final:
+            severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
+            response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
+            return response
+
+        return hangouts.views.generate_edit_work_item(work_item)
 
     @staticmethod
     def next_state(*args):
@@ -201,8 +222,12 @@ class SeverityChoice(ChoiceState):
         work_item.save()
 
         change_state(event['space']['name'])
-        response = hangouts.views.generate_edit_work_item(work_item)
-        return response
+
+        if not user_object.final:
+            response = hangouts.views.generate_edit_work_item(work_item)
+            return response
+
+        return hangouts.views.generate_edit_work_item(work_item)
 
     @staticmethod
     def next_state(*args):
@@ -214,12 +239,11 @@ class EndState(ChoiceState):
 
     @staticmethod
     def action(message, event):
+        user_object = User.objects.get(name=event['space']['name'])
+        work_item = user_object.get_work_item()
         if message == "save":
-            user_object = User.objects.get(name=event['space']['name'])
             user_object.final = True
             user_object.save()
-
-            work_item = user_object.get_work_item()
 
             path_dict = work_item.path_dict
             fields_dict = hangouts.views.generate_fields_dict(work_item)
@@ -242,8 +266,9 @@ class EndState(ChoiceState):
             change_state(event['space']['name'])
             response = hangouts.views.text_format("Your work item has been saved.")
 
-        else:
-            response = hangouts.views.text_format("Gimana hayo")
+        elif message == "Title":
+            user_object.state = TitleState.STATE_LABEL
+            response = hangouts.views.text_format("Please enter title" % message)
 
         return response
 
