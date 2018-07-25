@@ -305,6 +305,26 @@ class EndState(ChoiceState):
 
             response = hangouts.views.text_format("Please enter your issue Title.")
 
+        elif message == "Description":
+            user_object.state = DescriptionState.STATE_LABEL
+            user_object.save()
+
+            response = hangouts.views.text_format("Please describe your issue.")
+
+        elif message == "Hardware Type":
+            user_object.state = HardwareChoice.STATE_LABEL
+            user_object.save()
+
+            hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
+            response = hangouts.views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
+
+        elif message == "Severity":
+            user_object.state = SeverityChoice.STATE_LABEL
+            user_object.save()
+
+            severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
+            response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
+
         return response
 
     @staticmethod
@@ -314,7 +334,7 @@ class EndState(ChoiceState):
     @staticmethod
     def where():
         return "You're near the finish line. Please evaluate your issue at the card above and click" \
-               "'save' when you're done."
+               " 'save' when you're done."
 
 
 states_list = {InitialState.STATE_LABEL: InitialState, ChoiceState.STATE_LABEL: ChoiceState,
