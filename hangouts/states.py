@@ -52,14 +52,12 @@ class InitialState(State):
     @staticmethod
     def action(message, event):
         if message.lower() == 'support':
-            response = hangouts.views.generate_choices("Choose work item type", ["Hardware Support", "Software Support"],
-                                        "choose_type")
             change_state(event['space']['name'])
+            return hangouts.views.generate_choices("Choose work item type",
+                                                   ["Hardware Support", "Software Support"], "choose_type")
         else:
             message = 'You said: `%s`' % message
-            response = hangouts.views.text_format(message)
-
-        return response
+            return hangouts.views.text_format(message)
 
     @staticmethod
     def is_waiting_text():
@@ -120,12 +118,12 @@ class TitleState(State):
         work_item.title = message
         work_item.save()
 
-        change_state(event['space']['name'])
+        next_state = change_state(event['space']['name'])
 
-        if not user_object.final:
-            return hangouts.views.text_format("Please describe your issue.")
+        if next_state == EndState.STATE_LABEL:
+            return hangouts.views.generate_edit_work_item(work_item)
 
-        return hangouts.views.generate_edit_work_item(work_item)
+        return hangouts.views.text_format("Please describe your issue.")
 
     @staticmethod
     def next_state(*args):
@@ -148,6 +146,9 @@ class DescriptionState(State):
         user_object = User.objects.get(name=event['space']['name'])
 
         work_item = user_object.get_work_item()
+        user_email = str(event['message']['sender']['email'])
+        user_email = user_email.split("@")[0] + '@staff.gramedia.com'
+        message += "\n\n- Issued by %s via GDN's Hangouts Chat bot" % user_email
         work_item.description = message
         work_item.save()
 
@@ -155,14 +156,12 @@ class DescriptionState(State):
 
         if next_state == HardwareChoice.STATE_LABEL:
             hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-            response = hangouts.views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
+            return hangouts.views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
         elif next_state == SoftwareChoice.STATE_LABEL:
             third_party = ["GSuite", "Power BI", "VSTS"]
-            response = hangouts.views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
+            return hangouts.views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
         elif next_state == EndState.STATE_LABEL:
-            response = hangouts.views.generate_edit_work_item(work_item)
-
-        return response
+            return hangouts.views.generate_edit_work_item(work_item)
 
     @staticmethod
     def next_state(*args):
@@ -189,14 +188,13 @@ class HardwareChoice(ChoiceState):
         work_item.hardware_type = message
         work_item.save()
 
-        change_state(event['space']['name'])
+        next_state = change_state(event['space']['name'])
 
-        if not user_object.final:
-            severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-            response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
-            return response
+        if next_state == EndState.STATE_LABEL:
+            return hangouts.views.generate_edit_work_item(work_item)
 
-        return hangouts.views.generate_edit_work_item(work_item)
+        severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
+        return hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
 
     @staticmethod
     def next_state(*args):
@@ -221,14 +219,13 @@ class SoftwareChoice(ChoiceState):
         work_item.requested_by = user_email
         work_item.save()
 
-        change_state(event['space']['name'])
+        next_state = change_state(event['space']['name'])
 
-        if not user_object.final:
-            severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-            response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
-            return response
+        if next_state == EndState.STATE_LABEL:
+            return hangouts.views.generate_edit_work_item(work_item)
 
-        return hangouts.views.generate_edit_work_item(work_item)
+        severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
+        return hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
 
     @staticmethod
     def next_state(*args):
@@ -251,11 +248,6 @@ class SeverityChoice(ChoiceState):
         work_item.save()
 
         change_state(event['space']['name'])
-
-        if not user_object.final:
-            response = hangouts.views.generate_edit_work_item(work_item)
-            return response
-
         return hangouts.views.generate_edit_work_item(work_item)
 
     @staticmethod
@@ -297,35 +289,33 @@ class EndState(ChoiceState):
 
             work_item.delete()
 
-            response = hangouts.views.text_format("Your work item has been saved.")
+            return hangouts.views.text_format("Your work item has been saved.")
 
         elif message == "Title":
             user_object.state = TitleState.STATE_LABEL
             user_object.save()
 
-            response = hangouts.views.text_format("Please enter your issue Title.")
+            return hangouts.views.text_format("Please enter your issue Title.")
 
         elif message == "Description":
             user_object.state = DescriptionState.STATE_LABEL
             user_object.save()
 
-            response = hangouts.views.text_format("Please describe your issue.")
+            return hangouts.views.text_format("Please describe your issue.")
 
         elif message == "Hardware Type":
             user_object.state = HardwareChoice.STATE_LABEL
             user_object.save()
 
             hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-            response = hangouts.views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
+            return hangouts.views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
 
         elif message == "Severity":
             user_object.state = SeverityChoice.STATE_LABEL
             user_object.save()
 
             severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-            response = hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
-
-        return response
+            return hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
 
     @staticmethod
     def next_state(*args):
