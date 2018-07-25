@@ -143,7 +143,25 @@ def generate_edit_work_item(work_item):
             {
                 "header": {
                     "title": work_item.title,
-                    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png"
+                    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png",
+                    "button": {
+                        "textButton": {
+                            "text": "Edit",
+                            "onClick": {
+                                "action": {
+                                    "actionMethodName": "edit_work_item",
+                                    "parameters": [
+                                        {
+                                            "key": "field",
+                                            "value": "Title"
+                                        }
+                                    ]
+                                }
+                            }
+
+                        }
+                    }
+
                 },
                 "sections": [
                     {
@@ -214,5 +232,6 @@ def generate_fields_dict(work_item):
     print(dict)
     del dict["id"]
     del dict["workitem_ptr"]
+    del dict["title"]
 
     return dict
