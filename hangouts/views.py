@@ -10,7 +10,6 @@ from hangouts.models import User, HardwareSupport, SoftwareSupport
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
-
 import json
 
 HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
@@ -75,7 +74,6 @@ def handle_action(event):
     return response
 
 
-
 # ----------------------- send message asynchronously -----------------------#
 def send_message(body, space):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
@@ -132,13 +130,14 @@ def generate_choices(title, list, method):
 
     return card
 
-def generate_edit_work_item(work_item):
-    dict = generate_fields_dict(work_item)
-    for old_key in dict.keys():
-        new_key = old_key.replace("_", " ").title()
-        dict[new_key] = dict.pop(old_key)
 
-    del dict["Title"]
+def generate_edit_work_item(work_item):
+    work_item_dict = generate_fields_dict(work_item)
+    for old_key in work_item_dict.keys():
+        new_key = old_key.replace("_", " ").title()
+        work_item_dict[new_key] = work_item_dict.pop(old_key)
+
+    del work_item_dict["Title"]
 
     card = {
         "cards": [
@@ -149,7 +148,7 @@ def generate_edit_work_item(work_item):
                             {
                                 "keyValue": {
                                     "content": work_item.title,
-                                    "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/WMF-Agora-Settings_808080.svg/1024px-WMF-Agora-Settings_808080.svg.png",
+                                    "iconUrl": "/static/svg/hardware_support.svg",
                                     "button": {
                                         "textButton": {
                                             "text": "Edit",
@@ -204,8 +203,7 @@ def generate_edit_work_item(work_item):
         ]
     }
 
-
-    for label, content in dict.items():
+    for label, content in work_item_dict.items():
         item_widget = {
             "keyValue": {
                 "topLabel": label,
@@ -233,6 +231,7 @@ def generate_edit_work_item(work_item):
         card['cards'][0]['sections'][1]['widgets'].append(item_widget)
 
     return card
+
 
 def generate_fields_dict(work_item):
     dict = model_to_dict(work_item)
