@@ -21,8 +21,9 @@ class SoftwareSupport(WorkItem):
     requested_by = models.CharField(max_length=30)
     third_party = models.CharField(max_length=30)
     severity = models.CharField(max_length=20, null=True)
-    self_dict = {"requested_by": "", "severity": "Microsoft.VSTS.Common.Severity"}
-    # path_dict = dict(WorkItem.path_dict, **self_dict)
+    self_dict = {"3rd_party_software": "Ticketing.3rdPartyApp", "requested_by": "Ticketing.RequestedBy",
+                 "severity": "Microsoft.VSTS.Common.Severity"}
+    path_dict = dict(WorkItem.path_dict, **self_dict)
 
     def __str__(self):
         return "software_support"
