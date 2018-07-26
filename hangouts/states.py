@@ -312,6 +312,14 @@ class EndState(ChoiceState):
             severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
             return hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
 
+        elif message == "Third Party":
+            user_object.state = SoftwareChoice.STATE_LABEL
+            user_object.save()
+
+            third_party = ["GSuite", "Power BI", "VSTS"]
+            return hangouts.views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
+
+
     @staticmethod
     def next_state(*args):
         return InitialState.STATE_LABEL
