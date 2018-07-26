@@ -122,3 +122,16 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = '/static/'
+
+# ------------------------------------------ App specific variables --------------------------------------------------
+
+# 1. Hangouts API Token. GDN bot will include this token at every sent request
+HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
+
+# 2. VSTS API Token. This token belongs to admin@gramedia.digital.com . TOKEN EXPIRES ON 13 JULY 2019 !
+VSTS_PERSONAL_ACCESS_TOKEN = 'yhissyen5qljuutmcdesr3w3ov2saj6ujhsqnr7dskvkxa6rhq5a'
+
+# 3. Gramedia Digital Nusantara VSTS Base URL.
+VSTS_BASE_URL = 'https://quickstartbot.visualstudio.com/'
+
+# 4.

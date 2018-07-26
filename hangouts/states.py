@@ -4,14 +4,12 @@ import hangouts.views
 import vsts.views
 
 
-def change_state(space_name):
+def change_state(space_name, next_state):
     user_object = User.objects.get(name=space_name)
     current_state = states_list[user_object.state]
 
     if user_object.final:
         next_state = EndState.STATE_LABEL
-    else:
-        next_state = current_state.next_state(space_name)
 
     print("current state: " + current_state.STATE_LABEL)
     print("next state:")
@@ -37,11 +35,6 @@ class State(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def next_state(*args):
-        pass
-
-    @staticmethod
-    @abc.abstractmethod
     def where():
         pass
 
@@ -50,22 +43,18 @@ class InitialState(State):
     STATE_LABEL = "initial"
 
     @staticmethod
+    def is_waiting_text():
+        return True
+
+    @staticmethod
     def action(message, event):
         if message.lower() == 'support':
-            change_state(event['space']['name'])
+            change_state(event['space']['name'], ChoiceState.STATE_LABEL)
             return hangouts.views.generate_choices("Choose work item type",
                                                    ["Hardware Support", "Software Support"], "choose_type")
         else:
             message = 'You said: `%s`' % message
             return hangouts.views.text_format(message)
-
-    @staticmethod
-    def is_waiting_text():
-        return True
-
-    @staticmethod
-    def next_state(*args):
-        return ChoiceState.STATE_LABEL
 
     @staticmethod
     def where():
@@ -90,13 +79,9 @@ class ChoiceState(State):
         user_object.work_item = work_item_object
         user_object.save()
 
-        change_state(event['space']['name'])
+        change_state(event['space']['name'], TitleState.STATE_LABEL)
 
         return hangouts.views.text_format("You've chosen `%s`\n\nPlease enter your issue Title." % message)
-
-    @staticmethod
-    def next_state(*args):
-        return TitleState.STATE_LABEL
 
     @staticmethod
     def where():
@@ -118,16 +103,12 @@ class TitleState(State):
         work_item.title = message
         work_item.save()
 
-        next_state = change_state(event['space']['name'])
+        next_state = change_state(event['space']['name'], DescriptionState.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
             return hangouts.views.generate_edit_work_item(work_item)
 
         return hangouts.views.text_format("Please describe your issue.")
-
-    @staticmethod
-    def next_state(*args):
-        return DescriptionState.STATE_LABEL
 
     @staticmethod
     def where():
@@ -152,25 +133,19 @@ class DescriptionState(State):
         work_item.description = message
         work_item.save()
 
-        next_state = change_state(event['space']['name'])
+        if isinstance(work_item, HardwareSupport):
+            next_state = change_state(event['space']['name'], HardwareChoice.STATE_LABEL)
+        elif isinstance(work_item, SoftwareSupport):
+            next_state = change_state(event['space']['name'], SoftwareChoice.STATE_LABEL)
 
         if next_state == HardwareChoice.STATE_LABEL:
             hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
             return hangouts.views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
         elif next_state == SoftwareChoice.STATE_LABEL:
-            third_party = ["GSuite", "Power BI", "VSTS"]
+            third_party = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
             return hangouts.views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
         elif next_state == EndState.STATE_LABEL:
             return hangouts.views.generate_edit_work_item(work_item)
-
-    @staticmethod
-    def next_state(*args):
-        user_object = User.objects.get(name=args[0])
-        work_item = user_object.get_work_item()
-        if isinstance(work_item, HardwareSupport):
-            return HardwareChoice.STATE_LABEL
-        elif isinstance(work_item, SoftwareSupport):
-            return SoftwareChoice.STATE_LABEL
 
     @staticmethod
     def where():
@@ -188,17 +163,13 @@ class HardwareChoice(ChoiceState):
         work_item.hardware_type = message
         work_item.save()
 
-        next_state = change_state(event['space']['name'])
+        next_state = change_state(event['space']['name'], SeverityChoice.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
             return hangouts.views.generate_edit_work_item(work_item)
 
         severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
         return hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
-
-    @staticmethod
-    def next_state(*args):
-        return SeverityChoice.STATE_LABEL
 
     @staticmethod
     def where():
@@ -211,15 +182,21 @@ class SoftwareChoice(ChoiceState):
     @staticmethod
     def action(message, event):
         user_object = User.objects.get(name=event['space']['name'])
-
         work_item = user_object.get_work_item()
-        work_item.third_party = message
         user_email = str(event['user']['email'])
         user_email = user_email.split("@")[0] + '@staff.gramedia.com'
         work_item.requested_by = user_email
+
+        if message == "Fill your own..":
+            work_item.save()
+            user_object.state = OtherSoftwareType.STATE_LABEL
+            user_object.save()
+            return hangouts.views.text_format("Please enter your own software type")
+
+        work_item.third_party = message
         work_item.save()
 
-        next_state = change_state(event['space']['name'])
+        next_state = change_state(event['space']['name'], SeverityChoice.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
             return hangouts.views.generate_edit_work_item(work_item)
@@ -228,12 +205,36 @@ class SoftwareChoice(ChoiceState):
         return hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
 
     @staticmethod
-    def next_state(*args):
-        return SeverityChoice.STATE_LABEL
+    def where():
+        return "You're on `Choose Software`. Please select 3rd Party App that is being issued from the card above."
+
+
+class OtherSoftwareType(State):
+    STATE_LABEL = "other_software_type"
+
+    @staticmethod
+    def is_waiting_text():
+        return True
+
+    @staticmethod
+    def action(message, event):
+        user_object = User.objects.get(name=event['space']['name'])
+
+        work_item = user_object.get_work_item()
+        work_item.third_party = message
+        work_item.save()
+
+        next_state = change_state(event['space']['name'], SeverityChoice.STATE_LABEL)
+
+        if next_state == EndState.STATE_LABEL:
+            return hangouts.views.generate_edit_work_item(work_item)
+
+        severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
+        return hangouts.views.generate_choices("How severe is this issue?", severities, "severity")
 
     @staticmethod
     def where():
-        return "You're on `Choose Software`. Please select 3rd Party App that is being issued from the card above."
+        return "You're on `Custom Software Type`. Please enter your own desired 3rd party software."
 
 
 class SeverityChoice(ChoiceState):
@@ -247,12 +248,8 @@ class SeverityChoice(ChoiceState):
         work_item.severity = message
         work_item.save()
 
-        change_state(event['space']['name'])
+        change_state(event['space']['name'], EndState.STATE_LABEL)
         return hangouts.views.generate_edit_work_item(work_item)
-
-    @staticmethod
-    def next_state(*args):
-        return EndState.STATE_LABEL
 
     @staticmethod
     def where():
@@ -316,21 +313,17 @@ class EndState(ChoiceState):
             user_object.state = SoftwareChoice.STATE_LABEL
             user_object.save()
 
-            third_party = ["GSuite", "Power BI", "VSTS"]
+            third_party = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
             return hangouts.views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
-
-
-    @staticmethod
-    def next_state(*args):
-        return InitialState.STATE_LABEL
 
     @staticmethod
     def where():
         return "You're near the finish line. Please evaluate your issue at the card above and click" \
-               " <b>save</b> when you're done."
+               " `save` when you're done."
 
 
 states_list = {InitialState.STATE_LABEL: InitialState, ChoiceState.STATE_LABEL: ChoiceState,
                TitleState.STATE_LABEL: TitleState, DescriptionState.STATE_LABEL: DescriptionState,
                HardwareChoice.STATE_LABEL: HardwareChoice, SoftwareChoice.STATE_LABEL: SoftwareChoice,
-               SeverityChoice.STATE_LABEL: SeverityChoice, EndState.STATE_LABEL: EndState}
+               OtherSoftwareType.STATE_LABEL: OtherSoftwareType, SeverityChoice.STATE_LABEL: SeverityChoice,
+               EndState.STATE_LABEL: EndState}

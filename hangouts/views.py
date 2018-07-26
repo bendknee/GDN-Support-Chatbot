@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from .states import *
+from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
@@ -13,15 +14,13 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 import json
 
-HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
-
 
 # ----------------------- receive message from Hangouts -----------------------#
 @csrf_exempt
 def receive_message(payload):
     event = json.loads(payload.body)
     print(event)
-    if event['token'] == HANGOUTS_CHAT_API_TOKEN:
+    if event['token'] == settings.HANGOUTS_CHAT_API_TOKEN:
         user_object, created = User.objects.get_or_create(name=event['space']['name'])
         state = states_list[user_object.state]
         if event['type'] == 'ADDED_TO_SPACE' and event['space']['type'] == 'ROOM':
@@ -50,7 +49,13 @@ def receive_message(payload):
         elif event['type'] == 'CARD_CLICKED':
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
-                response = handle_action(event)
+                action = event['action']
+                user_object = User.objects.get(name=event['space']['name'])
+                state = states_list[user_object.state]
+
+                response = state.action(action['parameters'][0]['value'], event)
+            else:
+                response = {}
         else:
             return
     else:
@@ -61,16 +66,6 @@ def receive_message(payload):
 
 def text_format(message):
     return {"text": message}
-
-
-def handle_action(event):
-    action = event['action']
-    user_object = User.objects.get(name=event['space']['name'])
-    state = states_list[user_object.state]
-
-    response = state.action(action['parameters'][0]['value'], event)
-
-    return response
 
 
 # ----------------------- send message asynchronously -----------------------#
@@ -87,8 +82,8 @@ def send_message(body, space):
 
 
 # ----------------------- card generators -----------------------#
-def generate_choices(title, list, method):
-    if list == [] and method == 'unsubscribe':
+def generate_choices(title, choices, method):
+    if choices == [] and method == 'unsubscribe':
         return text_format("You did not subscribe to any area.")
 
     card = {
@@ -107,7 +102,7 @@ def generate_choices(title, list, method):
         ]
     }
 
-    for item in list:
+    for item in choices:
         item_widget = {
             "keyValue": {
                 "content": item,
