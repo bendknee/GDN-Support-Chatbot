@@ -77,7 +77,7 @@ def handle_action(event):
 def send_message(body, space):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        'project-id-2458129994854391868-7fe6d3521132.json', scopes)
+        'GDN Support Bot service key.json', scopes)
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
@@ -147,7 +147,8 @@ def generate_edit_work_item(work_item):
                             {
                                 "keyValue": {
                                     "content": work_item.title,
-                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" + static('png/' + work_item.__str__() + '.png'),
+                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" +
+                                               static('png/' + work_item.image_url + '.png'),
                                     "button": {
                                         "textButton": {
                                             "text": "Edit",
