@@ -133,6 +133,10 @@ def generate_choices(title, list, method):
 def generate_edit_work_item(work_item):
     work_item_dict = generate_fields_dict(work_item)
 
+    del work_item_dict["title"]
+    if "requested_by" in work_item_dict:
+        del work_item_dict["requested_by"]
+
     label_dict = {}
 
     for old_key in work_item_dict.keys():
@@ -143,10 +147,6 @@ def generate_edit_work_item(work_item):
     #     new_key = old_key.replace("_", " ").title()
     #     print(new_key)
     #     work_item_dict[new_key] = work_item_dict.pop(old_key)
-
-    del work_item_dict["Title"]
-    if "Requested By" in work_item_dict:
-        del work_item_dict["Requested By"]
 
     card = {
         "cards": [
