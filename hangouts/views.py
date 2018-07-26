@@ -213,7 +213,7 @@ def generate_edit_work_item(work_item):
         ]
     }
 
-    for label, content in work_item_dict.items():
+    for label, content in label_dict.items():
         item_widget = {
             "keyValue": {
                 "topLabel": label,
