@@ -35,8 +35,8 @@ def receive_message(payload):
             else:
                 message = event['message']['argumentText']
             if message == '/help':
-                response = text_format('Type "%s" to know where you are on issuing a new Work Item\n' % '/where'
-                                       + 'Type "%s" to abort all progress on issuing a new Work Item' % '/reset')
+                response = text_format('Type `/where` to know where you are on issuing a new Work Item\n'
+                                       + 'Type `/reset` to abort all progress on issuing a new Work Item')
             elif message == '/reset':
                 User.objects.filter(name=event['space']['name']).delete()
                 response = text_format("Your progress has been aborted")

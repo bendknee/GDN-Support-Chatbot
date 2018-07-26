@@ -69,7 +69,7 @@ class InitialState(State):
 
     @staticmethod
     def where():
-        return "You're nowhere. Type '%s' to begin issuing new Work Item." % 'support'
+        return "You're nowhere. Type `support` to begin issuing new Work Item."
 
 
 class ChoiceState(State):
@@ -92,7 +92,7 @@ class ChoiceState(State):
 
         change_state(event['space']['name'])
 
-        return hangouts.views.text_format("You've chosen '%s'\nPlease enter your issue Title." % message)
+        return hangouts.views.text_format("You've chosen `%s`\n\nPlease enter your issue Title." % message)
 
     @staticmethod
     def next_state(*args):
@@ -100,7 +100,7 @@ class ChoiceState(State):
 
     @staticmethod
     def where():
-        return "You're on Choose Type. Please pick desired work item Type from the card above."
+        return "You're on `Choose Type`. Please pick desired work item Type from the card above."
 
 
 class TitleState(State):
@@ -131,7 +131,7 @@ class TitleState(State):
 
     @staticmethod
     def where():
-        return "You're on Title. Please enter issue Title."
+        return "You're on `Title`. Please enter issue Title."
 
 
 class DescriptionState(State):
@@ -174,7 +174,7 @@ class DescriptionState(State):
 
     @staticmethod
     def where():
-        return "You're on Description. Please describe your issue."
+        return "You're on `Description`. Please describe your issue."
 
 
 class HardwareChoice(ChoiceState):
@@ -202,7 +202,7 @@ class HardwareChoice(ChoiceState):
 
     @staticmethod
     def where():
-        return "You're on Choose Hardware. Please select one Hardware Type that is being issued from the card above."
+        return "You're on `Choose Hardware`. Please select one Hardware Type that is being issued from the card above."
 
 
 class SoftwareChoice(ChoiceState):
@@ -233,7 +233,7 @@ class SoftwareChoice(ChoiceState):
 
     @staticmethod
     def where():
-        return "You're on Choose Software. Please select 3rd Party App that is being issued from the card above."
+        return "You're on `Choose Software`. Please select 3rd Party App that is being issued from the card above."
 
 
 class SeverityChoice(ChoiceState):
@@ -256,7 +256,7 @@ class SeverityChoice(ChoiceState):
 
     @staticmethod
     def where():
-        return "You're on Choose Severity. Please select this issue's severity level from the card above."
+        return "You're on `Choose Severity`. Please select this issue's severity level from the card above."
 
 
 class EndState(ChoiceState):
@@ -324,7 +324,7 @@ class EndState(ChoiceState):
     @staticmethod
     def where():
         return "You're near the finish line. Please evaluate your issue at the card above and click" \
-               " 'save' when you're done."
+               " <b>save</b> when you're done."
 
 
 states_list = {InitialState.STATE_LABEL: InitialState, ChoiceState.STATE_LABEL: ChoiceState,
