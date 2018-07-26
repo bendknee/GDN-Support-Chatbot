@@ -132,10 +132,11 @@ def generate_choices(title, list, method):
 
 def generate_edit_work_item(work_item):
     work_item_dict = generate_fields_dict(work_item)
-    print(work_item_dict)
     for old_key in work_item_dict.keys():
         new_key = old_key.replace("_", " ").title()
         work_item_dict[new_key] = work_item_dict.pop(old_key)
+
+    print(work_item_dict)
 
     del work_item_dict["Title"]
     if "Requested By" in work_item_dict:
