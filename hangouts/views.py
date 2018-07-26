@@ -137,7 +137,8 @@ def generate_edit_work_item(work_item):
         work_item_dict[new_key] = work_item_dict.pop(old_key)
 
     del work_item_dict["Title"]
-    del work_item_dict["Requested By"]
+    if "Requested By" in work_item_dict:
+        del work_item_dict["Requested By"]
 
     card = {
         "cards": [
