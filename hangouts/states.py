@@ -146,7 +146,7 @@ class DescriptionState(State):
         user_object = User.objects.get(name=event['space']['name'])
 
         work_item = user_object.get_work_item()
-        user_email = str(event['message']['sender']['email'])
+        user_email = str(event['user']['email'])
         user_email = user_email.split("@")[0] + '@staff.gramedia.com'
         message += "\n\n- Issued by %s via GDN's Hangouts Chat bot" % user_email
         work_item.description = message
@@ -214,7 +214,7 @@ class SoftwareChoice(ChoiceState):
 
         work_item = user_object.get_work_item()
         work_item.third_party = message
-        user_email = str(event['message']['sender']['email'])
+        user_email = str(event['user']['email'])
         user_email = user_email.split("@")[0] + '@staff.gramedia.com'
         work_item.requested_by = user_email
         work_item.save()
@@ -279,12 +279,7 @@ class EndState(ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            if isinstance(work_item, HardwareSupport):
-                url = "Hardware%20Support"
-            elif isinstance(work_item, SoftwareSupport):
-                url = "Software%20Support"
-
-            vsts.views.create_work_item(work_item_dict, url)
+            vsts.views.create_work_item(work_item_dict, work_item.vsts_url)
             print(work_item_dict)
 
             work_item.delete()

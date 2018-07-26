@@ -13,16 +13,18 @@ class HardwareSupport(WorkItem):
     path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Support.HardwareType",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
     image_url = "hardware_support"
+    vsts_url = "Hardware%20Support"
 
 
 class SoftwareSupport(WorkItem):
     requested_by = models.CharField(max_length=30)
     third_party = models.CharField(max_length=30)
     severity = models.CharField(max_length=20, null=True)
-    path_dict = dict(WorkItem.path_dict, **{"3rd_party_software": "Ticketing.3rdPartyApp",
-                                            "requested_by": "Ticketing.RequestedBy",
+    path_dict = dict(WorkItem.path_dict, **{"3rd_party_software": "Support.3rdPartyApp",
+                                            "requested_by": "Support.RequestedBy",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
     image_url = "software_support"
+    vsts_url = "Software%20Support"
 
 
 class User(models.Model):
