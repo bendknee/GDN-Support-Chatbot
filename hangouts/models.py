@@ -20,7 +20,7 @@ class SoftwareSupport(WorkItem):
     requested_by = models.CharField(max_length=30)
     third_party = models.CharField(max_length=30)
     severity = models.CharField(max_length=20, null=True)
-    path_dict = dict(WorkItem.path_dict, **{"3rd_party_software": "Support.3rdPartyApp",
+    path_dict = dict(WorkItem.path_dict, **{"third_party": "Support.3rdPartyApp",
                                             "requested_by": "Support.RequestedBy",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
     image_url = "software_support"
