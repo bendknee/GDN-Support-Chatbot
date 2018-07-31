@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from hangouts.models import VstsArea
+from hangouts.models import WorkItem
 
 import hangouts.views
 
@@ -12,41 +13,39 @@ import json
 import requests
 import traceback
 
-VSTS_PERSONAL_ACCESS_TOKEN = 'yhissyen5qljuutmcdesr3w3ov2saj6ujhsqnr7dskvkxa6rhq5a'
-ENCODED_PAT = str(base64.b64encode(b':' + bytes(VSTS_PERSONAL_ACCESS_TOKEN, 'utf-8'))).replace("b'", '').replace("'", '')
-BASE_URL = 'https://{{account_name}}.visualstudio.com/'
-ACCOUNT_NAME = 'quickstartbot'
+ENCODED_PAT = str(base64.b64encode(b':' + bytes(settings.VSTS_PERSONAL_ACCESS_TOKEN,
+                                                'utf-8'))).replace("b'", '').replace("'", '')
 
 
-#----------------------- post bug to VSTS -----------------------#
-def create_work_item(work_item_dict):
-    url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '{{Project}}/_apis/wit/workitems/$Bug?api-version=4.1'
+# ----------------------- post bug to VSTS -----------------------#
+def create_work_item(work_item_dict, url):
+    url = settings.VSTS_BASE_URL + 'Support/_apis/wit/workitems/$' + url + '?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
     payload = []
 
     for key, value in work_item_dict.items():
         field = {
             "op": "add",
-            "path": key,
+            "path": "/fields/" + key,
             "value": value
         }
         payload.append(field)
 
+    req = requests.post(url, headers=headers, data=json.dumps(payload))
+    print(req.json())
+    print("ke vsts!")
 
-    req = requests.post(url.replace("{{Project}}", "Support"), headers=headers, data=json.dumps(payload))
-    return req.json()
 
-#----------------------- receive webhook from VSTS -----------------------#
+# ----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
 def receive_webhook(request):
     try:
         event = json.loads(request.body)
+        print(event)
 
-        body = hangouts.views.generate_bug(event['resource'])
+        body = hangouts.views.generate_work_item(event['resource'])
 
-        # get all spaces subscribed to area
-
-        area = VstsArea.objects.get(name=event['resource']['fields']['System.AreaPath'])
+        work_item = WorkItem.objects.get(name=event['resource']['workItemId'])
 
         spaces = area.hangoutsSpaces.all()
         for space in spaces:
@@ -59,10 +58,9 @@ def receive_webhook(request):
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
 
-
 def get_projects():
     project_list = set()
-    url = BASE_URL.replace("{{account_name}}", ACCOUNT_NAME) + '_apis/projecthistory?api-version=4.1-preview.2'
+    url = settings.VSTS_BASE_URL + '_apis/projecthistory?api-version=4.1-preview.2'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT}
     req = requests.get(url, headers=headers)
     response = req.json()
@@ -70,10 +68,11 @@ def get_projects():
         project_list.add(obj["name"])
     return project_list
 
-#----------------------- get all areas from VSTS -----------------------#
+
+# ----------------------- get all areas from VSTS -----------------------#
 def get_all_areas():
     areas_list = []
-    url = BASE_URL.replace('{{account_name}}', ACCOUNT_NAME) + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
+    url = settings.VSTS_BASE_URL + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT}
     for project in get_projects():
         req = requests.get(url.replace("{{Project}}", project), headers=headers)
@@ -85,6 +84,7 @@ def get_all_areas():
         except KeyError:
             continue
     return areas_list
+
 
 def recursive_path_maker(area, parent_path='', areas_list=None):
     if areas_list is None:
