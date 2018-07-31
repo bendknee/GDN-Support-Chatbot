@@ -2,6 +2,8 @@ from django.db import models
 
 
 class WorkItem(models.Model):
+    id = models.CharField(max_length=30)
+    user = models.ManyToManyField('User', on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=50)
     description = models.TextField()
     path_dict = {"title": "System.Title", "description": "System.Description"}

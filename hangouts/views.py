@@ -233,6 +233,114 @@ def generate_edit_work_item(work_item):
     return card
 
 
+def generate_work_item(work_item):
+    temp_dict = generate_fields_dict(work_item)
+
+    del temp_dict["title"]
+    if "requested_by" in temp_dict:
+        del temp_dict["requested_by"]
+
+    work_item_dict = {}
+
+    for old_key in temp_dict.keys():
+        new_key = old_key.replace("_", " ").title()
+        work_item_dict[new_key] = temp_dict[old_key]
+
+    card = {
+        "cards": [
+            {
+                "sections": [
+                    {
+                        "widgets": [
+                            {
+                                "keyValue": {
+                                    "content": work_item.title,
+                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" +
+                                               static('png/' + work_item.image_url + '.png'),
+                                    "button": {
+                                        "textButton": {
+                                            "text": "Edit",
+                                            "onClick": {
+                                                "action": {
+                                                    "actionMethodName": "edit_work_item",
+                                                    "parameters": [
+                                                        {
+                                                            "key": "field",
+                                                            "value": "Title"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "widgets": [
+                        ]
+                    },
+                    {
+                        "widgets": [
+                            {
+                                "buttons": [
+                                    {
+                                        "textButton": {
+                                            "text": "SAVE",
+                                            "onClick": {
+                                                "action": {
+                                                    "actionMethodName": "save_work_item",
+                                                    "parameters": [
+                                                        {
+                                                            "key": "field",
+                                                            "value": "save"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+    for label, content in work_item_dict.items():
+        item_widget = {
+            "keyValue": {
+                "topLabel": label,
+                "content": content,
+                "button": {
+                    "textButton": {
+                        "text": "Edit",
+                        "onClick": {
+                            "action": {
+                                "actionMethodName": "edit_work_item",
+                                "parameters": [
+                                    {
+                                        "key": "field",
+                                        "value": label
+                                    }
+                                ]
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        card['cards'][0]['sections'][1]['widgets'].append(item_widget)
+
+    return card
+
+
 def generate_fields_dict(work_item):
     dict = model_to_dict(work_item)
 

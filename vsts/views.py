@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from hangouts.models import VstsArea
+from hangouts.models import WorkItem
 
 import hangouts.views
 
@@ -43,12 +43,9 @@ def receive_webhook(request):
         event = json.loads(request.body)
         print(event)
 
-        fields_dict = {'Area Path': 'System.AreaPath', 'Severity': 'Microsoft.VSTS.Common.Severity', 'Repro Steps': 'Microsoft.VSTS.TCM.ReproSteps'}
-        body = hangouts.views.generate_bug(event['resource'], "https://www.iconspng.com/uploads/bad-bug/bad-bug.png", fields_dict)
+        body = hangouts.views.generate_work_item(event['resource'])
 
-        # get all spaces subscribed to area
-
-        area = VstsArea.objects.get(name=event['resource']['fields']['System.AreaPath'])
+        work_item = WorkItem.objects.get(name=event['resource']['workItemId'])
 
         spaces = area.hangoutsSpaces.all()
         for space in spaces:
