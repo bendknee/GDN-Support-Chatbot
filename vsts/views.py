@@ -43,13 +43,13 @@ def receive_webhook(request):
         event = json.loads(request.body)
         print(event)
 
-        body = hangouts.views.generate_work_item(event['resource'])
+        body = hangouts.views.generate_updated_work_item(event['resource'])
 
         work_item = WorkItem.objects.get(name=event['resource']['workItemId'])
 
-        spaces = area.hangoutsSpaces.all()
-        for space in spaces:
-            hangouts.views.send_message(body, space.__str__())
+        user = work_item.user
+
+        hangouts.views.send_message(body, user.name)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 

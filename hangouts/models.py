@@ -2,8 +2,8 @@ from django.db import models
 
 
 class WorkItem(models.Model):
-    id = models.CharField(max_length=30)
-    user = models.ManyToManyField('User', on_delete=models.CASCADE, null=True)
+    # id = models.CharField(max_length=30)
+    # user = models.ManyToManyField('User', on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=50)
     description = models.TextField()
     path_dict = {"title": "System.Title", "description": "System.Description"}
@@ -19,7 +19,7 @@ class HardwareSupport(WorkItem):
 
 
 class SoftwareSupport(WorkItem):
-    requested_by = models.CharField(max_length=30)
+    requested_by = models.TextField()
     third_party = models.CharField(max_length=30)
     severity = models.CharField(max_length=20, null=True)
     path_dict = dict(WorkItem.path_dict, **{"third_party": "Support.3rdPartyApp",
@@ -47,11 +47,3 @@ class User(models.Model):
             return self.work_item.softwaresupport
         except SoftwareSupport.DoesNotExist:
             pass
-
-
-class VstsArea(models.Model):
-    name = models.CharField(max_length=30)
-    hangoutsSpaces = models.ManyToManyField(User)
-
-    def __str__(self):
-        return self.name

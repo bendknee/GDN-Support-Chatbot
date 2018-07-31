@@ -69,14 +69,14 @@ def text_format(message):
 
 
 # ----------------------- send message asynchronously -----------------------#
-def send_message(body, space):
+def send_message(body, user):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'GDN Support Bot service key.json', scopes)
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().create(parent=space, body=body).execute()
+    resp = chat.spaces().messages().create(parent=user, body=body).execute()
 
     print(resp)
 
@@ -233,7 +233,7 @@ def generate_edit_work_item(work_item):
     return card
 
 
-def generate_work_item(work_item):
+def generate_updated_work_item(work_item):
     temp_dict = generate_fields_dict(work_item)
 
     del temp_dict["title"]
