@@ -47,7 +47,6 @@ def receive_message(payload):
                 response = text_format(state.where())
 
         elif event['type'] == 'CARD_CLICKED':
-            response = handle_action(event)
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 action = event['action']
@@ -340,6 +339,7 @@ def generate_work_item(work_item):
         card['cards'][0]['sections'][1]['widgets'].append(item_widget)
 
     return card
+
 
 def generate_fields_dict(work_item):
     dict = model_to_dict(work_item)
