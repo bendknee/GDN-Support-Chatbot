@@ -148,7 +148,7 @@ def generate_edit_work_item(work_item):
                                 "keyValue": {
                                     "content": work_item.title,
                                     "iconUrl": "http://hangouts-vsts.herokuapp.com" +
-                                               static('png/' + work_item.url + '.png'),
+                                               static('png/' + "hardware_support" + '.png'),
                                     "button": {
                                         "textButton": {
                                             "text": "Edit",
