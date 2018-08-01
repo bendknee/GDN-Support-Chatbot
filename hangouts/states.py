@@ -268,6 +268,9 @@ class EndState(ChoiceState):
         user_object.save()
 
         if message == "save":
+            user_object.final = False
+            user_object.save()
+            
             path_dict = work_item.path_dict
             fields_dict = hangouts.views.generate_fields_dict(work_item)
 
@@ -280,6 +283,7 @@ class EndState(ChoiceState):
             print(work_item_dict)
 
             work_item.delete()
+
             change_state(event['space']['name'], InitialState.STATE_LABEL)
 
             return hangouts.views.text_format("Your work item has been saved.")
