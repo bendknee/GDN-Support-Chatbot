@@ -271,10 +271,10 @@ def generate_updated_work_item(work_item):
                                 "buttons": [
                                     {
                                         "textButton": {
-                                            "text": "SAVE",
+                                            "text": "MORE",
                                             "onClick": {
                                                 "openLink": {
-                                                    "url": work_item['url']
+                                                    "url": work_item['_links']['html']['href']
                                                 }
                                             }
                                         }
