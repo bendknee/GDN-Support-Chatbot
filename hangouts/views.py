@@ -244,6 +244,11 @@ def generate_updated_work_item(work_item):
     if 'System.History' in work_item['fields']:
         fields['Comment'] = work_item['fields']['System.History']['newValue']
 
+    image_url = "http://hangouts-vsts.herokuapp.com" + static('png/' +
+                            work_item['revision']['fields']['System.WorkItemType'] + '.png')
+
+    print(image_url)
+
     card = {
         "cards": [
             {
@@ -253,9 +258,7 @@ def generate_updated_work_item(work_item):
                             {
                                 "keyValue": {
                                     "content": work_item['revision']['fields']['System.Title'],
-                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" +
-                                               static('png/' + work_item['revision']['fields']['System.WorkItemType'] +
-                                                      '.png')
+                                    "iconUrl": image_url
                                 }
                             }
                         ]
