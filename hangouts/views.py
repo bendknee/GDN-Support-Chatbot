@@ -247,8 +247,6 @@ def generate_updated_work_item(work_item):
     image_url = "http://hangouts-vsts.herokuapp.com" + static('png/' +
                             work_item['revision']['fields']['System.WorkItemType'].replace(" ", "%20") + '.png')
 
-    print(image_url)
-
     card = {
         "cards": [
             {
