@@ -270,7 +270,7 @@ class EndState(ChoiceState):
         if message == "save":
             user_object.final = False
             user_object.save()
-            
+
             path_dict = work_item.path_dict
             fields_dict = hangouts.views.generate_fields_dict(work_item)
 

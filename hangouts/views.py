@@ -238,8 +238,8 @@ def generate_updated_work_item(work_item):
     fields = {'Revised by': work_item['revisedBy']['name']}
 
     if 'System.State' in work_item['fields']:
-        fields['State'] = 'Changed from `' + work_item['fields']['System.State']['oldValue'] + \
-                          '` to `' + work_item['fields']['System.State']['newValue'] + '`'
+        fields['State'] = '`' + work_item['fields']['System.State']['oldValue'] + \
+                          '` --> `' + work_item['fields']['System.State']['newValue'] + '`'
 
     if 'System.History' in work_item['fields']:
         fields['Comment'] = work_item['fields']['System.History']['newValue']
@@ -263,6 +263,24 @@ def generate_updated_work_item(work_item):
                     },
                     {
                         "widgets": [
+                        ]
+                    },
+                    {
+                        "widgets": [
+                            {
+                                "buttons": [
+                                    {
+                                        "textButton": {
+                                            "text": "SAVE",
+                                            "onClick": {
+                                                "openLink": {
+                                                    "url": work_item['url']
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
                         ]
                     }
                 ]
