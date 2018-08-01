@@ -32,7 +32,7 @@ class WorkItemCreated(models.Model):
 
 class User(models.Model):
     name = models.CharField(max_length=40)
-    work_item = models.OneToOneField(WorkItem, on_delete=models.CASCADE, null=True)
+    work_item = models.OneToOneField(WorkItem, on_delete=models.SET_NULL, null=True)
     state = models.CharField(default='initial', max_length=30)
     final = models.BooleanField(default=False)
 
