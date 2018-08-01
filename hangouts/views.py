@@ -234,17 +234,14 @@ def generate_edit_work_item(work_item):
 
 
 def generate_updated_work_item(work_item):
-    temp_dict = generate_fields_dict(work_item)
 
-    del temp_dict["title"]
-    if "requested_by" in temp_dict:
-        del temp_dict["requested_by"]
+    fields = {'Revised by:': work_item['revisedBy']['name'], 'State': 'Changed from `' + work_item['fields']['System.State']['oldValue'] + '` to `' + work_item['fields']['System.State']['newValue'] + '`'}
 
-    work_item_dict = {}
+    if 'System.State' in work_item['fields']:
+        fields['State'] = 'Changed from `' + work_item['fields']['System.State']['oldValue'] + '` to `' + work_item['fields']['System.State']['newValue'] + '`'
 
-    for old_key in temp_dict.keys():
-        new_key = old_key.replace("_", " ").title()
-        work_item_dict[new_key] = temp_dict[old_key]
+    if 'System.History' in work_item['fields']:
+        fields['Comment'] = work_item['fields']['System.History']['newValue']
 
     card = {
         "cards": [
@@ -254,26 +251,7 @@ def generate_updated_work_item(work_item):
                         "widgets": [
                             {
                                 "keyValue": {
-                                    "content": work_item.title,
-                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" +
-                                               static('png/' + work_item.image_url + '.png'),
-                                    "button": {
-                                        "textButton": {
-                                            "text": "Edit",
-                                            "onClick": {
-                                                "action": {
-                                                    "actionMethodName": "edit_work_item",
-                                                    "parameters": [
-                                                        {
-                                                            "key": "field",
-                                                            "value": "Title"
-                                                        }
-                                                    ]
-                                                }
-                                            }
-
-                                        }
-                                    }
+                                    "content": work_item['revision']['fields']['System.Title']
                                 }
                             }
                         ]
@@ -281,37 +259,13 @@ def generate_updated_work_item(work_item):
                     {
                         "widgets": [
                         ]
-                    },
-                    {
-                        "widgets": [
-                            {
-                                "buttons": [
-                                    {
-                                        "textButton": {
-                                            "text": "SAVE",
-                                            "onClick": {
-                                                "action": {
-                                                    "actionMethodName": "save_work_item",
-                                                    "parameters": [
-                                                        {
-                                                            "key": "field",
-                                                            "value": "save"
-                                                        }
-                                                    ]
-                                                }
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
                     }
                 ]
             }
         ]
     }
 
-    for label, content in work_item_dict.items():
+    for label, content in fields.items():
         item_widget = {
             "keyValue": {
                 "topLabel": label,

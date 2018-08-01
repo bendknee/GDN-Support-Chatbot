@@ -47,9 +47,9 @@ def receive_webhook(request):
 
         work_item = WorkItem.objects.get(name=event['resource']['workItemId'])
 
-        user = work_item.user
-
-        hangouts.views.send_message(body, user.name)
+        # user = work_item.user
+        #
+        hangouts.views.send_message(body, "spaces/gYb-1AAAAAE")
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
