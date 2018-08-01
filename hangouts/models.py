@@ -26,7 +26,7 @@ class SoftwareSupport(WorkItem):
 
 
 class WorkItemCreated(models.Model):
-    id = models.CharField(max_length=30)
+    id = models.CharField(max_length=30, primary_key=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
 
 
