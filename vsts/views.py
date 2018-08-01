@@ -45,7 +45,7 @@ def receive_webhook(request):
 
         body = hangouts.views.generate_updated_work_item(event['resource'])
 
-        work_item = WorkItemCreated.objects.get(name=event['resource']['workItemId'])
+        work_item = WorkItemCreated.objects.get(id=event['resource']['workItemId'])
 
         hangouts.views.send_message(body, work_item.user.name)
 
