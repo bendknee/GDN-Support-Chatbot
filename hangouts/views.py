@@ -148,7 +148,7 @@ def generate_edit_work_item(work_item):
                                 "keyValue": {
                                     "content": work_item.title,
                                     "iconUrl": "http://hangouts-vsts.herokuapp.com" +
-                                               static('png/' + work_item.image_url + '.png'),
+                                               static('png/' + work_item.url + '.png'),
                                     "button": {
                                         "textButton": {
                                             "text": "Edit",
@@ -238,12 +238,11 @@ def generate_updated_work_item(work_item):
     fields = {'Revised by': work_item['revisedBy']['name']}
 
     if 'System.State' in work_item['fields']:
-        fields['State'] = 'Changed from `' + work_item['fields']['System.State']['oldValue'] + '` to `' + work_item['fields']['System.State']['newValue'] + '`'
+        fields['State'] = 'Changed from `' + work_item['fields']['System.State']['oldValue'] + \
+                          '` to `' + work_item['fields']['System.State']['newValue'] + '`'
 
     if 'System.History' in work_item['fields']:
         fields['Comment'] = work_item['fields']['System.History']['newValue']
-
-    url = work_item['revision']['fields']['System.WorkItemType'].lower().replace(" ", "_")
 
     card = {
         "cards": [
@@ -255,7 +254,8 @@ def generate_updated_work_item(work_item):
                                 "keyValue": {
                                     "content": work_item['revision']['fields']['System.Title'],
                                     "iconUrl": "http://hangouts-vsts.herokuapp.com" +
-                                               static('png/' + url + '.png')
+                                               static('png/' + work_item['revision']['fields']['System.WorkItemType'] +
+                                                      '.png')
                                 }
                             }
                         ]

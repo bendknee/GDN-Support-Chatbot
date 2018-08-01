@@ -14,8 +14,7 @@ class HardwareSupport(WorkItem):
     severity = models.CharField(max_length=20, null=True)
     path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Support.HardwareType",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
-    image_url = "hardware_support"
-    vsts_url = "Hardware Support"
+    url = "Hardware Support"
 
 
 class SoftwareSupport(WorkItem):
@@ -25,8 +24,7 @@ class SoftwareSupport(WorkItem):
     path_dict = dict(WorkItem.path_dict, **{"third_party": "Support.3rdPartyApp",
                                             "requested_by": "Support.RequestedBy",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
-    image_url = "software_support"
-    vsts_url = "Software%20Support"
+    url = "Software Support"
 
 
 class User(models.Model):

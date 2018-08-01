@@ -276,7 +276,7 @@ class EndState(ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            vsts.views.create_work_item(work_item_dict, work_item.vsts_url)
+            vsts.views.create_work_item(work_item_dict, work_item.url)
             print(work_item_dict)
 
             work_item.delete()
