@@ -235,7 +235,7 @@ def generate_edit_work_item(work_item):
 
 def generate_updated_work_item(work_item):
 
-    fields = {'Revised by:': work_item['revisedBy']['name'], 'State': 'Changed from `' + work_item['fields']['System.State']['oldValue'] + '` to `' + work_item['fields']['System.State']['newValue'] + '`'}
+    fields = {'Revised by:': work_item['revisedBy']['name']}
 
     if 'System.State' in work_item['fields']:
         fields['State'] = 'Changed from `' + work_item['fields']['System.State']['oldValue'] + '` to `' + work_item['fields']['System.State']['newValue'] + '`'
