@@ -15,7 +15,7 @@ class HardwareSupport(WorkItem):
     path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Support.HardwareType",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
     image_url = "hardware_support"
-    vsts_url = "Hardware%20Support"
+    vsts_url = "Hardware Support"
 
 
 class SoftwareSupport(WorkItem):
