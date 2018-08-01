@@ -96,3 +96,18 @@ def recursive_path_maker(area, parent_path='', areas_list=None):
     else:
         areas_list.append((parent_path + area["name"]))
     return areas_list
+
+
+# ----------------------- authorize VSTS -----------------------#
+@csrf_exempt
+def authorize(request):
+    try:
+        code = request.GET.get('code')
+
+        print(code)
+
+        return JsonResponse({"text": "success!"}, content_type='application/json')
+
+    except:
+        traceback.print_exc()
+        return JsonResponse({"text": "failed!"}, content_type='application/json')
