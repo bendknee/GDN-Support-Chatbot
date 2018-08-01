@@ -243,6 +243,8 @@ def generate_updated_work_item(work_item):
     if 'System.History' in work_item['fields']:
         fields['Comment'] = work_item['fields']['System.History']['newValue']
 
+    url = work_item['revision']['fields']['System.WorkItemType'].lower().replace(" ", "_")
+
     card = {
         "cards": [
             {
@@ -251,7 +253,9 @@ def generate_updated_work_item(work_item):
                         "widgets": [
                             {
                                 "keyValue": {
-                                    "content": work_item['revision']['fields']['System.Title']
+                                    "content": work_item['revision']['fields']['System.Title'],
+                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" +
+                                               static('png/' + url + '.png')
                                 }
                             }
                         ]
@@ -269,24 +273,7 @@ def generate_updated_work_item(work_item):
         item_widget = {
             "keyValue": {
                 "topLabel": label,
-                "content": content,
-                "button": {
-                    "textButton": {
-                        "text": "Edit",
-                        "onClick": {
-                            "action": {
-                                "actionMethodName": "edit_work_item",
-                                "parameters": [
-                                    {
-                                        "key": "field",
-                                        "value": label
-                                    }
-                                ]
-                            }
-                        }
-
-                    }
-                }
+                "content": content
             }
         }
 
