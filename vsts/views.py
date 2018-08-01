@@ -34,6 +34,7 @@ def create_work_item(work_item_dict, url, user):
     req = requests.post(url, headers=headers, data=json.dumps(payload))
 
     WorkItemCreated.objects.create(id=req.json()['id'], user=user)
+    print("ini jalan gasih lmao")
 
 
 # ----------------------- receive webhook from VSTS -----------------------#
