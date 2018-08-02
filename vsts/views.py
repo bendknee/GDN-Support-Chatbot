@@ -113,7 +113,7 @@ def authorize(request):
         traceback.print_exc()
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
-def isTokenRefresh():
+def isTokenExpired():
     return False
 
 def refreshToken():

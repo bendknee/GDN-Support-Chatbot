@@ -302,7 +302,7 @@ def generate_updated_work_item(work_item):
 
 def generate_signin_card(user):
     login_url = "app.vssps.visualstudio.com/oauth2/authorize?client_id=C8A33DD9-D575-428F-A0CA-7210BC9A4363&response_" \
-                "type=Assertion&state=" + user.pk + "&scope=vso.work_full&redirect_uri=https://hangouts-vsts.herokuapp.com/vsts/oauth"
+                "type=Assertion&state=" + str(user.pk) + "&scope=vso.work_full&redirect_uri=https://hangouts-vsts.herokuapp.com/vsts/oauth"
     card = {
         "cards": [
             {

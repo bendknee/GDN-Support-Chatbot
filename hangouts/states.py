@@ -53,7 +53,7 @@ class InitialState(State):
             if user_object.awt_token is None:
                 return hangouts.views.generate_signin_card(user_object)
             else:
-                if vsts.views.isTokenRefresh():
+                if vsts.views.isTokenExpired():
                     vsts.views.refreshToken()
                 change_state(event['space']['name'], ChoiceState.STATE_LABEL)
                 return hangouts.views.generate_choices("Choose work item type",
