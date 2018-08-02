@@ -34,7 +34,6 @@ def create_work_item(work_item_dict, url, user):
     req = requests.post(url, headers=headers, data=json.dumps(payload))
 
     WorkItemCreated.objects.create(id=req.json()['id'], user=user)
-    print("ini jalan gasih lmao")
 
 
 # ----------------------- receive webhook from VSTS -----------------------#
@@ -103,8 +102,11 @@ def recursive_path_maker(area, parent_path='', areas_list=None):
 def authorize(request):
     try:
         code = request.GET.get('code')
+        user_pk = request.GET.get('state')
 
         print(code)
+        print("jalan gasih lu lmao")
+        print(user_pk)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
