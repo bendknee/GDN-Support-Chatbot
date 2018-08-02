@@ -313,15 +313,6 @@ def generate_signin_card(user):
                     {
                         "widgets": [
                             {
-                                "keyValue": {
-                                    "content": "Please sign in to your VSTS account."
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "widgets": [
-                            {
                                 "buttons": [
                                     {
                                         "textButton": {
