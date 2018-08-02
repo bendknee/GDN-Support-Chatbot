@@ -69,14 +69,14 @@ def text_format(message):
 
 
 # ----------------------- send message asynchronously -----------------------#
-def send_message(body, space):
+def send_message(body, user):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'GDN Support Bot service key.json', scopes)
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().create(parent=space, body=body).execute()
+    resp = chat.spaces().messages().create(parent=user, body=body).execute()
 
     print(resp)
 
@@ -148,7 +148,7 @@ def generate_edit_work_item(work_item):
                                 "keyValue": {
                                     "content": work_item.title,
                                     "iconUrl": "http://hangouts-vsts.herokuapp.com" +
-                                               static('png/' + work_item.image_url + '.png'),
+                                               static('png/' + work_item.url + '.png'),
                                     "button": {
                                         "textButton": {
                                             "text": "Edit",
@@ -229,6 +229,109 @@ def generate_edit_work_item(work_item):
         }
 
         card['cards'][0]['sections'][1]['widgets'].append(item_widget)
+
+    return card
+
+
+def generate_updated_work_item(work_item):
+
+    fields = {'Revised by': work_item['revisedBy']['name']}
+
+    if 'System.State' in work_item['fields']:
+        fields['State'] = work_item['fields']['System.State']['oldValue'] + \
+                          ' --> ' + work_item['fields']['System.State']['newValue']
+
+    if 'System.History' in work_item['fields']:
+        fields['Comment'] = work_item['fields']['System.History']['newValue']
+
+    image_url = "http://hangouts-vsts.herokuapp.com" + static('png/' +
+                            work_item['revision']['fields']['System.WorkItemType'].replace(" ", "%20") + '.png')
+
+    card = {
+        "cards": [
+            {
+                "sections": [
+                    {
+                        "widgets": [
+                            {
+                                "keyValue": {
+                                    "content": work_item['revision']['fields']['System.Title'],
+                                    "iconUrl": image_url
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "widgets": [
+                        ]
+                    },
+                    {
+                        "widgets": [
+                            {
+                                "buttons": [
+                                    {
+                                        "textButton": {
+                                            "text": "MORE",
+                                            "onClick": {
+                                                "openLink": {
+                                                    "url": work_item['_links']['html']['href']
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+    for label, content in fields.items():
+        item_widget = {
+            "keyValue": {
+                "topLabel": label,
+                "content": content
+            }
+        }
+
+        card['cards'][0]['sections'][1]['widgets'].append(item_widget)
+
+    return card
+
+def generate_signin_card(user):
+    signin_url = "app.vssps.visualstudio.com/oauth2/authorize?client_id=C8A33DD9-D575-428F-A0CA-7210BC9A4363&response_" \
+                "type=Assertion&state=" + str(user.pk) + "&scope=vso.work_full&redirect_uri=https://hangouts-vsts.herokuapp.com/vsts/oauth"
+    card = {
+        "cards": [
+            {
+                "header": {
+                    "title": "Please sign in to your VSTS account."
+                },
+                "sections": [
+                    {
+                        "widgets": [
+                            {
+                                "buttons": [
+                                    {
+                                        "textButton": {
+                                            "text": "SIGN IN",
+                                            "onClick": {
+                                                "openLink": {
+                                                    "url": signin_url
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
 
     return card
 

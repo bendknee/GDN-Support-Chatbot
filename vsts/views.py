@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from hangouts.models import VstsArea
+from hangouts.models import WorkItemCreated
 
 import hangouts.views
 
@@ -18,7 +18,7 @@ ENCODED_PAT = str(base64.b64encode(b':' + bytes(settings.VSTS_PERSONAL_ACCESS_TO
 
 
 # ----------------------- post bug to VSTS -----------------------#
-def create_work_item(work_item_dict, url):
+def create_work_item(work_item_dict, url, user):
     url = settings.VSTS_BASE_URL + 'Support/_apis/wit/workitems/$' + url + '?api-version=4.1'
     headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
     payload = []
@@ -32,8 +32,8 @@ def create_work_item(work_item_dict, url):
         payload.append(field)
 
     req = requests.post(url, headers=headers, data=json.dumps(payload))
-    print(req.json())
-    print("ke vsts!")
+
+    WorkItemCreated.objects.create(id=req.json()['id'], user=user)
 
 
 # ----------------------- receive webhook from VSTS -----------------------#
@@ -43,16 +43,11 @@ def receive_webhook(request):
         event = json.loads(request.body)
         print(event)
 
-        fields_dict = {'Area Path': 'System.AreaPath', 'Severity': 'Microsoft.VSTS.Common.Severity', 'Repro Steps': 'Microsoft.VSTS.TCM.ReproSteps'}
-        body = hangouts.views.generate_bug(event['resource'], "https://www.iconspng.com/uploads/bad-bug/bad-bug.png", fields_dict)
+        body = hangouts.views.generate_updated_work_item(event['resource'])
 
-        # get all spaces subscribed to area
+        work_item = WorkItemCreated.objects.get(id=event['resource']['workItemId'])
 
-        area = VstsArea.objects.get(name=event['resource']['fields']['System.AreaPath'])
-
-        spaces = area.hangoutsSpaces.all()
-        for space in spaces:
-            hangouts.views.send_message(body, space.__str__())
+        hangouts.views.send_message(body, work_item.user.name)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
@@ -100,3 +95,26 @@ def receive_webhook(request):
 #     else:
 #         areas_list.append((parent_path + area["name"]))
 #     return areas_list
+
+
+# ----------------------- authorize VSTS -----------------------#
+@csrf_exempt
+def authorize(request):
+    try:
+        code = request.GET.get('code')
+        user_pk = request.GET.get('state')
+
+        print(code)
+        print(user_pk)
+
+        return JsonResponse({"text": "success!"}, content_type='application/json')
+
+    except:
+        traceback.print_exc()
+        return JsonResponse({"text": "failed!"}, content_type='application/json')
+
+def isTokenExpired():
+    return False
+
+def refreshToken():
+    return

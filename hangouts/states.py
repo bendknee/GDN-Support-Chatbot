@@ -49,9 +49,15 @@ class InitialState(State):
     @staticmethod
     def action(message, event):
         if message.lower() == 'support':
-            change_state(event['space']['name'], ChoiceState.STATE_LABEL)
-            return hangouts.views.generate_choices("Choose work item type",
-                                                   ["Hardware Support", "Software Support"], "choose_type")
+            user_object = User.objects.get(name=event['space']['name'])
+            if user_object.awt_token is None:
+                return hangouts.views.generate_signin_card(user_object)
+            else:
+                if vsts.views.isTokenExpired():
+                    vsts.views.refreshToken()
+                change_state(event['space']['name'], ChoiceState.STATE_LABEL)
+                return hangouts.views.generate_choices("Choose work item type",
+                                                       ["Hardware Support", "Software Support"], "choose_type")
         else:
             message = 'You said: `%s`' % message
             return hangouts.views.text_format(message)
@@ -268,6 +274,9 @@ class EndState(ChoiceState):
         user_object.save()
 
         if message == "save":
+            user_object.final = False
+            user_object.save()
+
             path_dict = work_item.path_dict
             fields_dict = hangouts.views.generate_fields_dict(work_item)
 
@@ -276,10 +285,12 @@ class EndState(ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            vsts.views.create_work_item(work_item_dict, work_item.vsts_url)
+            vsts.views.create_work_item(work_item_dict, work_item.url, user_object)
             print(work_item_dict)
 
             work_item.delete()
+
+            change_state(event['space']['name'], InitialState.STATE_LABEL)
 
             return hangouts.views.text_format("Your work item has been saved.")
 
