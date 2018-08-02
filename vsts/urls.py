@@ -1,10 +1,10 @@
 from django.conf.urls import url
-from .views import receive_webhook, authorize
+from .views import notification, authorize
 #url for app
 
 app_name = 'vsts'
 
 urlpatterns = [
-    url(r'^$', receive_webhook, name='vsts'),
+    url(r'^$', notification, name='vsts'),
     url(r'^oauth/$', authorize, name='oauth'),
 ]

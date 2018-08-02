@@ -35,7 +35,7 @@ class User(models.Model):
     work_item = models.OneToOneField(WorkItem, on_delete=models.SET_NULL, null=True)
     state = models.CharField(default='initial', max_length=30)
     final = models.BooleanField(default=False)
-    awt_token = models.CharField(max_length=700, null=True)
+    jwt_token = models.CharField(max_length=700, null=True)
     refresh_token = models.CharField(max_length=750, null=True)
 
     def __str__(self):

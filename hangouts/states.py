@@ -50,10 +50,10 @@ class InitialState(State):
     def action(message, event):
         if message.lower() == 'support':
             user_object = User.objects.get(name=event['space']['name'])
-            if user_object.awt_token is None:
+            if user_object.jwt_token is None:
                 return hangouts.views.generate_signin_card(user_object)
             else:
-                if vsts.views.isTokenExpired():
+                if vsts.views.is_token_expired():
                     vsts.views.refreshToken()
                 change_state(event['space']['name'], ChoiceState.STATE_LABEL)
                 return hangouts.views.generate_choices("Choose work item type",
