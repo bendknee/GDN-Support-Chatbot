@@ -61,42 +61,42 @@ def receive_webhook(request):
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
 
-def get_projects():
-    project_list = set()
-    url = settings.VSTS_BASE_URL + '_apis/projecthistory?api-version=4.1-preview.2'
-    headers = {'Authorization': 'Basic ' + ENCODED_PAT}
-    req = requests.get(url, headers=headers)
-    response = req.json()
-    for obj in response["value"]:
-        project_list.add(obj["name"])
-    return project_list
+# def get_projects():
+#     project_list = set()
+#     url = settings.VSTS_BASE_URL + '_apis/projecthistory?api-version=4.1-preview.2'
+#     headers = {'Authorization': 'Basic ' + ENCODED_PAT}
+#     req = requests.get(url, headers=headers)
+#     response = req.json()
+#     for obj in response["value"]:
+#         project_list.add(obj["name"])
+#     return project_list
 
 
 # ----------------------- get all areas from VSTS -----------------------#
-def get_all_areas():
-    areas_list = []
-    url = settings.VSTS_BASE_URL + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
-    headers = {'Authorization': 'Basic ' + ENCODED_PAT}
-    for project in get_projects():
-        req = requests.get(url.replace("{{Project}}", project), headers=headers)
-        response = req.json()
-        try:
-            for obj in response["value"]:
-                if obj["structureType"] == "area":
-                    areas_list += recursive_path_maker(obj)
-        except KeyError:
-            continue
-    return areas_list
+# def get_all_areas():
+#     areas_list = []
+#     url = settings.VSTS_BASE_URL + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
+#     headers = {'Authorization': 'Basic ' + ENCODED_PAT}
+#     for project in get_projects():
+#         req = requests.get(url.replace("{{Project}}", project), headers=headers)
+#         response = req.json()
+#         try:
+#             for obj in response["value"]:
+#                 if obj["structureType"] == "area":
+#                     areas_list += recursive_path_maker(obj)
+#         except KeyError:
+#             continue
+#     return areas_list
 
 
-def recursive_path_maker(area, parent_path='', areas_list=None):
-    if areas_list is None:
-        areas_list = []
-    if area["hasChildren"]:
-        if parent_path != '':
-            areas_list.append((parent_path + area["name"]))
-        for child in area["children"]:
-            recursive_path_maker(child, parent_path + area["name"] + "\\", areas_list)
-    else:
-        areas_list.append((parent_path + area["name"]))
-    return areas_list
+# def recursive_path_maker(area, parent_path='', areas_list=None):
+#     if areas_list is None:
+#         areas_list = []
+#     if area["hasChildren"]:
+#         if parent_path != '':
+#             areas_list.append((parent_path + area["name"]))
+#         for child in area["children"]:
+#             recursive_path_maker(child, parent_path + area["name"] + "\\", areas_list)
+#     else:
+#         areas_list.append((parent_path + area["name"]))
+#     return areas_list
