@@ -105,7 +105,6 @@ def authorize(request):
         user_pk = request.GET.get('state')
 
         print(code)
-        print("jalan gasih lu lmao")
         print(user_pk)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
@@ -113,3 +112,9 @@ def authorize(request):
     except:
         traceback.print_exc()
         return JsonResponse({"text": "failed!"}, content_type='application/json')
+
+def isTokenRefresh():
+    return False
+
+def refreshToken():
+    return

@@ -52,9 +52,12 @@ class InitialState(State):
             user_object = User.objects.get(name=event['space']['name'])
             if user_object.awt_token is None:
                 return hangouts.views.generate_signin_card(user_object)
-            change_state(event['space']['name'], ChoiceState.STATE_LABEL)
-            return hangouts.views.generate_choices("Choose work item type",
-                                                   ["Hardware Support", "Software Support"], "choose_type")
+            else:
+                if vsts.views.isTokenRefresh():
+                    vsts.views.refreshToken()
+                change_state(event['space']['name'], ChoiceState.STATE_LABEL)
+                return hangouts.views.generate_choices("Choose work item type",
+                                                       ["Hardware Support", "Software Support"], "choose_type")
         else:
             message = 'You said: `%s`' % message
             return hangouts.views.text_format(message)
