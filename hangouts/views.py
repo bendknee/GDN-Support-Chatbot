@@ -306,25 +306,16 @@ def generate_signin_card(user):
     card = {
         "cards": [
             {
+                "header": {
+                    "title": "Please sign in to your VSTS account."
+                },
                 "sections": [
                     {
                         "widgets": [
                             {
                                 "keyValue": {
                                     "content": "Please sign in to your VSTS account."
-                                },
-                                "buttons": [
-                                    {
-                                        "textButton": {
-                                            "text": "SIGN IN",
-                                            "onClick": {
-                                                "openLink": {
-                                                    "url": signin_url
-                                                }
-                                            }
-                                        }
-                                    }
-                                ]
+                                }
                             }
                         ]
                     },
