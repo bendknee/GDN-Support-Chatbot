@@ -301,7 +301,7 @@ def generate_updated_work_item(work_item):
     return card
 
 def generate_signin_card(user):
-    login_url = "app.vssps.visualstudio.com/oauth2/authorize?client_id=C8A33DD9-D575-428F-A0CA-7210BC9A4363&response_" \
+    signin_url = "app.vssps.visualstudio.com/oauth2/authorize?client_id=C8A33DD9-D575-428F-A0CA-7210BC9A4363&response_" \
                 "type=Assertion&state=" + str(user.pk) + "&scope=vso.work_full&redirect_uri=https://hangouts-vsts.herokuapp.com/vsts/oauth"
     card = {
         "cards": [
@@ -312,7 +312,19 @@ def generate_signin_card(user):
                             {
                                 "keyValue": {
                                     "content": "Please sign in to your VSTS account."
-                                }
+                                },
+                                "buttons": [
+                                    {
+                                        "textButton": {
+                                            "text": "SIGN IN",
+                                            "onClick": {
+                                                "openLink": {
+                                                    "url": signin_url
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -322,10 +334,10 @@ def generate_signin_card(user):
                                 "buttons": [
                                     {
                                         "textButton": {
-                                            "text": "LOGIN",
+                                            "text": "SIGN IN",
                                             "onClick": {
                                                 "openLink": {
-                                                    "url": login_url
+                                                    "url": signin_url
                                                 }
                                             }
                                         }
