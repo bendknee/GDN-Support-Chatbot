@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from hangouts.models import WorkItemCreated
 
@@ -107,7 +107,7 @@ def authorize(request):
         print(code)
         print(user_pk)
 
-        return "Sign in successful!"
+        return HttpResponse("Sign in successful!")
 
     except:
         traceback.print_exc()
