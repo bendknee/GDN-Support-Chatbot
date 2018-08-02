@@ -107,7 +107,7 @@ def authorize(request):
         print(code)
         print(user_pk)
 
-        return JsonResponse({"text": "success!"}, content_type='application/json')
+        return "Sign in successful!"
 
     except:
         traceback.print_exc()
