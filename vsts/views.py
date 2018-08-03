@@ -5,7 +5,7 @@ from .models import CreatedWorkItems
 from base64 import b64encode
 from datetime import datetime, timezone
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from hangouts import views as hangouts
@@ -83,11 +83,14 @@ def authorize(request):
         print(code)
         print(user_pk)
 
-        return render(request, 'oauth_callback.html')
+        body = hangouts.text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
+        hangouts.send_message(body, user_object.name)
+
+        return HttpResponse("Please close window.")
 
     except:
         traceback.print_exc()
-        return JsonResponse({"text": "failed!"}, content_type='application/json')
+        return HttpResponse("Fail.", content_type='application/json')
 
 
 def token_expired_or_refresh(user_object):
