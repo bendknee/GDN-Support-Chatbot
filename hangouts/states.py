@@ -282,9 +282,8 @@ class EndState(ChoiceState):
             vsts.create_work_item(work_item_dict, work_item.url, user_object)
             print(work_item_dict)
 
-            work_item.delete()
-
             change_state(user_object, InitialState.STATE_LABEL)
+            work_item.delete()
 
             return hangouts.text_format("Your work item has been saved.")
 
