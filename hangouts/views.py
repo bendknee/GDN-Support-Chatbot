@@ -38,13 +38,13 @@ def receive_message(payload):
                                        + 'Type `/where` to know where you are on issuing a new Work Item\n'
                                        + 'Type `/reset` to abort all progress on issuing a new Work Item')
             elif message == '/reset':
+                change_state(user_object, InitialState.STATE_LABEL)
+
                 try:
                     user_object.work_item.delete()
-                    user_object.work_item.save()
                 except AttributeError:
                     pass
-
-                change_state(user_object, InitialState.STATE_LABEL)
+                
                 response = text_format("Your progress has been aborted")
             elif message == '/where':
                 response = text_format(state.where())
