@@ -5,7 +5,8 @@ from .models import CreatedWorkItems
 from base64 import b64encode
 from datetime import datetime, timezone
 from django.conf import settings
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from hangouts import views as hangouts
 from hangouts.models import User
@@ -82,7 +83,7 @@ def authorize(request):
         print(code)
         print(user_pk)
 
-        return HttpResponse("Sign in successful!")
+        return render(request, 'oauth_callback.html')
 
     except:
         traceback.print_exc()

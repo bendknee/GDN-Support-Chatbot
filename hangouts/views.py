@@ -44,7 +44,7 @@ def receive_message(payload):
                     user_object.work_item.delete()
                 except AttributeError:
                     pass
-                
+
                 response = text_format("Your progress has been aborted")
             elif message == '/where':
                 response = text_format(state.where())
