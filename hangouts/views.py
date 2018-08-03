@@ -40,9 +40,10 @@ def receive_message(payload):
             elif message == '/reset':
                 try:
                     user_object.work_item.delete()
+                    user_object.work_item.save()
                 except AttributeError:
                     pass
-                
+
                 change_state(user_object, InitialState.STATE_LABEL)
                 response = text_format("Your progress has been aborted")
             elif message == '/where':
