@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from .models import CreatedWorkItems
 from base64 import b64encode
-from datetime import datetime
+from datetime import datetime, timezone
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -76,7 +76,7 @@ def authorize(request):
         user_object = User.objects.get(pk=int(user_pk))
         user_object.jwt_token = response["access_token"]
         user_object.refresh_token = response["refresh_token"]
-        user_object.last_auth = datetime.now()
+        user_object.last_auth = datetime.now(timezone.utc)
         user_object.save()
 
         print(code)
@@ -103,7 +103,7 @@ def token_expired_or_refresh(user_object):
 
         user_object.jwt_token = response["access_token"]
         user_object.refresh_token = response["refresh_token"]
-        user_object.last_auth = datetime.now()
+        user_object.last_auth = datetime.now(timezone.utc)
         user_object.save()
 
 # def get_projects():
