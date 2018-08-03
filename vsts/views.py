@@ -86,7 +86,7 @@ def authorize(request):
         body = hangouts.text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
         hangouts.send_message(body, user_object.name)
 
-        return HttpResponse("Please close window.")
+        return render(request, "oauth_callback.html")
 
     except:
         traceback.print_exc()
