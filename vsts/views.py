@@ -90,7 +90,7 @@ def authorize(request):
 
 
 def token_expired_or_refresh(user_object):
-    delta = datetime.now() - user_object.last_auth
+    delta = datetime.now(timezone.utc) - user_object.last_auth
     if delta.seconds >= settings.VSTS_EXPIRY_TIME:
         url = "https://app.vssps.visualstudio.com/oauth2/token"
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
