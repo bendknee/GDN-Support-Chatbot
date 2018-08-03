@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from .models import CreatedWorkItems
+from base64 import b64encode
+from datetime import datetime
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from hangouts.models import WorkItemCreated, User
+from hangouts import views as hangouts
+from hangouts.models import User
 
-import hangouts.views as hangouts
-
-from base64 import b64encode
 import json
 import requests
 import traceback
@@ -17,10 +18,10 @@ ENCODED_PAT = str(b64encode(b':' + bytes(settings.VSTS_PERSONAL_ACCESS_TOKEN,
                                                 'utf-8'))).replace("b'", '').replace("'", '')
 
 
-# ----------------------- post bug to VSTS -----------------------#
+# ----------------------- post work item to VSTS -----------------------#
 def create_work_item(work_item_dict, url, user):
     url = 'https://quickstartbot.visualstudio.com/' + 'Support/_apis/wit/workitems/$' + url + '?api-version=4.1'
-    headers = {'Authorization': 'Basic ' + ENCODED_PAT, "Content-Type": "application/json-patch+json"}
+    headers = {'Authorization': 'Bearer ' + user.jwt_token, "Content-Type": "application/json-patch+json"}
     payload = []
 
     for key, value in work_item_dict.items():
@@ -33,7 +34,7 @@ def create_work_item(work_item_dict, url, user):
 
     req = requests.post(url, headers=headers, data=json.dumps(payload))
 
-    WorkItemCreated.objects.create(id=req.json()['id'], user=user)
+    CreatedWorkItems.objects.create(id=req.json()['id'], user=user)
 
 
 # ----------------------- receive webhook from VSTS -----------------------#
@@ -45,7 +46,7 @@ def notification(request):
 
         body = hangouts.generate_updated_work_item(event['resource'])
 
-        work_item = WorkItemCreated.objects.get(id=event['resource']['workItemId'])
+        work_item = CreatedWorkItems.objects.get(id=event['resource']['workItemId'])
 
         hangouts.send_message(body, work_item.user.name)
 
@@ -69,12 +70,13 @@ def authorize(request):
                 "client_assertion": settings.VSTS_OAUTH_SECRET,
                 "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
                 "assertion": code,
-                "redirect_uri": "https://hangouts-vsts.herokuapp.com"}
-        response = requests.post(url, headers=headers, body=body).json()
+                "redirect_uri": "https://hangouts-vsts.herokuapp.com/vsts/oauth"}
+        response = requests.post(url, headers=headers, data=body).json()
 
         user_object = User.objects.get(pk=int(user_pk))
         user_object.jwt_token = response["access_token"]
         user_object.refresh_token = response["refresh_token"]
+        user_object.last_auth = datetime.now()
         user_object.save()
 
         print(code)
@@ -87,25 +89,22 @@ def authorize(request):
         return JsonResponse({"text": "failed!"}, content_type='application/json')
 
 
-def is_token_expired(space_name):
-    user_object = User.objects.get(name=space_name)
+def token_expired_or_refresh(user_object):
+    delta = datetime.now() - user_object.last_auth
+    if delta.seconds >= settings.VSTS_EXPIRY_TIME:
+        url = "https://app.vssps.visualstudio.com/oauth2/token"
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        body = {"client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                "client_assertion": settings.VSTS_OAUTH_SECRET,
+                "grant_type": "refresh_token",
+                "assertion": user_object.refresh_token,
+                "redirect_uri": "https://hangouts-vsts.herokuapp.com/vsts/oauth"}
+        response = requests.post(url, headers=headers, data=body).json()
 
-
-def refresh_token(space_name):
-    user_object = User.objects.get(name=space_name)
-
-    url = "https://app.vssps.visualstudio.com/oauth2/token"
-    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    body = {"client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-            "client_assertion": settings.VSTS_OAUTH_SECRET,
-            "grant_type": "refresh_token",
-            "assertion": user_object.refresh_token,
-            "redirect_uri": "https://hangouts-vsts.herokuapp.com"}
-    response = requests.post(url, headers=headers, body=body).json()
-
-    user_object.jwt_token = response["access_token"]
-    user_object.refresh_token = response["refresh_token"]
-    user_object.save()
+        user_object.jwt_token = response["access_token"]
+        user_object.refresh_token = response["refresh_token"]
+        user_object.last_auth = datetime.now()
+        user_object.save()
 
 # def get_projects():
 #     project_list = set()
@@ -132,17 +131,4 @@ def refresh_token(space_name):
 #                     areas_list += recursive_path_maker(obj)
 #         except KeyError:
 #             continue
-#     return areas_list
-
-
-# def recursive_path_maker(area, parent_path='', areas_list=None):
-#     if areas_list is None:
-#         areas_list = []
-#     if area["hasChildren"]:
-#         if parent_path != '':
-#             areas_list.append((parent_path + area["name"]))
-#         for child in area["children"]:
-#             recursive_path_maker(child, parent_path + area["name"] + "\\", areas_list)
-#     else:
-#         areas_list.append((parent_path + area["name"]))
 #     return areas_list

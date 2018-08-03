@@ -34,10 +34,11 @@ def receive_message(payload):
             else:
                 message = event['message']['argumentText']
             if message == '/help':
-                response = text_format('Type `/where` to know where you are on issuing a new Work Item\n'
+                response = text_format('Type `support` to start issuing new Work Item!\n\n'
+                                       + 'Type `/where` to know where you are on issuing a new Work Item\n'
                                        + 'Type `/reset` to abort all progress on issuing a new Work Item')
             elif message == '/reset':
-                User.objects.filter(name=event['space']['name']).delete()
+                user_object.delete()
                 response = text_format("Your progress has been aborted")
             elif message == '/where':
                 response = text_format(state.where())
@@ -50,9 +51,6 @@ def receive_message(payload):
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 action = event['action']
-                user_object = User.objects.get(name=event['space']['name'])
-                state = states_list[user_object.state]
-
                 response = state.action(action['parameters'][0]['value'], event)
             else:
                 response = {}
@@ -83,9 +81,6 @@ def send_message(body, user):
 
 # ----------------------- card generators -----------------------#
 def generate_choices(title, choices, method):
-    if choices == [] and method == 'unsubscribe':
-        return text_format("You did not subscribe to any area.")
-
     card = {
         "cards": [
             {
@@ -299,6 +294,7 @@ def generate_updated_work_item(work_item):
         card['cards'][0]['sections'][1]['widgets'].append(item_widget)
 
     return card
+
 
 def generate_signin_card(user):
     signin_url = "app.vssps.visualstudio.com/oauth2/authorize?client_id=C8A33DD9-D575-428F-A0CA-7210BC9A4363&response_" \
