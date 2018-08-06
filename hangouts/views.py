@@ -67,7 +67,7 @@ def receive_message(payload):
                 try:
                     return JsonResponse(response, content_type='application/json')
                 finally:
-                    delete_message()
+                    delete_message(event['message']['name'])
             else:
                 response = {}
         else:
