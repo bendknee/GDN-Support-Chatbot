@@ -44,8 +44,10 @@ def receive_message(payload):
                     user_object.work_item.delete()
                     user_object.is_finished = False
                     user_object.save()
-                except AttributeError:
-                    pass
+
+                    print("jalan ga???")
+                except AttributeError as e:
+                    print(e)
 
                 response = text_format("Your progress has been aborted")
             elif message == '/where':
