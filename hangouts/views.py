@@ -64,10 +64,6 @@ def receive_message(payload):
                 # response can be text or card, depending on action
                 action = event['action']
                 response = state.action(action['parameters'][0]['value'], event)
-                try:
-                    return JsonResponse(response, content_type='application/json')
-                finally:
-                    delete_message(event['message']['name'])
             else:
                 response = {}
         else:
@@ -75,7 +71,7 @@ def receive_message(payload):
     else:
         return
 
-    # send_message(response, event['space']['name'])
+    send_message(response, event['space']['name'])
     return JsonResponse(response, content_type='application/json')
 
 
@@ -249,6 +245,72 @@ def generate_edit_work_item(work_item):
 
                     }
                 }
+            }
+        }
+
+        card['cards'][0]['sections'][1]['widgets'].append(item_widget)
+
+    return card
+
+def generate_work_item(work_item):
+    temp_dict = generate_fields_dict(work_item)
+
+    del temp_dict["title"]
+    if "requested_by" in temp_dict:
+        del temp_dict["requested_by"]
+
+    work_item_dict = {}
+
+    for old_key in temp_dict.keys():
+        new_key = old_key.replace("_", " ").title()
+        work_item_dict[new_key] = temp_dict[old_key]
+
+    card = {
+        "cards": [
+            {
+                "sections": [
+                    {
+                        "widgets": [
+                            {
+                                "keyValue": {
+                                    "content": work_item.title,
+                                    "iconUrl": "http://hangouts-vsts.herokuapp.com" +
+                                               static('png/' + work_item.url + '.png'),                                }
+                            }
+                        ]
+                    },
+                    {
+                        "widgets": [
+                        ]
+                    },
+                    {
+                        "widgets": [
+                            {
+                                "buttons": [
+                                    {
+                                        "textButton": {
+                                            "text": "MORE",
+                                            "onClick": {
+                                                "openLink": {
+                                                    "url": work_item['_links']['html']['href']
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+    for label, content in work_item_dict.items():
+        item_widget = {
+            "keyValue": {
+                "topLabel": label,
+                "content": content,
             }
         }
 

@@ -19,6 +19,7 @@ class EndState(choice_state.ChoiceState):
         user_object.save()
 
         if message == "save":
+            views.delete_message(event['message']['name'])
             user_object.is_finished = False
             user_object.save()
 
@@ -30,13 +31,14 @@ class EndState(choice_state.ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            url = create_work_item(work_item_dict, work_item.url, user_object)
+            create_work_item(work_item_dict, work_item.url, user_object)
             print(work_item_dict)
 
             states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
             work_item.delete()
 
             return views.text_format("Your work item has been saved.")
+            # return views.generate_work_item(work_item)
 
         elif message == "Title":
             user_object.state = title_state.TitleState.STATE_LABEL
