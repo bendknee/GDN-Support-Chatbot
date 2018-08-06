@@ -72,7 +72,7 @@ def receive_message(payload):
         return
 
     send_message(response, event['space']['name'])
-    return JsonResponse(response, content_type='application/json')
+    return JsonResponse({"text": "aneh"}, content_type='application/json')
 
 
 def text_format(message):
