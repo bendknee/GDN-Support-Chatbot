@@ -42,6 +42,8 @@ def receive_message(payload):
 
                 try:
                     user_object.work_item.delete()
+                    user_object.is_finished = False
+                    user_object.save()
                 except AttributeError:
                     pass
 
