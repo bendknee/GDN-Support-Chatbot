@@ -59,10 +59,11 @@ def receive_message(payload):
 
         elif event['type'] == 'CARD_CLICKED':
             if not state.is_waiting_text():
-                delete_message(event['message']['name'])
                 # response can be text or card, depending on action
                 action = event['action']
                 response = state.action(action['parameters'][0]['value'], event)
+
+                delete_message(event['message']['name'])
             else:
                 response = {}
         else:
