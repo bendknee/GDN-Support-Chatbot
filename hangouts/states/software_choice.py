@@ -1,19 +1,14 @@
-from .choice_state import ChoiceState
-from .end_state import EndState
-from .other_software_type import OtherSoftwareType
-from .severity_choice import SeverityChoice
-from .states_conf import change_state
-
 from hangouts.models import User
-from hangouts.views import delete_message, generate_choices, generate_edit_work_item, text_format
+from hangouts.states import end_state, severity_choice, states_conf, choice_state, other_software_type
+from hangouts import views
 
 
-class SoftwareChoice(ChoiceState):
+class SoftwareChoice(choice_state.ChoiceState):
     STATE_LABEL = "software_type"
 
     @staticmethod
     def action(message, event):
-        delete_message(event['message']['name'])
+        views.delete_message(event['message']['name'])
 
         user_object = User.objects.get(name=event['space']['name'])
         work_item = user_object.get_work_item()
@@ -23,20 +18,20 @@ class SoftwareChoice(ChoiceState):
 
         if message == "Fill your own..":
             work_item.save()
-            user_object.state = OtherSoftwareType.STATE_LABEL
+            user_object.state = other_software_type.OtherSoftwareType.STATE_LABEL
             user_object.save()
-            return text_format("Please enter your own software type")
+            return views.text_format("Please enter your own software type")
 
         work_item.third_party = message
         work_item.save()
 
-        next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
+        next_state = states_conf.change_state(user_object, severity_choice.SeverityChoice.STATE_LABEL)
 
-        if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item)
+        if next_state == end_state.EndState.STATE_LABEL:
+            return views.generate_edit_work_item(work_item)
 
         severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        return generate_choices("How severe is this issue?", severities, "severity")
+        return views.generate_choices("How severe is this issue?", severities, "severity")
 
     @staticmethod
     def where():

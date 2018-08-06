@@ -1,14 +1,9 @@
-from .end_state import EndState
-from .hardware_choice import HardwareChoice
-from .software_choice import SoftwareChoice
-from .state import State
-from .states_conf import change_state
-
+from hangouts import views
 from hangouts.models import User, HardwareSupport, SoftwareSupport
-from hangouts.views import generate_edit_work_item, generate_choices
+from hangouts.states import end_state, hardware_choice, software_choice, state, states_conf
 
 
-class DescriptionState(State):
+class DescriptionState(state.State):
     STATE_LABEL = "description"
 
     @staticmethod
@@ -24,18 +19,18 @@ class DescriptionState(State):
         work_item.save()
 
         if isinstance(work_item, HardwareSupport):
-            next_state = change_state(user_object, HardwareChoice.STATE_LABEL)
+            next_state = states_conf.change_state(user_object, hardware_choice.HardwareChoice.STATE_LABEL)
         elif isinstance(work_item, SoftwareSupport):
-            next_state = change_state(user_object, SoftwareChoice.STATE_LABEL)
+            next_state = states_conf.change_state(user_object, software_choice.SoftwareChoice.STATE_LABEL)
 
-        if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item)
-        elif next_state == HardwareChoice.STATE_LABEL:
+        if next_state == end_state.EndState.STATE_LABEL:
+            return views.generate_edit_work_item(work_item)
+        elif next_state == hardware_choice.HardwareChoice.STATE_LABEL:
             hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-            return generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
-        elif next_state == SoftwareChoice.STATE_LABEL:
+            return views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
+        elif next_state == software_choice.SoftwareChoice.STATE_LABEL:
             third_party = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
-            return generate_choices("Choose 3rd Party Software", third_party, "software_type")
+            return views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
 
     @staticmethod
     def where():

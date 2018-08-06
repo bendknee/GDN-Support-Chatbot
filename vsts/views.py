@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from .models import CreatedWorkItems
-from hangouts.views import generate_updated_work_item, send_message, text_format
+from hangouts import views
 from hangouts.models import User
 
 from base64 import b64encode
@@ -48,11 +48,11 @@ def notification(request):
         event = json.loads(request.body)
         print(event)
 
-        body = generate_updated_work_item(event['resource'])
+        body = views.generate_updated_work_item(event['resource'])
 
         work_item = CreatedWorkItems.objects.get(id=event['resource']['workItemId'])
 
-        send_message(body, work_item.user.name)
+        views.send_message(body, work_item.user.name)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
@@ -86,8 +86,8 @@ def authorize(request):
         print(code)
         print(user_pk)
 
-        body = text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
-        send_message(body, user_object.name)
+        body = views.text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
+        views.send_message(body, user_object.name)
 
         return render(request, "oauth_callback.html")
 

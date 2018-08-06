@@ -1,12 +1,9 @@
-from .states_conf import change_state
-from .choice_state import ChoiceState
-from .title_state import TitleState
-
+from hangouts import views
 from hangouts.models import User, HardwareSupport, SoftwareSupport
-from hangouts.views import delete_message, text_format
+from hangouts.states import states_conf, choice_state, title_state
 
 
-class ItemTypeState(ChoiceState):
+class ItemTypeState(choice_state.ChoiceState):
     STATE_LABEL = "choice"
 
     @staticmethod
@@ -15,7 +12,7 @@ class ItemTypeState(ChoiceState):
 
     @staticmethod
     def action(message, event):
-        delete_message(event['message']['name'])
+        views.delete_message(event['message']['name'])
 
         user_object = User.objects.get(name=event['space']['name'])
         if message == 'Hardware Support':
@@ -26,9 +23,9 @@ class ItemTypeState(ChoiceState):
         user_object.work_item = work_item_object
         user_object.save()
 
-        change_state(user_object, TitleState.STATE_LABEL)
+        states_conf.change_state(user_object, title_state.TitleState.STATE_LABEL)
 
-        return text_format("You've chosen `%s`\n\nPlease enter your issue Title." % message)
+        return views.text_format("You've chosen `%s`\n\nPlease enter your issue Title." % message)
 
     @staticmethod
     def where():
