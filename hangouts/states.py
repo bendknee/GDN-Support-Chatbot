@@ -73,6 +73,8 @@ class ChoiceState(State):
 
     @staticmethod
     def action(message, event):
+        hangouts.delete_message(event['message']['name'])
+
         user_object = User.objects.get(name=event['space']['name'])
         if message == 'Hardware Support':
             work_item_object = HardwareSupport.objects.create()
@@ -157,6 +159,8 @@ class HardwareChoice(ChoiceState):
 
     @staticmethod
     def action(message, event):
+        hangouts.delete_message(event['message']['name'])
+
         user_object = User.objects.get(name=event['space']['name'])
 
         work_item = user_object.get_work_item()
@@ -181,6 +185,8 @@ class SoftwareChoice(ChoiceState):
 
     @staticmethod
     def action(message, event):
+        hangouts.delete_message(event['message']['name'])
+
         user_object = User.objects.get(name=event['space']['name'])
         work_item = user_object.get_work_item()
         user_email = str(event['user']['email'])
@@ -218,6 +224,8 @@ class OtherSoftwareType(State):
 
     @staticmethod
     def action(message, event):
+        hangouts.delete_message(event['message']['name'])
+
         user_object = User.objects.get(name=event['space']['name'])
 
         work_item = user_object.get_work_item()
@@ -242,6 +250,8 @@ class SeverityChoice(ChoiceState):
 
     @staticmethod
     def action(message, event):
+        hangouts.delete_message(event['message']['name'])
+
         user_object = User.objects.get(name=event['space']['name'])
 
         work_item = user_object.get_work_item()

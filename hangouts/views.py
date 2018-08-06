@@ -62,10 +62,6 @@ def receive_message(payload):
                 # response can be text or card, depending on action
                 action = event['action']
                 response = state.action(action['parameters'][0]['value'], event)
-                print("response")
-                print(response)
-
-                delete_message(event['message']['name'])
             else:
                 response = {}
         else:
