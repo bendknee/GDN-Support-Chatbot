@@ -64,6 +64,10 @@ def receive_message(payload):
                 # response can be text or card, depending on action
                 action = event['action']
                 response = state.action(action['parameters'][0]['value'], event)
+                try:
+                    return JsonResponse(response, content_type='application/json')
+                finally:
+                    delete_message()
             else:
                 response = {}
         else:
@@ -71,8 +75,8 @@ def receive_message(payload):
     else:
         return
 
-    send_message(response, event['space']['name'])
-    return JsonResponse({"text": ""}, content_type='application/json')
+    # send_message(response, event['space']['name'])
+    return JsonResponse(response, content_type='application/json')
 
 
 def text_format(message):

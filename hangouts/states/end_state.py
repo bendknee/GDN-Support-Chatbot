@@ -30,7 +30,7 @@ class EndState(choice_state.ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            create_work_item(work_item_dict, work_item.url, user_object)
+            url = create_work_item(work_item_dict, work_item.url, user_object)
             print(work_item_dict)
 
             states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
