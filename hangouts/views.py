@@ -99,7 +99,7 @@ def update_message(name, body):
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().delete(name=name, body=body).execute()
+    resp = chat.spaces().messages().update(name=name, body=body).execute()
 
     print(resp)
 
