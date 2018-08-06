@@ -2,13 +2,15 @@
 from __future__ import unicode_literals
 
 from .states import states_conf, initial_state
+from hangouts.models import User
+
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+
 from googleapiclient.discovery import build
-from hangouts.models import User
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -38,16 +40,15 @@ def receive_message(payload):
                                        + 'Type `/where` to know where you are on issuing a new Work Item\n'
                                        + 'Type `/reset` to abort all progress on issuing a new Work Item')
             elif message == '/reset':
-                change_state(user_object, InitialState.STATE_LABEL)
+                user_object.is_finished = False
+                user_object.save()
+
+                states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
 
                 try:
                     user_object.work_item.delete()
-                    user_object.is_finished = False
-                    user_object.save()
-
-                    print("jalan ga???")
-                except AttributeError as e:
-                    print(e)
+                except AttributeError:
+                    pass
 
                 response = text_format("Your progress has been aborted")
             elif message == '/where':
@@ -59,7 +60,6 @@ def receive_message(payload):
 
         elif event['type'] == 'CARD_CLICKED':
             if not state.is_waiting_text():
-                delete_message(event['message']['name'])
                 # response can be text or card, depending on action
                 action = event['action']
                 response = state.action(action['parameters'][0]['value'], event)
@@ -70,7 +70,8 @@ def receive_message(payload):
     else:
         return
 
-    return JsonResponse(response, content_type='application/json')
+    send_message(response, event['space']['name'])
+    return JsonResponse({}, content_type='application/json')
 
 
 def text_format(message):
