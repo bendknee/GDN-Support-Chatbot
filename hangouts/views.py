@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from .states import *
+from .states import states_conf, initial_state
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
@@ -22,7 +22,7 @@ def receive_message(payload):
     print(event)
     if event['token'] == settings.HANGOUTS_CHAT_API_TOKEN:
         user_object, created = User.objects.get_or_create(name=event['space']['name'])
-        state = states_list[user_object.state]
+        state = states_conf.states_list[user_object.state]
         if event['type'] == 'ADDED_TO_SPACE' and event['space']['type'] == 'ROOM':
             message = 'Thanks for adding me to "%s"!' % event['space']['displayName']
             response = text_format(message)
@@ -88,6 +88,7 @@ def send_message(body, user):
     resp = chat.spaces().messages().create(parent=user, body=body).execute()
 
     print(resp)
+
 
 def delete_message(name):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
