@@ -1,6 +1,6 @@
+from hangouts import views
 from hangouts.models import User
 from hangouts.states import end_state, severity_choice, states_conf, choice_state, other_software_type
-from hangouts import views
 
 
 class SoftwareChoice(choice_state.ChoiceState):

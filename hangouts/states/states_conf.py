@@ -18,6 +18,7 @@ def change_state(user_object, next_state):
 
     if user_object.is_finished:
         next_state = end_state.EndState.STATE_LABEL
+        print(next_state)
 
     print("current state: " + current_state.STATE_LABEL)
     print("next state: " + next_state)
