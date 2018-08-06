@@ -107,6 +107,7 @@ def token_expired_or_refresh(user_object):
                 "redirect_uri": "https://hangouts-vsts.herokuapp.com/vsts/oauth"}
         response = requests.post(url, headers=headers, data=body).json()
 
+        print("refresh!")
         user_object.jwt_token = response["access_token"]
         user_object.refresh_token = response["refresh_token"]
         user_object.last_auth = datetime.now(timezone.utc)
