@@ -1,11 +1,5 @@
-from .choice_state import ChoiceState
-from .description_state import DescriptionState
-from .hardware_choice import HardwareChoice
-from .initial_state import InitialState
-from .severity_choice import SeverityChoice
-from .software_choice import SoftwareChoice
-from .states_conf import change_state
-from .title_state import TitleState
+from . import choice_state, description_state, hardware_choice, initial_state, severity_choice,\
+    states_conf, software_choice, title_state
 
 from hangouts.models import User
 from hangouts.views import generate_choices, generate_fields_dict, text_format
@@ -13,7 +7,7 @@ from hangouts.views import generate_choices, generate_fields_dict, text_format
 from vsts.views import create_work_item
 
 
-class EndState(ChoiceState):
+class EndState(choice_state.ChoiceState):
     STATE_LABEL = "end"
 
     @staticmethod
@@ -39,39 +33,39 @@ class EndState(ChoiceState):
             create_work_item(work_item_dict, work_item.url, user_object)
             print(work_item_dict)
 
-            change_state(user_object, InitialState.STATE_LABEL)
+            states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
             work_item.delete()
 
             return text_format("Your work item has been saved.")
 
         elif message == "Title":
-            user_object.state = TitleState.STATE_LABEL
+            user_object.state = title_state.TitleState.STATE_LABEL
             user_object.save()
 
             return text_format("Please enter your issue Title.")
 
         elif message == "Description":
-            user_object.state = DescriptionState.STATE_LABEL
+            user_object.state = description_state.DescriptionState.STATE_LABEL
             user_object.save()
 
             return text_format("Please describe your issue.")
 
         elif message == "Hardware Type":
-            user_object.state = HardwareChoice.STATE_LABEL
+            user_object.state = hardware_choice.HardwareChoice.STATE_LABEL
             user_object.save()
 
             hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
             return generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
 
         elif message == "Severity":
-            user_object.state = SeverityChoice.STATE_LABEL
+            user_object.state = severity_choice.SeverityChoice.STATE_LABEL
             user_object.save()
 
             severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
             return generate_choices("How severe is this issue?", severities, "severity")
 
         elif message == "Third Party":
-            user_object.state = SoftwareChoice.STATE_LABEL
+            user_object.state = software_choice.SoftwareChoice.STATE_LABEL
             user_object.save()
 
             third_party = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
