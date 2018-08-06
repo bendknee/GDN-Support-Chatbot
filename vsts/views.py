@@ -34,7 +34,7 @@ def create_work_item(work_item_dict, url, user):
         payload.append(field)
 
     req = requests.post(url, headers=headers, data=json.dumps(payload))
-    print(req.json())
+    print(req)
 
     CreatedWorkItems.objects.create(id=req.json()['id'], user=user)
 
