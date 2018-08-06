@@ -1,6 +1,6 @@
 from hangouts import views
 from hangouts.models import User
-from hangouts.states import states_conf, choice_state, state
+from hangouts.states import states_conf, item_type_state, state
 
 from vsts.views import token_expired_or_refresh
 
@@ -20,7 +20,7 @@ class InitialState(state.State):
                 return views.generate_signin_card(user_object)
             else:
                 token_expired_or_refresh(user_object)
-                states_conf.change_state(user_object, choice_state.ChoiceState.STATE_LABEL)
+                states_conf.change_state(user_object, item_type_state.ItemTypeState.STATE_LABEL)
                 return views.generate_choices("Choose work item type",
                                                        ["Hardware Support", "Software Support"], "choose_type")
         else:
