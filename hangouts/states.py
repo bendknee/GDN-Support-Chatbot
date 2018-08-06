@@ -224,8 +224,6 @@ class OtherSoftwareType(State):
 
     @staticmethod
     def action(message, event):
-        hangouts.delete_message(event['message']['name'])
-
         user_object = User.objects.get(name=event['space']['name'])
 
         work_item = user_object.get_work_item()
