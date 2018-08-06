@@ -71,8 +71,8 @@ def receive_message(payload):
     else:
         return
 
-    send_message(response, event['space']['name'])
-    return JsonResponse({"text": " "}, content_type='application/json')
+    # send_message(response, event['space']['name'])
+    return JsonResponse(response, content_type='application/json')
 
 
 def text_format(message):
@@ -92,14 +92,14 @@ def send_message(body, user):
     print(resp)
 
 
-def delete_message(name):
+def update_message(name, body):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'GDN Support Bot service key.json', scopes)
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().delete(name=name).execute()
+    resp = chat.spaces().messages().delete(name=name, body=body).execute()
 
     print(resp)
 

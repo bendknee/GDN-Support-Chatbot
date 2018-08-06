@@ -19,7 +19,6 @@ class EndState(choice_state.ChoiceState):
         user_object.save()
 
         if message == "save":
-            views.delete_message(event['message']['name'])
             user_object.is_finished = False
             user_object.save()
 
