@@ -12,6 +12,7 @@ states_list = {initial_state.InitialState.STATE_LABEL: initial_state.InitialStat
                severity_choice.SeverityChoice.STATE_LABEL: severity_choice.SeverityChoice,
                end_state.EndState.STATE_LABEL: end_state.EndState}
 
+some_state = end_state.EndState.STATE_LABEL
 
 def change_state(user_object, next_state):
     current_state = states_list[user_object.state]
@@ -20,7 +21,8 @@ def change_state(user_object, next_state):
         next_state = end_state.EndState.STATE_LABEL
 
     print("current state: " + current_state.STATE_LABEL)
-    # print("next state: " + next_state)
+    print("next state: " + next_state)
+    print("some state: " + some_state)
 
     user_object.state = next_state
     user_object.save()
