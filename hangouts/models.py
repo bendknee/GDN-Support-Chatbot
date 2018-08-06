@@ -36,7 +36,7 @@ class User(models.Model):
     is_finished = models.BooleanField(default=False)
     jwt_token = models.CharField(max_length=700, null=True)
     refresh_token = models.CharField(max_length=750, null=True)
-    last_auth = models.DateTimeField(auto_now=True)
+    last_auth = models.DateTimeField(default=datetime.now(), blank=True)
 
     def __str__(self):
         return self.name
