@@ -55,6 +55,7 @@ def receive_message(payload):
 
         elif event['type'] == 'CARD_CLICKED':
             if not state.is_waiting_text():
+                delete_message(event['message']['name'])
                 # response can be text or card, depending on action
                 action = event['action']
                 response = state.action(action['parameters'][0]['value'], event)
@@ -81,6 +82,17 @@ def send_message(body, user):
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
     resp = chat.spaces().messages().create(parent=user, body=body).execute()
+
+    print(resp)
+
+def delete_message(name):
+    scopes = ['https://www.googleapis.com/auth/chat.bot']
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        'GDN Support Bot service key.json', scopes)
+    http = Http()
+    credentials.authorize(http)
+    chat = build('chat', 'v1', http=http)
+    resp = chat.spaces().messages().delete(name=name).execute()
 
     print(resp)
 
