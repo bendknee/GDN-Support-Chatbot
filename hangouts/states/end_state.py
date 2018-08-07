@@ -38,11 +38,11 @@ class EndState(choice_state.ChoiceState):
             states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
             work_item.delete()
 
-            body = views.generate_work_item(work_item, req['_links']['html']['href'])
-            views.send_message(body, event['space']['name'])
+            # body = views.generate_work_item(work_item, req['_links']['html']['href'])
+            # views.send_message(body, event['space']['name'])
 
-            return views.text_format("Your work item has been saved.")
-            # return views.generate_work_item(work_item)
+            # return views.text_format("Your work item has been saved.")
+            return views.generate_work_item(work_item, req['_links']['html']['href'])
 
         elif message == "Title":
             user_object.state = title_state.TitleState.STATE_LABEL
