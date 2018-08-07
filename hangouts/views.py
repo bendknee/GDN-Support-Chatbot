@@ -71,7 +71,7 @@ def receive_message(payload):
     else:
         return
 
-    send_message(response, event['space']['name'])
+    send_message(response, event['thread']['name'])
     return HttpResponse("OK")
 
 
