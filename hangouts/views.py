@@ -64,8 +64,7 @@ def receive_message(payload):
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 action = event['action']
-                if action['actionMethodName'] == state.STATE_LABEL or \
-                        action['actionMethodName'] == end_state.EndState.STATE_LABEL:
+                if action['actionMethodName'] == state.STATE_LABEL:
                     response = state.action(action['parameters'][0]['value'], event)
                 else:
                     response = text_format(state.where())
@@ -183,7 +182,7 @@ def generate_edit_work_item(work_item):
                                             "text": "Edit",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": end_state.EndState.STATE_LABEL,
+                                                    "actionMethodName": "title",
                                                     "parameters": [
                                                         {
                                                             "key": "field",
@@ -242,7 +241,7 @@ def generate_edit_work_item(work_item):
                         "text": "Edit",
                         "onClick": {
                             "action": {
-                                "actionMethodName": end_state.EndState.STATE_LABEL,
+                                "actionMethodName": label,
                                 "parameters": [
                                     {
                                         "key": "field",
