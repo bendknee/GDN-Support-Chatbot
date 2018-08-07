@@ -68,7 +68,7 @@ def receive_message(payload):
                         action['actionMethodName'] == end_state.EndState.STATE_LABEL:
                     response = state.action(action['parameters'][0]['value'], event)
                 else:
-                    response = text_format("salah bro")
+                    response = text_format(state.where())
             else:
                 response = text_format(state.where())
         else:
