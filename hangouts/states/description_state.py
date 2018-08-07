@@ -27,10 +27,10 @@ class DescriptionState(state.State):
             return views.generate_edit_work_item(work_item)
         elif next_state == hardware_choice.HardwareChoice.STATE_LABEL:
             hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-            return views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
+            return views.generate_choices("Choose Hardware Type", hardware_type, software_choice.SoftwareChoice.STATE_LABEL)
         elif next_state == software_choice.SoftwareChoice.STATE_LABEL:
             third_party = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
-            return views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
+            return views.generate_choices("Choose 3rd Party Software", third_party, software_choice.SoftwareChoice.STATE_LABEL)
 
     @staticmethod
     def where():

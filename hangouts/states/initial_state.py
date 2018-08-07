@@ -22,7 +22,7 @@ class InitialState(state.State):
                 token_expired_or_refresh(user_object)
                 states_conf.change_state(user_object, item_type_state.ItemTypeState.STATE_LABEL)
                 return views.generate_choices("Choose work item type",
-                                                       ["Hardware Support", "Software Support"], "choose_type")
+                                                       ["Hardware Support", "Software Support"], item_type_state.ItemTypeState.STATE_LABEL)
         else:
             message = "I'm not sure what you mean. Type /help to see available commands."
             return views.text_format(message)

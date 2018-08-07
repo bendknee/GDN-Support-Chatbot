@@ -8,7 +8,7 @@ class SoftwareChoice(choice_state.ChoiceState):
 
     @staticmethod
     def action(message, event):
-        views.delete_message(event['message']['name'])
+        # views.delete_message(event['message']['name'])
 
         user_object = User.objects.get(name=event['space']['name'])
         work_item = user_object.get_work_item()
@@ -31,7 +31,7 @@ class SoftwareChoice(choice_state.ChoiceState):
             return views.generate_edit_work_item(work_item)
 
         severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        return views.generate_choices("How severe is this issue?", severities, "severity")
+        return views.generate_choices("How severe is this issue?", severities, severity_choice.SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():

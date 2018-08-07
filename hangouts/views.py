@@ -15,6 +15,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 import hangouts.states.states_conf as states_conf
 import hangouts.states.initial_state as initial_state
+import hangouts.states.end_state as end_state
 import json
 
 
@@ -63,7 +64,11 @@ def receive_message(payload):
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 action = event['action']
-                response = state.action(action['parameters'][0]['value'], event)
+                if action['actionMethodName'] == state.STATE_LABEL and \
+                        state.STATE_LABEL != end_state.EndState.STATE_LABEL:
+                    response = state.action(action['parameters'][0]['value'], event)
+                else:
+                    response = text_format("salah bro")
             else:
                 response = {}
         else:
@@ -75,8 +80,8 @@ def receive_message(payload):
     # print("thread")
     # print(event['message']['thread']['name'])
     print(response)
-    send_message(response, event['space']['name'])
-    return JsonResponse(text_format("        "), content_type='application/json')
+    # send_message(response, event['space']['name'])
+    return JsonResponse(response, content_type='application/json')
 
 
 def text_format(message):

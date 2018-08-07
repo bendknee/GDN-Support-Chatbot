@@ -19,7 +19,7 @@ class EndState(choice_state.ChoiceState):
         user_object.save()
 
         if message == "save":
-            views.delete_message(event['message']['name'])
+            # views.delete_message(event['message']['name'])
             user_object.is_finished = False
             user_object.save()
 
@@ -62,21 +62,21 @@ class EndState(choice_state.ChoiceState):
             user_object.save()
 
             hardware_type = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-            return views.generate_choices("Choose Hardware Type", hardware_type, "hardware_type")
+            return views.generate_choices("Choose Hardware Type", hardware_type, hardware_choice.HardwareChoice.STATE_LABEL)
 
         elif message == "Severity":
             user_object.state = severity_choice.SeverityChoice.STATE_LABEL
             user_object.save()
 
             severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-            return views.generate_choices("How severe is this issue?", severities, "severity")
+            return views.generate_choices("How severe is this issue?", severities, severity_choice.SeverityChoice.STATE_LABEL)
 
         elif message == "Third Party":
             user_object.state = software_choice.SoftwareChoice.STATE_LABEL
             user_object.save()
 
             third_party = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
-            return views.generate_choices("Choose 3rd Party Software", third_party, "software_type")
+            return views.generate_choices("Choose 3rd Party Software", third_party, software_choice.SoftwareChoice.STATE_LABEL)
 
     @staticmethod
     def where():

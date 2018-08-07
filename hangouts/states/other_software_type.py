@@ -24,7 +24,7 @@ class OtherSoftwareType(state.State):
             return views.generate_edit_work_item(work_item)
 
         severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        return views.generate_choices("How severe is this issue?", severities, "severity")
+        return views.generate_choices("How severe is this issue?", severities, severity_choice.SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():
