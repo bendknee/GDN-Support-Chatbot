@@ -70,7 +70,7 @@ def receive_message(payload):
                 else:
                     response = text_format("salah bro")
             else:
-                response = {}
+                response = text_format(state.where())
         else:
             return
     else:
@@ -183,7 +183,7 @@ def generate_edit_work_item(work_item):
                                             "text": "Edit",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": "edit_work_item",
+                                                    "actionMethodName": end_state.EndState.STATE_LABEL,
                                                     "parameters": [
                                                         {
                                                             "key": "field",
@@ -212,7 +212,7 @@ def generate_edit_work_item(work_item):
                                             "text": "SAVE",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": "save_work_item",
+                                                    "actionMethodName": end_state.EndState.STATE_LABEL,
                                                     "parameters": [
                                                         {
                                                             "key": "field",
@@ -242,7 +242,7 @@ def generate_edit_work_item(work_item):
                         "text": "Edit",
                         "onClick": {
                             "action": {
-                                "actionMethodName": "edit_work_item",
+                                "actionMethodName": end_state.EndState.STATE_LABEL,
                                 "parameters": [
                                     {
                                         "key": "field",
