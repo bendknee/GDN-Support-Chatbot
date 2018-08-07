@@ -76,7 +76,7 @@ def receive_message(payload):
     # print(event['message']['thread']['name'])
     print(response)
     send_message(response, event['space']['name'])
-    return JsonResponse(text_format(""), content_type='application/json')
+    return JsonResponse(text_format("        "), content_type='application/json')
 
 
 def text_format(message):
