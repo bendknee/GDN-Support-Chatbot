@@ -42,8 +42,8 @@ class EndState(choice_state.ChoiceState):
             body = views.generate_work_item(work_item, req['_links']['html']['href'])
             views.send_message(body, event['space']['name'])
 
-            # return views.text_format("Your work item has been saved.")
-            return views.generate_work_item(work_item, req['_links']['html']['href'])
+            return views.text_format("Your work item has been saved.")
+            # return views.generate_work_item(work_item, req['_links']['html']['href'])
 
         elif message == "Title":
             user_object.state = title_state.TitleState.STATE_LABEL
