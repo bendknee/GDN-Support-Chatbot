@@ -71,11 +71,11 @@ def receive_message(payload):
     else:
         return
 
-    response['threadKey'] = {"name": event['message']['thread']['name']}
+    # response['threadKey'] = {"name": event['message']['thread']['name']}
     print("thread")
     print(event['message']['thread']['name'])
-    print(response)
-    send_message(response, event['space']['name'])
+    # print(response)
+    send_message(response, event)
     return HttpResponse("OK")
 
 
@@ -84,14 +84,14 @@ def text_format(message):
 
 
 # ----------------------- send message asynchronously -----------------------#
-def send_message(body, user):
+def send_message(body, event):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'GDN Support Bot service key.json', scopes)
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().create(parent=user, body=body).execute()
+    resp = chat.spaces().messages().create(parent=event['space']['name'], body=body, threadKey=event['message']['thread']['name']).execute()
 
     print(resp)
 
