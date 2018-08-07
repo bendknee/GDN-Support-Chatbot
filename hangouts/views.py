@@ -76,7 +76,7 @@ def receive_message(payload):
     print(event['message']['thread']['name'])
     print(response)
     send_message(response, event)
-    return HttpResponse("OK")
+    return
 
 
 def text_format(message):
