@@ -30,11 +30,14 @@ class EndState(choice_state.ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            create_work_item(work_item_dict, work_item.url, user_object)
+            req = create_work_item(work_item_dict, work_item.url, user_object)
             print(work_item_dict)
 
             states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
             work_item.delete()
+
+            body = views.generate_work_item(work_item, req['resource']['_links']['html']['href'])
+            views.send_message(body, event['space']['name'])
 
             return views.text_format("Your work item has been saved.")
             # return views.generate_work_item(work_item)

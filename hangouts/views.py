@@ -6,7 +6,7 @@ from hangouts.models import User
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from googleapiclient.discovery import build
@@ -75,8 +75,8 @@ def receive_message(payload):
     print("thread")
     print(event['message']['thread']['name'])
     print(response)
-    send_message(response, event)
-    return
+    send_message(response, event['space']['name'])
+    return JsonResponse(text_format(""), content_type='application/json')
 
 
 def text_format(message):
@@ -84,14 +84,14 @@ def text_format(message):
 
 
 # ----------------------- send message asynchronously -----------------------#
-def send_message(body, event):
+def send_message(body, user):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'GDN Support Bot service key.json', scopes)
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().create(parent=event['space']['name'], body=body, threadKey=event['message']['thread']['name']).execute()
+    resp = chat.spaces().messages().create(parent=user, body=body).execute()
 
     print(resp)
 
@@ -256,7 +256,7 @@ def generate_edit_work_item(work_item):
 
     return card
 
-def generate_work_item(work_item):
+def generate_work_item(work_item, url):
     temp_dict = generate_fields_dict(work_item)
 
     del temp_dict["title"]
@@ -296,7 +296,7 @@ def generate_work_item(work_item):
                                             "text": "MORE",
                                             "onClick": {
                                                 "openLink": {
-                                                    "url": work_item['_links']['html']['href']
+                                                    "url": url
                                                 }
                                             }
                                         }

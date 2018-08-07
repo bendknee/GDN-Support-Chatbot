@@ -40,6 +40,8 @@ def create_work_item(work_item_dict, url, user):
 
     CreatedWorkItems.objects.create(id=req.json()['id'], user=user)
 
+    return req.json()
+
 
 # ----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
