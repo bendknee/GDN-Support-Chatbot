@@ -71,7 +71,7 @@ def receive_message(payload):
     else:
         return
 
-    response['thread'] = {"name": "spaces/SPACE_ID/threads/THREAD_ID"}
+    response['thread'] = {"name": event['message']['thread']['name']}
     send_message(response, event['space']['name'])
     return HttpResponse("OK")
 
