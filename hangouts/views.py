@@ -71,8 +71,8 @@ def receive_message(payload):
     else:
         return
 
-    # send_message(response, event['space']['name'])
-    return JsonResponse(response, content_type='application/json')
+    send_message(response, event['space']['name'])
+    return "OK"
 
 
 def text_format(message):
