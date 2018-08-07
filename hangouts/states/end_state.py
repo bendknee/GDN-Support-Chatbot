@@ -19,6 +19,7 @@ class EndState(choice_state.ChoiceState):
         user_object.save()
 
         if message == "save":
+            views.delete_message(event['message']['name'])
             user_object.is_finished = False
             user_object.save()
 
@@ -38,8 +39,8 @@ class EndState(choice_state.ChoiceState):
             states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
             work_item.delete()
 
-            # body = views.generate_work_item(work_item, req['_links']['html']['href'])
-            # views.send_message(body, event['space']['name'])
+            body = views.generate_work_item(work_item, req['_links']['html']['href'])
+            views.send_message(body, event['space']['name'])
 
             # return views.text_format("Your work item has been saved.")
             return views.generate_work_item(work_item, req['_links']['html']['href'])
