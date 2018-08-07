@@ -6,7 +6,7 @@ from hangouts.models import User
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
-from django.http import JsonResponse
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from googleapiclient.discovery import build
@@ -72,7 +72,7 @@ def receive_message(payload):
         return
 
     send_message(response, event['space']['name'])
-    return "OK"
+    return HttpResponse("OK")
 
 
 def text_format(message):
