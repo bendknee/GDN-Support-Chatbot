@@ -71,10 +71,10 @@ def receive_message(payload):
     else:
         return
 
-    # response['threadKey'] = {"name": event['message']['thread']['name']}
+    response['thread'] = {"name": event['message']['thread']['name']}
     print("thread")
     print(event['message']['thread']['name'])
-    # print(response)
+    print(response)
     send_message(response, event)
     return HttpResponse("OK")
 
