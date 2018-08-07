@@ -64,8 +64,8 @@ def receive_message(payload):
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 action = event['action']
-                if action['actionMethodName'] == state.STATE_LABEL and \
-                        state.STATE_LABEL != end_state.EndState.STATE_LABEL:
+                if action['actionMethodName'] == state.STATE_LABEL or \
+                        action['actionMethodName'] == end_state.EndState.STATE_LABEL:
                     response = state.action(action['parameters'][0]['value'], event)
                 else:
                     response = text_format("salah bro")
