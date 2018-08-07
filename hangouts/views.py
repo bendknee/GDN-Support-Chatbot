@@ -182,7 +182,7 @@ def generate_edit_work_item(work_item):
                                             "text": "Edit",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": "title",
+                                                    "actionMethodName": end_state.EndState.STATE_LABEL,
                                                     "parameters": [
                                                         {
                                                             "key": "field",
@@ -241,7 +241,7 @@ def generate_edit_work_item(work_item):
                         "text": "Edit",
                         "onClick": {
                             "action": {
-                                "actionMethodName": label,
+                                "actionMethodName": end_state.EndState.STATE_LABEL,
                                 "parameters": [
                                     {
                                         "key": "field",
