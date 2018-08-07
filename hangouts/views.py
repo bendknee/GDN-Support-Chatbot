@@ -71,7 +71,7 @@ def receive_message(payload):
     else:
         return
 
-    response['thread']['name'] = event['message']['thread']['name']
+    response['thread'] = {"name": event['message']['thread']['name']}
     print("thread")
     print(event['message']['thread']['name'])
     print(response)
