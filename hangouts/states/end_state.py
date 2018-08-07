@@ -32,6 +32,8 @@ class EndState(choice_state.ChoiceState):
 
             req = create_work_item(work_item_dict, work_item.url, user_object)
             print(work_item_dict)
+            print("req")
+            print(req)
 
             states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
             work_item.delete()
