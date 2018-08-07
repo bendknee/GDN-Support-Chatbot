@@ -92,14 +92,14 @@ def send_message(body, user):
     print(resp)
 
 
-def update_message(name, body):
+def delete_message(name):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'GDN Support Bot service key.json', scopes)
     http = Http()
     credentials.authorize(http)
     chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().update(name=name, body=body).execute()
+    resp = chat.spaces().messages().update(name=name).execute()
 
     print(resp)
 

@@ -12,7 +12,7 @@ class ItemTypeState(choice_state.ChoiceState):
 
     @staticmethod
     def action(message, event):
-        views.update_message(event['message']['name'], views.text_format("You chose `" + message + "`"))
+        views.delete_message(event['message']['name'])
 
         user_object = User.objects.get(name=event['space']['name'])
         if message == 'Hardware Support':
