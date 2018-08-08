@@ -1,9 +1,9 @@
 from hangouts import views
 from hangouts.models import User
-from hangouts.states import description_state, end_state, state, states_conf
+from hangouts.states import DescriptionState, EndState, State, change_state
 
 
-class TitleState(state.State):
+class TitleState(State):
     STATE_LABEL = "title"
 
     @staticmethod
@@ -18,9 +18,9 @@ class TitleState(state.State):
         work_item.title = message
         work_item.save()
 
-        next_state = states_conf.change_state(user_object, description_state.DescriptionState.STATE_LABEL)
+        next_state = change_state(user_object, DescriptionState.STATE_LABEL)
 
-        if next_state == end_state.EndState.STATE_LABEL:
+        if next_state == EndState.STATE_LABEL:
             return views.generate_edit_work_item(work_item)
 
         return views.text_format("Please describe your issue.")

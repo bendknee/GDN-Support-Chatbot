@@ -1,9 +1,9 @@
 from hangouts import views
 from hangouts.models import User
-from hangouts.states import end_state, severity_choice, states_conf, state
+from hangouts.states import EndState, SeverityChoice, change_state, State, severities_list
 
 
-class OtherSoftwareType(state.State):
+class OtherSoftwareType(State):
     STATE_LABEL = "other_software_type"
 
     @staticmethod
@@ -18,13 +18,12 @@ class OtherSoftwareType(state.State):
         work_item.third_party = message
         work_item.save()
 
-        next_state = states_conf.change_state(user_object, severity_choice.SeverityChoice.STATE_LABEL)
+        next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
 
-        if next_state == end_state.EndState.STATE_LABEL:
+        if next_state == EndState.STATE_LABEL:
             return views.generate_edit_work_item(work_item)
 
-        severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        return views.generate_choices("How severe is this issue?", severities, "severity")
+        return views.generate_choices("How severe is this issue?", severities_list, "severity")
 
     @staticmethod
     def where():

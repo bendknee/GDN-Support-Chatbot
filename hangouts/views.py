@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from hangouts.models import User
+from .models import User
+from .states import states_conf, initial_state
 
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -13,8 +14,6 @@ from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
-import hangouts.states.states_conf as states_conf
-import hangouts.states.initial_state as initial_state
 import json
 
 
