@@ -19,6 +19,7 @@ class EndState(ChoiceState):
         user_object.save()
 
         if message == "save":
+            # views.delete_message(event['message']['name'])
             user_object.is_finished = False
             user_object.save()
 
@@ -30,14 +31,19 @@ class EndState(ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            create_work_item(work_item_dict, work_item.url, user_object)
+            req = create_work_item(work_item_dict, work_item.url, user_object)
             print(work_item_dict)
+            print("req")
+            print(req)
 
             change_state(user_object, InitialState.STATE_LABEL)
             work_item.delete()
 
+            body = views.generate_work_item(work_item, req['_links']['html']['href'])
+            views.send_message(body, event['space']['name'])
+
             return views.text_format("Your work item has been saved.")
-            # return views.generate_work_item(work_item)
+            # return views.generate_work_item(work_item, req['_links']['html']['href'])
 
         elif message == "Title":
             user_object.state = TitleState.STATE_LABEL
@@ -55,19 +61,19 @@ class EndState(ChoiceState):
             user_object.state = HardwareChoice.STATE_LABEL
             user_object.save()
 
-            return views.generate_choices("Choose Hardware Type", hardware_list, "hardware_type")
+            return views.generate_choices("Choose Hardware Type", hardware_list, hardware_choice.HardwareChoice.STATE_LABEL)
 
         elif message == "Severity":
             user_object.state = SeverityChoice.STATE_LABEL
             user_object.save()
 
-            return views.generate_choices("How severe is this issue?", severities_list, "severity")
+            return views.generate_choices("How severe is this issue?", severities_list, severity_choice.SeverityChoice.STATE_LABEL)
 
         elif message == "Third Party":
             user_object.state = SoftwareChoice.STATE_LABEL
             user_object.save()
 
-            return views.generate_choices("Choose 3rd Party Software", software_list, "software_type")
+            return views.generate_choices("Choose 3rd Party Software", software_list, software_choice.SoftwareChoice.STATE_LABEL)
 
     @staticmethod
     def where():

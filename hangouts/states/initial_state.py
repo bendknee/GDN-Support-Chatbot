@@ -21,7 +21,7 @@ class InitialState(State):
             else:
                 token_expired_or_refresh(user_object)
                 change_state(user_object, ItemTypeState.STATE_LABEL)
-                return views.generate_choices("Choose work item type", available_types, "choose_type")
+                return views.generate_choices("Choose work item type", available_types, item_type_state.ItemTypeState.STATE_LABEL)
         else:
             message = "I'm not sure what you mean. Type /help to see available commands."
             return views.text_format(message)

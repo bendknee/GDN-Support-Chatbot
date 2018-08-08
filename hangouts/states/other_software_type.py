@@ -23,7 +23,7 @@ class OtherSoftwareType(State):
         if next_state == EndState.STATE_LABEL:
             return views.generate_edit_work_item(work_item)
 
-        return views.generate_choices("How severe is this issue?", severities_list, "severity")
+        return views.generate_choices("How severe is this issue?", severities_list, severity_choice.SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():

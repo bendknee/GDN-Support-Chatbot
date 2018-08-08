@@ -8,7 +8,7 @@ class HardwareChoice(ChoiceState):
 
     @staticmethod
     def action(message, event):
-        views.delete_message(event['message']['name'])
+        # views.delete_message(event['message']['name'])
 
         user_object = User.objects.get(name=event['space']['name'])
         work_item = user_object.get_work_item()
@@ -20,7 +20,7 @@ class HardwareChoice(ChoiceState):
         if next_state == EndState.STATE_LABEL:
             return views.generate_edit_work_item(work_item)
 
-        return views.generate_choices("How severe is this issue?", severities_list, "severity")
+        return views.generate_choices("How severe is this issue?", severities_list, severity_choice.SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():

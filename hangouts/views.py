@@ -7,13 +7,16 @@ from .states import states_conf, initial_state
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
+import hangouts.states.states_conf as states_conf
+import hangouts.states.initial_state as initial_state
+import hangouts.states.end_state as end_state
 import json
 
 
@@ -62,16 +65,23 @@ def receive_message(payload):
             if not state.is_waiting_text():
                 # response can be text or card, depending on action
                 action = event['action']
-                response = state.action(action['parameters'][0]['value'], event)
+                if action['actionMethodName'] == state.STATE_LABEL:
+                    response = state.action(action['parameters'][0]['value'], event)
+                else:
+                    response = text_format(state.where())
             else:
-                response = {}
+                response = text_format(state.where())
         else:
             return
     else:
         return
 
-    send_message(response, event['thread']['name'])
-    return HttpResponse("OK")
+    # response['thread'] = {"name": event['message']['thread']['name']}
+    # print("thread")
+    # print(event['message']['thread']['name'])
+    print(response)
+    # send_message(response, event['space']['name'])
+    return JsonResponse(response, content_type='application/json')
 
 
 def text_format(message):
@@ -173,7 +183,7 @@ def generate_edit_work_item(work_item):
                                             "text": "Edit",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": "edit_work_item",
+                                                    "actionMethodName": end_state.EndState.STATE_LABEL,
                                                     "parameters": [
                                                         {
                                                             "key": "field",
@@ -202,7 +212,7 @@ def generate_edit_work_item(work_item):
                                             "text": "SAVE",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": "save_work_item",
+                                                    "actionMethodName": end_state.EndState.STATE_LABEL,
                                                     "parameters": [
                                                         {
                                                             "key": "field",
@@ -232,7 +242,7 @@ def generate_edit_work_item(work_item):
                         "text": "Edit",
                         "onClick": {
                             "action": {
-                                "actionMethodName": "edit_work_item",
+                                "actionMethodName": end_state.EndState.STATE_LABEL,
                                 "parameters": [
                                     {
                                         "key": "field",
@@ -251,7 +261,7 @@ def generate_edit_work_item(work_item):
 
     return card
 
-def generate_work_item(work_item):
+def generate_work_item(work_item, url):
     temp_dict = generate_fields_dict(work_item)
 
     del temp_dict["title"]
@@ -291,7 +301,7 @@ def generate_work_item(work_item):
                                             "text": "MORE",
                                             "onClick": {
                                                 "openLink": {
-                                                    "url": work_item['_links']['html']['href']
+                                                    "url": url
                                                 }
                                             }
                                         }
