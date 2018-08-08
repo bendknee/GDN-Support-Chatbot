@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from .models import User
-from .states import states_conf, initial_state
+from .states import states_conf, InitialState, EndState
 
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -14,9 +14,6 @@ from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
-import hangouts.states.states_conf as states_conf
-import hangouts.states.initial_state as initial_state
-import hangouts.states.end_state as end_state
 import json
 
 
@@ -46,7 +43,7 @@ def receive_message(payload):
                 user_object.is_finished = False
                 user_object.save()
 
-                states_conf.change_state(user_object, initial_state.InitialState.STATE_LABEL)
+                states_conf.change_state(user_object, InitialState.STATE_LABEL)
 
                 try:
                     user_object.work_item.delete()
@@ -57,7 +54,7 @@ def receive_message(payload):
             elif message == '/where':
                 response = text_format(state.where())
             elif state.is_waiting_text():
-                response = state.action(message, event)
+                response = state.action(user_object, message, event)
             else:
                 response = text_format(state.where())
 
@@ -183,7 +180,7 @@ def generate_edit_work_item(work_item):
                                             "text": "Edit",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": end_state.EndState.STATE_LABEL,
+                                                    "actionMethodName": EndState.STATE_LABEL,
                                                     "parameters": [
                                                         {
                                                             "key": "field",
@@ -212,7 +209,7 @@ def generate_edit_work_item(work_item):
                                             "text": "SAVE",
                                             "onClick": {
                                                 "action": {
-                                                    "actionMethodName": end_state.EndState.STATE_LABEL,
+                                                    "actionMethodName": EndState.STATE_LABEL,
                                                     "parameters": [
                                                         {
                                                             "key": "field",
@@ -242,7 +239,7 @@ def generate_edit_work_item(work_item):
                         "text": "Edit",
                         "onClick": {
                             "action": {
-                                "actionMethodName": end_state.EndState.STATE_LABEL,
+                                "actionMethodName": EndState.STATE_LABEL,
                                 "parameters": [
                                     {
                                         "key": "field",

@@ -1,6 +1,8 @@
 from datetime import datetime
 from django.db import models
-from hangouts.states import InitialState, severities_list, hardware_list, states_list
+
+import hangouts.states.states_conf as states_conf
+import hangouts.states.initial_state as initial_state
 
 
 class WorkItem(models.Model):
@@ -14,8 +16,10 @@ class HardwareSupport(WorkItem):
     path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Support.HardwareType",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
     url = "Hardware%20Support"
+    severities_list = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
+    hardware_list = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
 
-    hardware_type = models.CharField(choices=hardware_list, max_length=30)
+    hardware_type = models.CharField(choices=tuple((x, x) for x in hardware_list), max_length=30)
     severity = models.IntegerField(choices=tuple((int(x[0]), x) for x in severities_list),
                                    default=severities_list[2])
 
@@ -25,6 +29,8 @@ class SoftwareSupport(WorkItem):
                                             "requested_by": "Support.RequestedBy",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
     url = "Software%20Support"
+    severities_list = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
+    software_list = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
 
     requested_by = models.TextField()
     third_party = models.CharField(max_length=30)
@@ -35,8 +41,8 @@ class SoftwareSupport(WorkItem):
 class User(models.Model):
     name = models.CharField(max_length=40)
     work_item = models.OneToOneField(WorkItem, on_delete=models.SET_NULL, null=True)
-    state = models.CharField(choices=tuple((x, x) for x in states_list.keys()),
-                             max_length=30, default=InitialState.STATE_LABEL)
+    state = models.CharField(choices=tuple((x, x) for x in states_conf.states_list.keys()),
+                             max_length=30, default=initial_state.InitialState.STATE_LABEL)
     is_finished = models.BooleanField(default=False)
     jwt_token = models.CharField(max_length=700, blank=True)
     refresh_token = models.CharField(max_length=750, blank=True)

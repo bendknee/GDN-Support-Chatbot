@@ -1,5 +1,5 @@
 from hangouts import views
-from hangouts.models import User, HardwareSupport, SoftwareSupport
+from hangouts.models import HardwareSupport, SoftwareSupport
 from hangouts.states import change_state, ChoiceState, TitleState
 
 
@@ -11,10 +11,9 @@ class ItemTypeState(ChoiceState):
         return False
 
     @staticmethod
-    def action(message, event):
+    def action(user_object, message, event):
         # views.delete_message(event['message']['name'])
 
-        user_object = User.objects.get(name=event['space']['name'])
         if message == 'Hardware Support':
             work_item_object = HardwareSupport.objects.create()
         elif message == 'Software Support':

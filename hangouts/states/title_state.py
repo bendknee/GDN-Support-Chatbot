@@ -1,5 +1,4 @@
 from hangouts import views
-from hangouts.models import User
 from hangouts.states import DescriptionState, EndState, State, change_state
 
 
@@ -11,8 +10,7 @@ class TitleState(State):
         return True
 
     @staticmethod
-    def action(message, event):
-        user_object = User.objects.get(name=event['space']['name'])
+    def action(user_object, message, event):
 
         work_item = user_object.get_work_item()
         work_item.title = message

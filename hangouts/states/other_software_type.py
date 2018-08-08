@@ -1,6 +1,5 @@
 from hangouts import views
-from hangouts.models import User
-from hangouts.states import EndState, SeverityChoice, change_state, State, severities_list
+from hangouts.states import EndState, SeverityChoice, change_state, State
 
 
 class OtherSoftwareType(State):
@@ -11,8 +10,7 @@ class OtherSoftwareType(State):
         return True
 
     @staticmethod
-    def action(message, event):
-        user_object = User.objects.get(name=event['space']['name'])
+    def action(user_object, message, event):
 
         work_item = user_object.get_work_item()
         work_item.third_party = message
@@ -23,7 +21,7 @@ class OtherSoftwareType(State):
         if next_state == EndState.STATE_LABEL:
             return views.generate_edit_work_item(work_item)
 
-        return views.generate_choices("How severe is this issue?", severities_list, severity_choice.SeverityChoice.STATE_LABEL)
+        return views.generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():

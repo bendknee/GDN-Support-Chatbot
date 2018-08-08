@@ -6,7 +6,7 @@ class State(metaclass=ABCMeta):
 
     @staticmethod
     @abstractmethod
-    def action(message, event):
+    def action(user_object, message, event):
         pass
 
     @staticmethod

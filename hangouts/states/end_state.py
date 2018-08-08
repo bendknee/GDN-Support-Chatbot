@@ -1,8 +1,7 @@
 from . import ChoiceState, DescriptionState, HardwareChoice, InitialState, SeverityChoice,\
-    SoftwareChoice, TitleState, hardware_list, severities_list, software_list, change_state
+    SoftwareChoice, TitleState, change_state
 
 from hangouts import views
-from hangouts.models import User
 
 from vsts.views import create_work_item
 
@@ -11,8 +10,7 @@ class EndState(ChoiceState):
     STATE_LABEL = "end"
 
     @staticmethod
-    def action(message, event):
-        user_object = User.objects.get(name=event['space']['name'])
+    def action(user_object, message, event):
         work_item = user_object.get_work_item()
 
         user_object.is_finished = True
@@ -61,19 +59,19 @@ class EndState(ChoiceState):
             user_object.state = HardwareChoice.STATE_LABEL
             user_object.save()
 
-            return views.generate_choices("Choose Hardware Type", hardware_list, hardware_choice.HardwareChoice.STATE_LABEL)
+            return views.generate_choices("Choose Hardware Type", work_item.hardware_list, HardwareChoice.STATE_LABEL)
 
         elif message == "Severity":
             user_object.state = SeverityChoice.STATE_LABEL
             user_object.save()
 
-            return views.generate_choices("How severe is this issue?", severities_list, severity_choice.SeverityChoice.STATE_LABEL)
+            return views.generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
         elif message == "Third Party":
             user_object.state = SoftwareChoice.STATE_LABEL
             user_object.save()
 
-            return views.generate_choices("Choose 3rd Party Software", software_list, software_choice.SoftwareChoice.STATE_LABEL)
+            return views.generate_choices("Choose 3rd Party Software", work_item.software_list, SoftwareChoice.STATE_LABEL)
 
     @staticmethod
     def where():

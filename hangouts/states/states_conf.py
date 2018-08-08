@@ -12,11 +12,6 @@ states_list = {InitialState.STATE_LABEL: InitialState,
                SeverityChoice.STATE_LABEL: SeverityChoice,
                EndState.STATE_LABEL: EndState}
 
-available_types = ["Hardware Support", "Software Support"]
-severities_list = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-hardware_list = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
-software_list = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
-
 
 def change_state(user_object, next_state):
     current_state = states_list[user_object.state]

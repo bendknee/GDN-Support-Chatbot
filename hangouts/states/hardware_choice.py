@@ -1,16 +1,14 @@
 from hangouts import views
-from hangouts.models import User
-from hangouts.states import EndState, change_state, ChoiceState, SeverityChoice, severities_list
+from hangouts.states import EndState, change_state, ChoiceState, SeverityChoice
 
 
 class HardwareChoice(ChoiceState):
     STATE_LABEL = "hardware_type"
 
     @staticmethod
-    def action(message, event):
+    def action(user_object, message, event):
         # views.delete_message(event['message']['name'])
 
-        user_object = User.objects.get(name=event['space']['name'])
         work_item = user_object.get_work_item()
         work_item.hardware_type = message
         work_item.save()
@@ -20,7 +18,7 @@ class HardwareChoice(ChoiceState):
         if next_state == EndState.STATE_LABEL:
             return views.generate_edit_work_item(work_item)
 
-        return views.generate_choices("How severe is this issue?", severities_list, severity_choice.SeverityChoice.STATE_LABEL)
+        return views.generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():
