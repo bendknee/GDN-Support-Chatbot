@@ -1,9 +1,9 @@
 from hangouts import views
 from hangouts.models import User
-from hangouts.states import end_state, states_conf, choice_state
+from hangouts.states import EndState, change_state, ChoiceState
 
 
-class SeverityChoice(choice_state.ChoiceState):
+class SeverityChoice(ChoiceState):
     STATE_LABEL = "severity"
 
     @staticmethod
@@ -15,7 +15,7 @@ class SeverityChoice(choice_state.ChoiceState):
         work_item.severity = message
         work_item.save()
 
-        states_conf.change_state(user_object, end_state.EndState.STATE_LABEL)
+        change_state(user_object, EndState.STATE_LABEL)
         return views.generate_edit_work_item(work_item)
 
     @staticmethod

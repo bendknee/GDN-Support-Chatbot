@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from hangouts.models import User
+from .models import User
+from .states import states_conf, initial_state
 
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static

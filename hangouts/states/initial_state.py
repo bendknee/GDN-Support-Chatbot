@@ -1,11 +1,11 @@
 from hangouts import views
 from hangouts.models import User
-from hangouts.states import states_conf, item_type_state, state
+from hangouts.states import change_state, available_types, ItemTypeState, State
 
 from vsts.views import token_expired_or_refresh
 
 
-class InitialState(state.State):
+class InitialState(State):
     STATE_LABEL = "initial"
 
     @staticmethod
@@ -20,9 +20,8 @@ class InitialState(state.State):
                 return views.generate_signin_card(user_object)
             else:
                 token_expired_or_refresh(user_object)
-                states_conf.change_state(user_object, item_type_state.ItemTypeState.STATE_LABEL)
-                return views.generate_choices("Choose work item type",
-                                                       ["Hardware Support", "Software Support"], item_type_state.ItemTypeState.STATE_LABEL)
+                change_state(user_object, ItemTypeState.STATE_LABEL)
+                return views.generate_choices("Choose work item type", available_types, item_type_state.ItemTypeState.STATE_LABEL)
         else:
             message = "I'm not sure what you mean. Type /help to see available commands."
             return views.text_format(message)

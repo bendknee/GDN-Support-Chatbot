@@ -1,9 +1,9 @@
 from hangouts import views
 from hangouts.models import User
-from hangouts.states import end_state, states_conf, choice_state, severity_choice
+from hangouts.states import EndState, change_state, ChoiceState, SeverityChoice, severities_list
 
 
-class HardwareChoice(choice_state.ChoiceState):
+class HardwareChoice(ChoiceState):
     STATE_LABEL = "hardware_type"
 
     @staticmethod
@@ -15,13 +15,12 @@ class HardwareChoice(choice_state.ChoiceState):
         work_item.hardware_type = message
         work_item.save()
 
-        next_state = states_conf.change_state(user_object, severity_choice.SeverityChoice.STATE_LABEL)
+        next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
 
-        if next_state == end_state.EndState.STATE_LABEL:
+        if next_state == EndState.STATE_LABEL:
             return views.generate_edit_work_item(work_item)
 
-        severities = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
-        return views.generate_choices("How severe is this issue?", severities, severity_choice.SeverityChoice.STATE_LABEL)
+        return views.generate_choices("How severe is this issue?", severities_list, severity_choice.SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():

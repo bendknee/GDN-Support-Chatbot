@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import models
+from hangouts.states import InitialState, severities_list, hardware_list, states_list
 
 
 class WorkItem(models.Model):
@@ -14,8 +15,9 @@ class HardwareSupport(WorkItem):
                                             "severity": "Microsoft.VSTS.Common.Severity"})
     url = "Hardware%20Support"
 
-    hardware_type = models.CharField(max_length=30)
-    severity = models.CharField(max_length=20, null=True)
+    hardware_type = models.CharField(choices=hardware_list, max_length=30)
+    severity = models.IntegerField(choices=tuple((int(x[0]), x) for x in severities_list),
+                                   default=severities_list[2])
 
 
 class SoftwareSupport(WorkItem):
@@ -26,16 +28,18 @@ class SoftwareSupport(WorkItem):
 
     requested_by = models.TextField()
     third_party = models.CharField(max_length=30)
-    severity = models.CharField(max_length=20, null=True)
+    severity = models.IntegerField(choices=tuple((int(x[0]), x) for x in severities_list),
+                                   default=severities_list[2])
 
 
 class User(models.Model):
     name = models.CharField(max_length=40)
     work_item = models.OneToOneField(WorkItem, on_delete=models.SET_NULL, null=True)
-    state = models.CharField(default='initial', max_length=30)
+    state = models.CharField(choices=tuple((x, x) for x in states_list.keys()),
+                             max_length=30, default=InitialState.STATE_LABEL)
     is_finished = models.BooleanField(default=False)
-    jwt_token = models.CharField(max_length=700, null=True)
-    refresh_token = models.CharField(max_length=750, null=True)
+    jwt_token = models.CharField(max_length=700, blank=True)
+    refresh_token = models.CharField(max_length=750, blank=True)
     last_auth = models.DateTimeField(default=datetime.now(), blank=True)
 
     def __str__(self):
