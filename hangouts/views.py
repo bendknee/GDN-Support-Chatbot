@@ -64,7 +64,7 @@ def receive_message(payload):
                 # response can be text or card, depending on action
                 action = event['action']
                 if action['actionMethodName'] == state.STATE_LABEL:
-                    response = state.action(action['parameters'][0]['value'], event)
+                    response = state.action(user_object, action['parameters'][0]['value'], event)
                 else:
                     response = text_format(state.where())
             else:
