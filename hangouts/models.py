@@ -1,15 +1,13 @@
 from datetime import datetime
 from django.db import models
 
-import hangouts.states.states_conf as states_conf
-import hangouts.states.initial_state as initial_state
-
 
 class WorkItem(models.Model):
     path_dict = {"title": "System.Title", "description": "System.Description"}
 
     title = models.CharField(max_length=50)
     description = models.TextField()
+    saved_url = models.TextField(null=True)
 
 
 class HardwareSupport(WorkItem):
@@ -41,12 +39,11 @@ class SoftwareSupport(WorkItem):
 class User(models.Model):
     name = models.CharField(max_length=40)
     work_item = models.OneToOneField(WorkItem, on_delete=models.SET_NULL, null=True)
-    state = models.CharField(choices=tuple((x, x) for x in states_conf.states_list.keys()),
-                             max_length=30, default=initial_state.InitialState.STATE_LABEL)
+    state = models.CharField(max_length=30, default="initial")
     is_finished = models.BooleanField(default=False)
-    jwt_token = models.CharField(max_length=700, blank=True)
-    refresh_token = models.CharField(max_length=750, blank=True)
-    last_auth = models.DateTimeField(default=datetime.now(), blank=True)
+    jwt_token = models.CharField(max_length=700, null=True)
+    refresh_token = models.CharField(max_length=750, null=True)
+    last_auth = models.DateTimeField(default=datetime.now(), null=True)
 
     def __str__(self):
         return self.name
