@@ -18,8 +18,8 @@ class HardwareSupport(WorkItem):
     hardware_list = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
 
     hardware_type = models.CharField(choices=tuple((x, x) for x in hardware_list), max_length=30)
-    severity = models.CharField(choices=tuple((int(x[0]), x) for x in severities_list),
-                                default=severities_list[2], max_length=20)
+    severity = models.IntegerField(choices=tuple((int(x[0]), x) for x in severities_list),
+                                   default=severities_list[2][0])
 
 
 class SoftwareSupport(WorkItem):
@@ -33,7 +33,7 @@ class SoftwareSupport(WorkItem):
     requested_by = models.TextField()
     third_party = models.CharField(max_length=30)
     severity = models.IntegerField(choices=tuple((int(x[0]), x) for x in severities_list),
-                                   default=severities_list[2])
+                                   default=severities_list[2][0])
 
 
 class User(models.Model):
