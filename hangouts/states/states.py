@@ -222,7 +222,7 @@ class SeverityChoice(ChoiceState):
         # views.delete_message(event['message']['name'])
 
         work_item = user_object.get_work_item()
-        work_item.severity = int(message[0])
+        work_item.severity = message
         work_item.save()
 
         change_state(user_object, EndState.STATE_LABEL)
