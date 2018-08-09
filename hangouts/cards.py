@@ -1,6 +1,7 @@
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
 
+
 def text_format(message):
     return {"text": message}
 
@@ -92,7 +93,7 @@ def generate_work_item(work_item):
 
     return card, work_item_dict
 
-def generate_edit_work_item(work_item):
+def generate_edit_work_item(work_item, state):
     card, work_item_dict = generate_work_item(work_item)
     print("card before")
     print(card)
@@ -103,7 +104,7 @@ def generate_edit_work_item(work_item):
             "text": "Edit",
             "onClick": {
                 "action": {
-                    "actionMethodName": end_state.EndState.STATE_LABEL,
+                    "actionMethodName": state,
                     "parameters": [
                         {
                             "key": "field",
@@ -123,7 +124,7 @@ def generate_edit_work_item(work_item):
                     "text": "SAVE",
                     "onClick": {
                         "action": {
-                            "actionMethodName": end_state.EndState.STATE_LABEL,
+                            "actionMethodName": state,
                             "parameters": [
                                 {
                                     "key": "field",
@@ -153,7 +154,7 @@ def generate_edit_work_item(work_item):
                         "text": "Edit",
                         "onClick": {
                             "action": {
-                                "actionMethodName": end_state.EndState.STATE_LABEL,
+                                "actionMethodName": state,
                                 "parameters": [
                                     {
                                         "key": "field",

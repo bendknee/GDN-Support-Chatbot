@@ -93,7 +93,7 @@ class TitleState(State):
         next_state = change_state(user_object, DescriptionState.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item)
+            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
         return text_format("Please describe your issue.")
 
@@ -121,7 +121,7 @@ class DescriptionState(State):
             next_state = change_state(user_object, SoftwareChoice.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item)
+            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
         elif next_state == HardwareChoice.STATE_LABEL:
             return generate_choices("Choose Hardware Type", work_item.hardware_list, "hardware_type")
         elif next_state == SoftwareChoice.STATE_LABEL:
@@ -146,7 +146,7 @@ class HardwareChoice(ChoiceState):
         next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item)
+            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
         return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
@@ -179,7 +179,7 @@ class SoftwareChoice(ChoiceState):
         next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item)
+            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
         return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
@@ -205,7 +205,7 @@ class OtherSoftwareType(State):
         next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item)
+            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
         return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
@@ -226,7 +226,7 @@ class SeverityChoice(ChoiceState):
         work_item.save()
 
         change_state(user_object, EndState.STATE_LABEL)
-        return generate_edit_work_item(work_item)
+        return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
     @staticmethod
     def where():
