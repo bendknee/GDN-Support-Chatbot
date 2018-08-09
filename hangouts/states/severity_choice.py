@@ -1,5 +1,4 @@
 from hangouts import views
-from hangouts.models import User
 from hangouts.states import EndState, change_state, ChoiceState
 
 
@@ -7,10 +6,9 @@ class SeverityChoice(ChoiceState):
     STATE_LABEL = "severity"
 
     @staticmethod
-    def action(message, event):
+    def action(user_object, message, event):
         # views.delete_message(event['message']['name'])
 
-        user_object = User.objects.get(name=event['space']['name'])
         work_item = user_object.get_work_item()
         work_item.severity = message
         work_item.save()

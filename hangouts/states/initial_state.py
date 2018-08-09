@@ -1,8 +1,9 @@
 from hangouts import views
-from hangouts.models import User
-from hangouts.states import change_state, available_types, ItemTypeState, State
+from hangouts.states import change_state, ItemTypeState, State
 
 from vsts.views import token_expired_or_refresh
+
+available_types = ["Hardware Support", "Software Support"]
 
 
 class InitialState(State):
@@ -13,15 +14,14 @@ class InitialState(State):
         return True
 
     @staticmethod
-    def action(message, event):
+    def action(user_object, message, event):
         if message.lower() == 'support':
-            user_object = User.objects.get(name=event['space']['name'])
             if user_object.jwt_token is None:
                 return views.generate_signin_card(user_object)
             else:
                 token_expired_or_refresh(user_object)
                 change_state(user_object, ItemTypeState.STATE_LABEL)
-                return views.generate_choices("Choose work item type", available_types, item_type_state.ItemTypeState.STATE_LABEL)
+                return views.generate_choices("Choose work item type", available_types, ItemTypeState.STATE_LABEL)
         else:
             message = "I'm not sure what you mean. Type /help to see available commands."
             return views.text_format(message)

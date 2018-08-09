@@ -1,16 +1,14 @@
 from hangouts import views
-from hangouts.models import User
-from hangouts.states import EndState, SeverityChoice, change_state, severities_list, ChoiceState, OtherSoftwareType
+from hangouts.states import EndState, SeverityChoice, change_state, ChoiceState, OtherSoftwareType
 
 
 class SoftwareChoice(ChoiceState):
     STATE_LABEL = "software_type"
 
     @staticmethod
-    def action(message, event):
+    def action(user_object, message, event):
         # views.delete_message(event['message']['name'])
 
-        user_object = User.objects.get(name=event['space']['name'])
         work_item = user_object.get_work_item()
         user_email = str(event['user']['email'])
         user_email = user_email.split("@")[0] + '@staff.gramedia.com'
@@ -30,7 +28,7 @@ class SoftwareChoice(ChoiceState):
         if next_state == EndState.STATE_LABEL:
             return views.generate_edit_work_item(work_item)
 
-        return views.generate_choices("How severe is this issue?", severities_list, severity_choice.SeverityChoice.STATE_LABEL)
+        return views.generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():
