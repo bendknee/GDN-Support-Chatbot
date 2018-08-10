@@ -5,6 +5,16 @@ from django.forms.models import model_to_dict
 def text_format(message):
     return {"text": message}
 
+# update card after CARD CLICKED event
+def generate_update_response(response, **kwargs):
+    if 'text' in kwargs:
+        response["text"] = kwargs['text']
+
+    response["actionResponse"] = {"type": "UPDATE_MESSAGE"}
+
+    return response
+
+
 # ----------------------- card generators -----------------------#
 def generate_card_layout(num_of_sections):
     card = {
@@ -168,8 +178,6 @@ def generate_edit_work_item(work_item, state):
 
 def generate_saved_work_item(work_item):
     card, work_item_dict = generate_work_item(work_item)
-    card["text"] = "Your work item has been saved."
-    card["actionResponse"] = {"type": "UPDATE_MESSAGE"}
 
     # add widgets
     buttons_widget = {
