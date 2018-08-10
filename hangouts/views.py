@@ -54,6 +54,7 @@ def receive_message(payload):
                 response = text_format("Your progress has been aborted")
             elif message == '/where':
                 response = text_format(state.where())
+                response["actionResponse"] = {"type": "UPDATE_MESSAGE"}
             elif state.is_waiting_text():
                 response = state.action(user_object, message, event)
             else:
@@ -79,7 +80,6 @@ def receive_message(payload):
     # print(event['message']['thread']['name'])
     print(response)
     # send_message(response, event['space']['name'])
-    response["actionResponse"] = {"type": "UPDATE_MESSAGE"}
     return JsonResponse(response, content_type='application/json')
 
 
