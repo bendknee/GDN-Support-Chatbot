@@ -66,7 +66,7 @@ class TitleState(TextState):
         user_object.state = DescriptionState.STATE_LABEL
         user_object.save()
 
-        if user_object.final:
+        if user_object.is_finished:
             user_object.state = EndState.STATE_LABEL
             user_object.save()
             return generate_edit_work_item(work_item, EndState.STATE_LABEL)
@@ -87,7 +87,7 @@ class DescriptionState(TextState):
         work_item.description = message
         work_item.save()
 
-        if user_object.final:
+        if user_object.is_finished:
             user_object.state = EndState.STATE_LABEL
             user_object.save()
             return generate_edit_work_item(work_item, EndState.STATE_LABEL)
@@ -119,7 +119,7 @@ class HardwareChoice(ChoiceState):
         user_object.state = SeverityChoice.STATE_LABEL
         user_object.save()
 
-        if user_object.final:
+        if user_object.is_finished:
             user_object.state = EndState.STATE_LABEL
             user_object.save()
             card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
@@ -157,7 +157,7 @@ class SoftwareChoice(ChoiceState):
         user_object.state = SeverityChoice.STATE_LABEL
         user_object.save()
 
-        if user_object.final:
+        if user_object.is_finished:
             user_object.state = EndState.STATE_LABEL
             user_object.save()
             card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
@@ -183,7 +183,7 @@ class OtherSoftwareType(TextState):
         user_object.state = SeverityChoice.STATE_LABEL
         user_object.save()
 
-        if user_object.final:
+        if user_object.is_finished:
             user_object.state = EndState.STATE_LABEL
             user_object.save()
             card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
