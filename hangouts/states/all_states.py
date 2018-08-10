@@ -187,6 +187,7 @@ class OtherSoftwareType(TextState):
             user_object.state = EndState.STATE_LABEL
             user_object.save()
             card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
+            return generate_update_response(card)
 
         return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
