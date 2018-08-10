@@ -148,9 +148,11 @@ class HardwareChoice(ChoiceState):
         next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
+            card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
+        else:
+            card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
+        return generate_update_response(card, text="You have chosen `%s`" % message)
 
     @staticmethod
     def where():
@@ -181,9 +183,10 @@ class SoftwareChoice(ChoiceState):
         next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
 
         if next_state == EndState.STATE_LABEL:
-            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
+            card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
+        else:
+            card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
         return generate_update_response(card, text="You have chosen `%s`" % message)
 
     @staticmethod
