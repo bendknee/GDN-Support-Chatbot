@@ -12,16 +12,9 @@ def generate_card_layout(num_of_sections):
             {
                 "sections": [
                 ]
-            },
-            {
-                "header": {
-                    "title": "Pizza Bot Customer Support",
-                    "subtitle": "pizzabot@example.com",
-                    "imageUrl": "https://goo.gl/aeDtrS",
-                    "imageStyle": "IMAGE"
-                  },
             }
-        ]
+        ],
+        "text": "YES"
     }
 
     for i in range(num_of_sections):
@@ -69,8 +62,6 @@ def generate_choices(title, choices, method):
 
 def generate_work_item(work_item):
     card = generate_card_layout(3)
-    print("three sections")
-    print(card)
 
     # remove fields that does not need to be displayed
     temp_dict = generate_fields_dict(work_item)
@@ -96,15 +87,12 @@ def generate_work_item(work_item):
         }
     }
 
-    print(card['cards'][0]['sections'][0]['widgets'])
     card['cards'][0]['sections'][0]['widgets'].append(title_widget)
 
     return card, work_item_dict
 
 def generate_edit_work_item(work_item, state):
     card, work_item_dict = generate_work_item(work_item)
-    print("card before")
-    print(card)
 
     # add widgets
     edit_title_button = {
@@ -147,8 +135,6 @@ def generate_edit_work_item(work_item, state):
     }
 
     card['cards'][0]['sections'][0]['widgets'][0]['keyValue']['button'] = edit_title_button
-    print("card now")
-    print(card)
     card['cards'][0]['sections'][2]['widgets'].append(buttons_widget)
 
 
