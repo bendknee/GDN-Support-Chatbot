@@ -168,7 +168,8 @@ def generate_edit_work_item(work_item, state):
 
 def generate_saved_work_item(work_item):
     card, work_item_dict = generate_work_item(work_item)
-    card['text'] = "Your work item has been saved."
+    # card["text"] = "Your work item has been saved."
+    card["actionResponse"] = {"type": "UPDATE_MESSAGE"}
 
     # add widgets
     buttons_widget = {
