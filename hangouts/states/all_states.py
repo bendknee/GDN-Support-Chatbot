@@ -1,7 +1,7 @@
-from .state import State
-from .choice_state import ChoiceState
+from .base_states import TextState, ChoiceState
 
-from hangouts.cards import generate_edit_work_item, generate_choices, generate_fields_dict, generate_saved_work_item, text_format, generate_signin_card
+from hangouts.cards import generate_edit_work_item, generate_choices, generate_fields_dict, generate_saved_work_item, \
+    text_format, generate_signin_card
 from hangouts.models import HardwareSupport, SoftwareSupport
 
 from vsts.views import create_work_item, token_expired_or_refresh
@@ -9,26 +9,8 @@ from vsts.views import create_work_item, token_expired_or_refresh
 available_types = ["Hardware Support", "Software Support"]
 
 
-def change_state(user_object, next_state):
-    current_state = states_list[user_object.state]
-
-    if user_object.is_finished:
-        next_state = EndState.STATE_LABEL
-
-    print("current state: " + current_state.STATE_LABEL)
-    print("next state: " + next_state)
-
-    user_object.state = next_state
-    user_object.save()
-    return next_state
-
-
-class InitialState(State):
+class InitialState(TextState):
     STATE_LABEL = "initial"
-
-    @staticmethod
-    def is_waiting_text():
-        return True
 
     @staticmethod
     def action(user_object, message, event):
@@ -37,7 +19,8 @@ class InitialState(State):
                 return generate_signin_card(user_object)
             else:
                 token_expired_or_refresh(user_object)
-                change_state(user_object, ItemTypeState.STATE_LABEL)
+                user_object.state = ItemTypeState.STATE_LABEL
+                user_object.save()
                 return generate_choices("Choose work item type", available_types, ItemTypeState.STATE_LABEL)
         else:
             message = "I'm not sure what you mean. Type /help to see available commands."
@@ -52,22 +35,17 @@ class ItemTypeState(ChoiceState):
     STATE_LABEL = "item_type"
 
     @staticmethod
-    def is_waiting_text():
-        return False
-
-    @staticmethod
     def action(user_object, message, event):
         # views.delete_message(event['message']['name'])
 
-        if message == 'Hardware Support':
+        if message == available_types[0]:
             work_item_object = HardwareSupport.objects.create()
-        elif message == 'Software Support':
+        elif message == available_types[1]:
             work_item_object = SoftwareSupport.objects.create()
 
         user_object.work_item = work_item_object
+        user_object.state = TitleState.STATE_LABEL
         user_object.save()
-
-        change_state(user_object, TitleState.STATE_LABEL)
 
         return text_format("You've chosen `%s`\n\nPlease enter your issue Title." % message)
 
@@ -76,23 +54,20 @@ class ItemTypeState(ChoiceState):
         return "You're on `Choose Type`. Please pick desired work item Type from the card above."
 
 
-class TitleState(State):
+class TitleState(TextState):
     STATE_LABEL = "title"
 
     @staticmethod
-    def is_waiting_text():
-        return True
-
-    @staticmethod
     def action(user_object, message, event):
-
         work_item = user_object.get_work_item()
         work_item.title = message
         work_item.save()
+        user_object.state = DescriptionState.STATE_LABEL
+        user_object.save()
 
-        next_state = change_state(user_object, DescriptionState.STATE_LABEL)
-
-        if next_state == EndState.STATE_LABEL:
+        if user_object.final:
+            user_object.state = EndState.STATE_LABEL
+            user_object.save()
             return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
         return text_format("Please describe your issue.")
@@ -102,12 +77,8 @@ class TitleState(State):
         return "You're on `Title`. Please enter issue Title."
 
 
-class DescriptionState(State):
+class DescriptionState(TextState):
     STATE_LABEL = "description"
-
-    @staticmethod
-    def is_waiting_text():
-        return True
 
     @staticmethod
     def action(user_object, message, event):
@@ -115,17 +86,19 @@ class DescriptionState(State):
         work_item.description = message
         work_item.save()
 
-        if isinstance(work_item, HardwareSupport):
-            next_state = change_state(user_object, HardwareChoice.STATE_LABEL)
-        elif isinstance(work_item, SoftwareSupport):
-            next_state = change_state(user_object, SoftwareChoice.STATE_LABEL)
-
-        if next_state == EndState.STATE_LABEL:
+        if user_object.final:
+            user_object.state = EndState.STATE_LABEL
+            user_object.save()
             return generate_edit_work_item(work_item, EndState.STATE_LABEL)
-        elif next_state == HardwareChoice.STATE_LABEL:
-            return generate_choices("Choose Hardware Type", work_item.hardware_list, "hardware_type")
-        elif next_state == SoftwareChoice.STATE_LABEL:
-            return generate_choices("Choose 3rd Party Software", work_item.software_list, "software_type")
+
+        if isinstance(work_item, HardwareSupport):
+            user_object.state = HardwareChoice.STATE_LABEL
+            user_object.save()
+            return generate_choices("Choose Hardware Type", work_item.hardware_list, HardwareChoice.STATE_LABEL)
+        elif isinstance(work_item, SoftwareSupport):
+            user_object.state = SoftwareChoice.STATE_LABEL
+            user_object.save()
+            return generate_choices("Choose 3rd Party Software", work_item.software_list, SoftwareChoice.STATE_LABEL)
 
     @staticmethod
     def where():
@@ -142,10 +115,12 @@ class HardwareChoice(ChoiceState):
         work_item = user_object.get_work_item()
         work_item.hardware_type = message
         work_item.save()
+        user_object.state = SeverityChoice.STATE_LABEL
+        user_object.save()
 
-        next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
-
-        if next_state == EndState.STATE_LABEL:
+        if user_object.final:
+            user_object.state = EndState.STATE_LABEL
+            user_object.save()
             return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
         return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
@@ -175,10 +150,12 @@ class SoftwareChoice(ChoiceState):
 
         work_item.third_party = message
         work_item.save()
+        user_object.state = SeverityChoice.STATE_LABEL
+        user_object.save()
 
-        next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
-
-        if next_state == EndState.STATE_LABEL:
+        if user_object.final:
+            user_object.state = EndState.STATE_LABEL
+            user_object.save()
             return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
         return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
@@ -188,23 +165,21 @@ class SoftwareChoice(ChoiceState):
         return "You're on `Choose Software`. Please select 3rd Party App that is being issued from the card above."
 
 
-class OtherSoftwareType(State):
+class OtherSoftwareType(TextState):
     STATE_LABEL = "other_software_type"
 
     @staticmethod
-    def is_waiting_text():
-        return True
-
-    @staticmethod
     def action(user_object, message, event):
-
         work_item = user_object.get_work_item()
         work_item.third_party = message
         work_item.save()
 
-        next_state = change_state(user_object, SeverityChoice.STATE_LABEL)
+        user_object.state = SeverityChoice.STATE_LABEL
+        user_object.save()
 
-        if next_state == EndState.STATE_LABEL:
+        if user_object.final:
+            user_object.state = EndState.STATE_LABEL
+            user_object.save()
             return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
         return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
@@ -225,7 +200,8 @@ class SeverityChoice(ChoiceState):
         work_item.severity = message
         work_item.save()
 
-        change_state(user_object, EndState.STATE_LABEL)
+        user_object.state = EndState.STATE_LABEL
+        user_object.save()
         return generate_edit_work_item(work_item, EndState.STATE_LABEL)
 
     @staticmethod
@@ -273,7 +249,8 @@ class EndState(ChoiceState):
 
             # return response
 
-            change_state(user_object, InitialState.STATE_LABEL)
+            user_object.state = InitialState.STATE_LABEL
+            user_object.save()
             work_item.delete()
 
             return generate_saved_work_item(work_item)
@@ -301,19 +278,20 @@ class EndState(ChoiceState):
             user_object.save()
 
             return generate_choices("How severe is this issue?", work_item.severities_list,
-                                          SeverityChoice.STATE_LABEL)
+                                    SeverityChoice.STATE_LABEL)
 
         elif message == "Third Party":
             user_object.state = SoftwareChoice.STATE_LABEL
             user_object.save()
 
             return generate_choices("Choose 3rd Party Software", work_item.software_list,
-                                          SoftwareChoice.STATE_LABEL)
+                                    SoftwareChoice.STATE_LABEL)
 
     @staticmethod
     def where():
         return "You're near the finish line. Please evaluate your issue at the card above and click" \
                " `save` when you're done."
+
 
 states_list = {InitialState.STATE_LABEL: InitialState,
                ItemTypeState.STATE_LABEL: ItemTypeState,

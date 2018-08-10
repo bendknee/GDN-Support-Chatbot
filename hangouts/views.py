@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from .cards import text_format
 from .models import User
-from .states.states import InitialState, states_list, change_state
+from .states.all_states import InitialState, states_list
 
 from django.conf import settings
 
@@ -42,9 +42,8 @@ def receive_message(payload):
                                        + 'Type `/reset` to abort all progress on issuing a new Work Item')
             elif message == '/reset':
                 user_object.is_finished = False
+                user_object.state = InitialState.STATE_LABEL
                 user_object.save()
-
-                change_state(user_object, InitialState.STATE_LABEL)
 
                 try:
                     user_object.work_item.delete()

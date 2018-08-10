@@ -18,3 +18,15 @@ class State(metaclass=ABCMeta):
     @abstractmethod
     def where():
         pass
+
+
+class TextState(State, metaclass=ABCMeta):
+    @staticmethod
+    def is_waiting_text():
+        return True
+
+
+class ChoiceState(State, metaclass=ABCMeta):
+    @staticmethod
+    def is_waiting_text():
+        return False
