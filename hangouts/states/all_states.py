@@ -1,7 +1,7 @@
 from .base_states import TextState, ChoiceState
 
 from hangouts.cards import generate_edit_work_item, generate_choices, generate_fields_dict, generate_saved_work_item, \
-    text_format, generate_signin_card
+    text_format, generate_signin_card, generate_update_response
 from hangouts.models import HardwareSupport, SoftwareSupport
 
 from vsts.views import create_work_item, token_expired_or_refresh
@@ -47,7 +47,8 @@ class ItemTypeState(ChoiceState):
         user_object.state = TitleState.STATE_LABEL
         user_object.save()
 
-        return text_format("You've chosen `%s`\n\nPlease enter your issue Title." % message)
+        text_response = text_format("You have chosen `%s`\nPlease enter your issue Title." % message)
+        return generate_update_response(text_response)
 
     @staticmethod
     def where():
@@ -121,9 +122,11 @@ class HardwareChoice(ChoiceState):
         if user_object.final:
             user_object.state = EndState.STATE_LABEL
             user_object.save()
-            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
+            card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
+        else:
+            card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
+        return generate_update_response(card, text="You have chosen `%s`" % message)
 
     @staticmethod
     def where():
@@ -156,9 +159,11 @@ class SoftwareChoice(ChoiceState):
         if user_object.final:
             user_object.state = EndState.STATE_LABEL
             user_object.save()
-            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
+            card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
+        else:
+            card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
+        return generate_update_response(card, text="You have chosen `%s`" % message)
 
     @staticmethod
     def where():
@@ -180,9 +185,11 @@ class OtherSoftwareType(TextState):
         if user_object.final:
             user_object.state = EndState.STATE_LABEL
             user_object.save()
-            return generate_edit_work_item(work_item, EndState.STATE_LABEL)
+            card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
+        else:
+            card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
+        return generate_update_response(card, text="You have chosen `%s`" % message)
 
     @staticmethod
     def where():
@@ -202,7 +209,8 @@ class SeverityChoice(ChoiceState):
 
         user_object.state = EndState.STATE_LABEL
         user_object.save()
-        return generate_edit_work_item(work_item, EndState.STATE_LABEL)
+        card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
+        return generate_update_response(card, text="You have chosen `%s`" % message)
 
     @staticmethod
     def where():
@@ -240,20 +248,12 @@ class EndState(ChoiceState):
             work_item.saved_url = str(req['_links']['html']['href'])
             work_item.save()
 
-            # body = views.generate_saved_work_item(work_item)
-            # views.send_message(body, event['space']['name'])
-
-            # text_response = views.text_format("Your work item has been saved.")
-            # card_response = views.generate_work_item(work_item, req['_links']['html']['href'])
-            # response = [text_response, card_response]
-
-            # return response
-
             user_object.state = InitialState.STATE_LABEL
             user_object.save()
             work_item.delete()
 
-            return generate_saved_work_item(work_item)
+            card_response = generate_saved_work_item(work_item)
+            return generate_update_response(card_response, text="Your work item has been saved.")
 
         elif message == "Title":
             user_object.state = TitleState.STATE_LABEL
