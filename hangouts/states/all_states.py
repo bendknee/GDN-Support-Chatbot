@@ -149,7 +149,8 @@ class SoftwareChoice(ChoiceState):
             work_item.save()
             user_object.state = OtherSoftwareType.STATE_LABEL
             user_object.save()
-            return text_format("Please enter your own software type")
+            text_response = text_format("Please enter your own software type")
+            return generate_update_response(text_response, text="You have chosen `%s`" % message)
 
         work_item.third_party = message
         work_item.save()
@@ -186,10 +187,8 @@ class OtherSoftwareType(TextState):
             user_object.state = EndState.STATE_LABEL
             user_object.save()
             card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
-        else:
-            card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        return generate_update_response(card, text="You have chosen `%s`" % message)
+        return generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
     @staticmethod
     def where():
