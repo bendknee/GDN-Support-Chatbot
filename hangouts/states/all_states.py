@@ -150,7 +150,7 @@ class SoftwareChoice(ChoiceState):
             user_object.state = OtherSoftwareType.STATE_LABEL
             user_object.save()
             text_response = text_format("Please enter your own software type")
-            return generate_update_response(text_response, text="You have chosen `%s`" % message)
+            return generate_update_response(text_response)
 
         work_item.third_party = message
         work_item.save()
