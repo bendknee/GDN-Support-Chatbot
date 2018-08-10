@@ -13,8 +13,7 @@ def generate_card_layout(num_of_sections):
                 "sections": [
                 ]
             }
-        ],
-        "text": "YES"
+        ]
     }
 
     for i in range(num_of_sections):
@@ -169,6 +168,7 @@ def generate_edit_work_item(work_item, state):
 
 def generate_saved_work_item(work_item):
     card, work_item_dict = generate_work_item(work_item)
+    card['text'] = "Your work item has been saved."
 
     # add widgets
     buttons_widget = {

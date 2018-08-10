@@ -264,15 +264,6 @@ class EndState(ChoiceState):
             work_item.saved_url = str(req['_links']['html']['href'])
             work_item.save()
 
-            # body = views.generate_saved_work_item(work_item)
-            # views.send_message(body, event['space']['name'])
-
-            # text_response = views.text_format("Your work item has been saved.")
-            # card_response = views.generate_work_item(work_item, req['_links']['html']['href'])
-            # response = [text_response, card_response]
-
-            # return response
-
             change_state(user_object, InitialState.STATE_LABEL)
             work_item.delete()
 
