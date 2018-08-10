@@ -79,6 +79,7 @@ def receive_message(payload):
     # print(event['message']['thread']['name'])
     print(response)
     # send_message(response, event['space']['name'])
+    response["actionResponse"] = {"type": "UPDATE_MESSAGE"}
     return JsonResponse(response, content_type='application/json')
 
 
