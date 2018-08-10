@@ -12,6 +12,14 @@ def generate_card_layout(num_of_sections):
             {
                 "sections": [
                 ]
+            },
+            {
+                "header": {
+                    "title": "Pizza Bot Customer Support",
+                    "subtitle": "pizzabot@example.com",
+                    "imageUrl": "https://goo.gl/aeDtrS",
+                    "imageStyle": "IMAGE"
+                  },
             }
         ]
     }
