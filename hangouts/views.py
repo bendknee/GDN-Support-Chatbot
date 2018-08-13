@@ -3,19 +3,17 @@ from __future__ import unicode_literals
 
 from .cards import text_format
 from .models import User
-from .states.all_states import InitialState, states_list
+from .states import InitialState, states_list
 
 from django.conf import settings
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from googleapiclient.discovery import build
-
-import json
-
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
+
+import json
 
 
 # ----------------------- receive message from Hangouts -----------------------#

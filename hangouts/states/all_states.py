@@ -1,7 +1,7 @@
 from .base_states import TextState, ChoiceState
 
 from hangouts.cards import generate_edit_work_item, generate_choices, generate_fields_dict, generate_saved_work_item, \
-    text_format, generate_signin_card, generate_update_response
+                            text_format, generate_signin_card, generate_update_response
 from hangouts.models import HardwareSupport, SoftwareSupport
 
 from vsts.views import create_work_item, token_expired_or_refresh

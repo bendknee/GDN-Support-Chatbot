@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
 
@@ -5,17 +6,8 @@ from django.forms.models import model_to_dict
 def text_format(message):
     return {"text": message}
 
-# update card after CARD CLICKED event
-def generate_update_response(response, **kwargs):
-    if 'text' in kwargs:
-        response["text"] = kwargs['text']
 
-    response["actionResponse"] = {"type": "UPDATE_MESSAGE"}
-
-    return response
-
-
-# ----------------------- card generators -----------------------#
+# ----------------------- card template generators -----------------------#
 def generate_card_layout(num_of_sections):
     card = {
         "cards": [
@@ -35,6 +27,16 @@ def generate_card_layout(num_of_sections):
         card['cards'][0]['sections'].append(section)
 
     return card
+
+
+# update card after CARD CLICKED event
+def generate_update_response(response, **kwargs):
+    if 'text' in kwargs:
+        response["text"] = kwargs['text']
+
+    response["actionResponse"] = {"type": "UPDATE_MESSAGE"}
+
+    return response
 
 
 def generate_choices(title, choices, method):
@@ -69,16 +71,12 @@ def generate_choices(title, choices, method):
 
     return card
 
+
 def generate_work_item(work_item):
     card = generate_card_layout(3)
 
     # remove fields that does not need to be displayed
     temp_dict = generate_fields_dict(work_item)
-
-    del temp_dict["title"]
-    del temp_dict["saved_url"]
-    if "requested_by" in temp_dict:
-        del temp_dict["requested_by"]
 
     # capitalize field names
     work_item_dict = {}
@@ -91,7 +89,7 @@ def generate_work_item(work_item):
     title_widget = {
         "keyValue": {
             "content": work_item.title,
-            "iconUrl": "http://hangouts-vsts.herokuapp.com" +
+            "iconUrl": settings.WEBHOOK_URL +
                        static('png/' + work_item.url + '.png')
         }
     }
@@ -99,6 +97,7 @@ def generate_work_item(work_item):
     card['cards'][0]['sections'][0]['widgets'].append(title_widget)
 
     return card, work_item_dict
+
 
 def generate_edit_work_item(work_item, state):
     card, work_item_dict = generate_work_item(work_item)
@@ -146,7 +145,6 @@ def generate_edit_work_item(work_item, state):
     card['cards'][0]['sections'][0]['widgets'][0]['keyValue']['button'] = edit_title_button
     card['cards'][0]['sections'][2]['widgets'].append(buttons_widget)
 
-
     for label, content in work_item_dict.items():
         field_widget = {
             "keyValue": {
@@ -175,6 +173,7 @@ def generate_edit_work_item(work_item, state):
         card['cards'][0]['sections'][1]['widgets'].append(field_widget)
 
     return card
+
 
 def generate_saved_work_item(work_item):
     card, work_item_dict = generate_work_item(work_item)
@@ -209,14 +208,15 @@ def generate_saved_work_item(work_item):
 
     return card
 
+
 def generate_updated_work_item(work_item):
     card = generate_card_layout(3)
 
     fields = {'Revised by': work_item['revisedBy']['name']}
 
-    image_url = "http://hangouts-vsts.herokuapp.com" + static('png/' +
-                                                              work_item['revision']['fields'][
-                                                                  'System.WorkItemType'].replace(" ", "%20") + '.png')
+    image_url = settings.WEBHOOK_URL + static('png/' +
+                                              work_item['revision']['fields'][
+                                                  'System.WorkItemType'].replace(" ", "%20") + '.png')
 
     if 'System.State' in work_item['fields']:
         fields['State'] = work_item['fields']['System.State']['oldValue'] + \
@@ -263,10 +263,11 @@ def generate_updated_work_item(work_item):
 
     return card
 
+
 def generate_signin_card(user):
     signin_url = "app.vssps.visualstudio.com/oauth2/authorize?client_id=C8A33DD9-D575-428F-A0CA-7210BC9A4363&" \
                  "response_type=Assertion&state=" + str(user.pk) + "&scope=vso.work_full&redirect_" \
-                                                                   "uri=https://hangouts-vsts.herokuapp.com/vsts/oauth"
+                                                                   "uri=" + settings.WEBHOOK_URL + "/vsts/oauth"
 
     card = generate_card_layout(1)
 
@@ -274,7 +275,7 @@ def generate_signin_card(user):
         "title": "Please sign in to your VSTS account."
     }
 
-    card['cards'][0]['header'] = header # bisa gak nih
+    card['cards'][0]['header'] = header  # bisa gak nih
 
     # add widgets
     buttons_widget = {
@@ -298,9 +299,11 @@ def generate_signin_card(user):
 
 
 def generate_fields_dict(work_item):
-    dict = model_to_dict(work_item)
+    model_dict = model_to_dict(work_item)
 
-    del dict["id"]
-    del dict["workitem_ptr"]
+    key_filter = ["id", "workitem_ptr", "title", "saved_url", "requested_by"]
+    for key in model_dict.keys():
+        if key in key_filter:
+            del model_dict[key]
 
-    return dict
+    return model_dict

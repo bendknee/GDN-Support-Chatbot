@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 from .models import CreatedWorkItems
-from hangouts import views
+from hangouts.cards import generate_updated_work_item, text_format
 from hangouts.models import User
+from hangouts.views import send_message
 
-from base64 import b64encode
 from datetime import datetime, timezone
 
 from django.conf import settings
@@ -16,9 +16,6 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import requests
 import traceback
-
-ENCODED_PAT = str(b64encode(b':' + bytes(settings.VSTS_PERSONAL_ACCESS_TOKEN,
-                                                'utf-8'))).replace("b'", '').replace("'", '')
 
 
 # ----------------------- post work item to VSTS -----------------------#
@@ -50,11 +47,11 @@ def notification(request):
         event = json.loads(request.body)
         print(event)
 
-        body = views.generate_updated_work_item(event['resource'])
+        body = generate_updated_work_item(event['resource'])
 
         work_item = CreatedWorkItems.objects.get(id=event['resource']['workItemId'])
 
-        views.send_message(body, work_item.user.name)
+        send_message(body, work_item.user.name)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
@@ -76,7 +73,7 @@ def authorize(request):
                 "client_assertion": settings.VSTS_OAUTH_SECRET,
                 "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
                 "assertion": code,
-                "redirect_uri": "https://hangouts-vsts.herokuapp.com/vsts/oauth"}
+                "redirect_uri": settings.WEBHOOK_URL + "/vsts/oauth"}
         response = requests.post(url, headers=headers, data=body).json()
 
         user_object = User.objects.get(pk=int(user_pk))
@@ -88,8 +85,8 @@ def authorize(request):
         print(code)
         print(user_pk)
 
-        body = views.text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
-        views.send_message(body, user_object.name)
+        body = text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
+        send_message(body, user_object.name)
 
         return render(request, "oauth_callback.html")
 
@@ -107,37 +104,10 @@ def token_expired_or_refresh(user_object):
                 "client_assertion": settings.VSTS_OAUTH_SECRET,
                 "grant_type": "refresh_token",
                 "assertion": user_object.refresh_token,
-                "redirect_uri": "https://hangouts-vsts.herokuapp.com/vsts/oauth"}
+                "redirect_uri": settings.WEBHOOK_URL + "/vsts/oauth"}
         response = requests.post(url, headers=headers, data=body).json()
 
         user_object.jwt_token = response["access_token"]
         user_object.refresh_token = response["refresh_token"]
         user_object.last_auth = datetime.now(timezone.utc)
         user_object.save()
-
-# def get_projects():
-#     project_list = set()
-#     url = settings.VSTS_BASE_URL + '_apis/projecthistory?api-version=4.1-preview.2'
-#     headers = {'Authorization': 'Basic ' + ENCODED_PAT}
-#     req = requests.get(url, headers=headers)
-#     response = req.json()
-#     for obj in response["value"]:
-#         project_list.add(obj["name"])
-#     return project_list
-
-
-# ----------------------- get all areas from VSTS -----------------------#
-# def get_all_areas():
-#     areas_list = []
-#     url = settings.VSTS_BASE_URL + '{{Project}}/_apis/wit/classificationnodes?api-version=4.1&$depth=99'
-#     headers = {'Authorization': 'Basic ' + ENCODED_PAT}
-#     for project in get_projects():
-#         req = requests.get(url.replace("{{Project}}", project), headers=headers)
-#         response = req.json()
-#         try:
-#             for obj in response["value"]:
-#                 if obj["structureType"] == "area":
-#                     areas_list += recursive_path_maker(obj)
-#         except KeyError:
-#             continue
-#     return areas_list

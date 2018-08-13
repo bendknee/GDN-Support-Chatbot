@@ -129,8 +129,8 @@ STATIC_URL = '/static/'
 # 1. Hangouts API Token. GDN bot will include this token at every sent request
 HANGOUTS_CHAT_API_TOKEN = 'SuCgaoGMzcA-U5xymm8khOEEezAapfV9fj5r2U3Tcjw='
 
-# 2. VSTS API Token. This token belongs to admin@gramedia.digital.com . TOKEN EXPIRES ON 13 JULY 2019 !
-VSTS_PERSONAL_ACCESS_TOKEN = 'yhissyen5qljuutmcdesr3w3ov2saj6ujhsqnr7dskvkxa6rhq5a'
+# 2. Chatbot webhook Base URL
+WEBHOOK_URL = "https://hangouts-vsts.herokuapp.com"
 
 # 4. VSTS Oauth App channel secret key.
 VSTS_OAUTH_SECRET = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im9PdmN6NU1fN3AtSGpJS2xGWHo5M3VfVjBabyJ9.eyJjaWQiOiJjOGEzM2RkOS1kNTc1LTQyOGYtYTBjYS03MjEwYmM5YTQzNjMiLCJjc2kiOiIxMzU4ZTA3My1iODNmLTRkZDQtODUyMS02ZGNjMmVhOTJmMWIiLCJuYW1laWQiOiJkNGMwMmNiMy00YWM4LTYwNjktOTA5ZS0zMzBmYzMxNDk0NGIiLCJpc3MiOiJhcHAudnNzcHMudmlzdWFsc3R1ZGlvLmNvbSIsImF1ZCI6ImFwcC52c3Nwcy52aXN1YWxzdHVkaW8uY29tIiwibmJmIjoxNTMzMTE0MzU3LCJleHAiOjE2OTA4ODA3NTd9.HmATZ58XxuT3chDm8VyjiSB0hirutG7COeKXctT6zqjKD7Za7-VGoOyFjodiKn3xeobj_QiMnns9jWf94Lumo_rVrEa6SNL0KfKdPMonD49lqdUob2ez2cdQwJuhTEdg92SuxCyQH3CYKQPz7z47nwzeAVANc2gS6bB9bW8BgVQbz0JhS13K6Un_6EhH6oRka-U_OBMEUDRDyvCf3VvPsscDxQtl6CvdonUR06NdWP-zyIS3f3b14nT5V5WhgqE7MPTgugnomEvmlBgu1xw_3WaHAI16Map2MDlPbiDbFb0A_3sKvn3ebCNcwu--Uy5kJRAfK5dw26UH6R18GfJVXA"
