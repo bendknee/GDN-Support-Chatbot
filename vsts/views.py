@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from .models import CreatedWorkItems
+from hangouts import views as hangouts
 from hangouts.cards import generate_updated_work_item, text_format
 from hangouts.models import User
 
@@ -12,7 +13,6 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-import hangouts.views as hangouts
 import json
 import requests
 import traceback
