@@ -77,8 +77,10 @@ def generate_work_item(work_item):
 
     # remove fields that does not need to be displayed
     temp_dict = generate_fields_dict(work_item)
-
+    if "requested_by" in temp_dict:
+        del temp_dict["requested_by"]
     del temp_dict["title"]
+
     # capitalize field names
     work_item_dict = {}
 
