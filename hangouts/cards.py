@@ -302,7 +302,7 @@ def generate_fields_dict(work_item):
     model_dict = model_to_dict(work_item)
 
     key_filter = ["id", "workitem_ptr", "title", "saved_url", "requested_by"]
-    for key in model_dict.keys():
+    for key in list(model_dict):
         if key in key_filter:
             del model_dict[key]
 
