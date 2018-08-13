@@ -78,6 +78,7 @@ def generate_work_item(work_item):
     # remove fields that does not need to be displayed
     temp_dict = generate_fields_dict(work_item)
 
+    del temp_dict["title"]
     # capitalize field names
     work_item_dict = {}
 
@@ -301,7 +302,7 @@ def generate_signin_card(user):
 def generate_fields_dict(work_item):
     model_dict = model_to_dict(work_item)
 
-    key_filter = ["id", "workitem_ptr", "title", "saved_url", "requested_by"]
+    key_filter = ["id", "workitem_ptr", "saved_url", "requested_by"]
     for key in list(model_dict):
         if key in key_filter:
             del model_dict[key]

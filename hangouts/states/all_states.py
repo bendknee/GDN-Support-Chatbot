@@ -240,9 +240,6 @@ class EndState(ChoiceState):
                 work_item_dict[value] = fields_dict[key]
 
             req = create_work_item(work_item_dict, work_item.url, user_object)
-            print(work_item_dict)
-            print("req")
-            print(req)
 
             work_item.saved_url = str(req['_links']['html']['href'])
             work_item.save()
