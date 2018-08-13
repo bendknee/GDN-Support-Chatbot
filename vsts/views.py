@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from .models import CreatedWorkItems
 from hangouts.cards import generate_updated_work_item, text_format
 from hangouts.models import User
-from hangouts.views import send_message
 
 from datetime import datetime, timezone
 
@@ -13,6 +12,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
+import hangouts.views as hangouts
 import json
 import requests
 import traceback
@@ -51,7 +51,7 @@ def notification(request):
 
         work_item = CreatedWorkItems.objects.get(id=event['resource']['workItemId'])
 
-        send_message(body, work_item.user.name)
+        hangouts.send_message(body, work_item.user.name)
 
         return JsonResponse({"text": "success!"}, content_type='application/json')
 
@@ -86,7 +86,7 @@ def authorize(request):
         print(user_pk)
 
         body = text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
-        send_message(body, user_object.name)
+        hangouts.send_message(body, user_object.name)
 
         return render(request, "oauth_callback.html")
 
