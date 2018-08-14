@@ -50,7 +50,7 @@ def notification(request):
 
         work_item = CreatedWorkItems.objects.get(id=event['resource']['workItemId'])
 
-        send_message(text_format("<<<NOTIFICATION>>>"), work_item.user.name)
+        send_message(text_format("`NOTIFICATION`"), work_item.user.name)
         send_message(text_format("Your Work Item has been updated:"), work_item.user.name)
         send_message(body, work_item.user.name)
 
