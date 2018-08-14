@@ -24,9 +24,11 @@ def receive_message(payload):
     if event['token'] == settings.HANGOUTS_CHAT_API_TOKEN:
         user_object, created = User.objects.get_or_create(name=event['space']['name'])
         state = states_list[user_object.state]
-        if event['type'] == 'ADDED_TO_SPACE' and event['space']['type'] == 'ROOM':
-            message = 'Thanks for adding me to "%s"!' % event['space']['displayName']
-            response = text_format(message)
+        if event['type'] == 'ADDED_TO_SPACE':
+            response = text_format('Type `support` to start issuing new Work Item!\n\n'
+                                   + 'Type `/where` to know where you are on issuing a new Work Item\n'
+                                   + 'Type `/reset` to abort all progress on issuing a new Work Item\n'
+                                   + 'Type `/help` to see list of valid commands')
 
         elif event['type'] == 'MESSAGE':
             # room or direct message
@@ -37,7 +39,8 @@ def receive_message(payload):
             if message == '/help':
                 response = text_format('Type `support` to start issuing new Work Item!\n\n'
                                        + 'Type `/where` to know where you are on issuing a new Work Item\n'
-                                       + 'Type `/reset` to abort all progress on issuing a new Work Item')
+                                       + 'Type `/reset` to abort all progress on issuing a new Work Item\n'
+                                       + 'Type `/help` to see list of valid commands')
             elif message == '/reset':
                 user_object.is_finished = False
                 user_object.state = InitialState.STATE_LABEL
