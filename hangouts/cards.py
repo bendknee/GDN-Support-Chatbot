@@ -253,6 +253,9 @@ def generate_updated_work_item(work_item):
     if 'System.History' in work_item['fields']:
         fields['Comment'] = work_item['fields']['System.History']['newValue']
 
+    if 'System.AssignedTo' in work_item['fields']:
+        fields['Assigned To'] = work_item['fields']['System.AssignedTo']['newValue']
+
     # add widgets
     title_widget = {
         "keyValue": {
