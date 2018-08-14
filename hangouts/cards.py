@@ -6,6 +6,12 @@ from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
+
+def text_format(message):
+    return {"text": message}
+
+
+# ----------------------- send message asynchronously -----------------------#
 def send_message(body, user):
     scopes = ['https://www.googleapis.com/auth/chat.bot']
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -16,9 +22,6 @@ def send_message(body, user):
     resp = chat.spaces().messages().create(parent=user, body=body).execute()
 
     print(resp)
-
-def text_format(message):
-    return {"text": message}
 
 
 # ----------------------- card template generators -----------------------#
@@ -44,10 +47,7 @@ def generate_card_layout(num_of_sections):
 
 
 # update card after CARD CLICKED event
-def generate_update_response(response, **kwargs):
-    if 'text' in kwargs:
-        response["text"] = kwargs['text']
-
+def generate_update_response(response):
     response["actionResponse"] = {"type": "UPDATE_MESSAGE"}
 
     return response

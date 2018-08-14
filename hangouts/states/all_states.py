@@ -36,8 +36,6 @@ class ItemTypeState(ChoiceState):
 
     @staticmethod
     def action(user_object, message, event):
-        # views.delete_message(event['message']['name'])
-
         if message == available_types[0]:
             work_item_object = HardwareSupport.objects.create()
         elif message == available_types[1]:
@@ -47,8 +45,9 @@ class ItemTypeState(ChoiceState):
         user_object.state = TitleState.STATE_LABEL
         user_object.save()
 
-        text_response = text_format("You have chosen `%s`\nPlease enter your issue Title." % message)
-        return generate_update_response(text_response)
+        send_message(text_format("Please enter your issue Title."), user_object.name)
+
+        return generate_update_response(text_format("You have chosen `%s`" % message))
 
     @staticmethod
     def where():
@@ -127,7 +126,6 @@ class HardwareChoice(ChoiceState):
             card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
         send_message(card, user_object.name)
-
         return generate_update_response(text_format("You have chosen `%s`" % message))
 
     @staticmethod
@@ -151,8 +149,9 @@ class SoftwareChoice(ChoiceState):
             work_item.save()
             user_object.state = OtherSoftwareType.STATE_LABEL
             user_object.save()
-            text_response = text_format("Please enter your own software type")
-            return generate_update_response(text_response)
+
+            send_message(text_format("Please enter your own software type"), user_object.name)
+            return generate_update_response(text_format("You have chosen `%s`" % message))
 
         work_item.third_party = message
         work_item.save()
@@ -166,7 +165,8 @@ class SoftwareChoice(ChoiceState):
         else:
             card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        return generate_update_response(card, text="You have chosen `%s`" % message)
+        send_message(card, user_object.name)
+        return generate_update_response(text_format("You have chosen `%s`" % message))
 
     @staticmethod
     def where():
@@ -211,7 +211,9 @@ class SeverityChoice(ChoiceState):
         user_object.state = EndState.STATE_LABEL
         user_object.save()
         card = generate_edit_work_item(work_item, EndState.STATE_LABEL)
-        return generate_update_response(card, text="You have chosen `%s`" % message)
+
+        send_message(card, user_object.name)
+        return generate_update_response(text_format("You have chosen `%s`" % message))
 
     @staticmethod
     def where():
@@ -250,8 +252,10 @@ class EndState(ChoiceState):
             user_object.save()
             work_item.delete()
 
-            card_response = generate_saved_work_item(work_item)
-            return generate_update_response(card_response, text="Your work item has been saved.")
+            card = generate_saved_work_item(work_item)
+
+            send_message(card, user_object.name)
+            return generate_update_response(text_format("Your work item has been saved."))
 
         elif message == "Title":
             user_object.state = TitleState.STATE_LABEL
