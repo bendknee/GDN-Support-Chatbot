@@ -9,10 +9,6 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from googleapiclient.discovery import build
-from httplib2 import Http
-from oauth2client.service_account import ServiceAccountCredentials
-
 import json
 
 
@@ -74,9 +70,4 @@ def receive_message(payload):
     else:
         return
 
-    # response['thread'] = {"name": event['message']['thread']['name']}
-    # print("thread")
-    # print(event['message']['thread']['name'])
-    print(response)
-    # send_message(response, event['space']['name'])
     return JsonResponse(response, content_type='application/json')

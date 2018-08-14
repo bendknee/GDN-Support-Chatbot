@@ -83,9 +83,6 @@ def authorize(request):
         user_object.last_auth = datetime.now(timezone.utc)
         user_object.save()
 
-        print(code)
-        print(user_pk)
-
         body = text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
         send_message(body, user_object.name)
 

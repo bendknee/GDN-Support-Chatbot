@@ -199,8 +199,6 @@ class SeverityChoice(ChoiceState):
 
     @staticmethod
     def action(user_object, message, event):
-        # views.delete_message(event['message']['name'])
-
         work_item = user_object.get_work_item()
         work_item.severity = message
         work_item.save()
@@ -228,7 +226,6 @@ class EndState(ChoiceState):
         user_object.save()
 
         if message == "save":
-            # views.delete_message(event['message']['name'])
             user_object.is_finished = False
             user_object.save()
 
