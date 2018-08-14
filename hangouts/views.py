@@ -28,7 +28,7 @@ def receive_message(payload):
             response = text_format('Type `support` to start issuing new Work Item!\n\n'
                                    + 'Type `/where` to know where you are on issuing a new Work Item\n'
                                    + 'Type `/reset` to abort all progress on issuing a new Work Item\n'
-                                   + 'Type `/help` to see list of valid commands')
+                                   + 'Type `/help` to see available commands')
 
         elif event['type'] == 'MESSAGE':
             # room or direct message
@@ -40,7 +40,7 @@ def receive_message(payload):
                 response = text_format('Type `support` to start issuing new Work Item!\n\n'
                                        + 'Type `/where` to know where you are on issuing a new Work Item\n'
                                        + 'Type `/reset` to abort all progress on issuing a new Work Item\n'
-                                       + 'Type `/help` to see list of valid commands')
+                                       + 'Type `/help` to see available commands')
             elif message == '/reset':
                 user_object.is_finished = False
                 user_object.state = InitialState.STATE_LABEL

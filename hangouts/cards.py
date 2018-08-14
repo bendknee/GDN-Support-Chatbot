@@ -2,6 +2,20 @@ from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms.models import model_to_dict
 
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client.service_account import ServiceAccountCredentials
+
+def send_message(body, user):
+    scopes = ['https://www.googleapis.com/auth/chat.bot']
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        'GDN Support Bot service key.json', scopes)
+    http = Http()
+    credentials.authorize(http)
+    chat = build('chat', 'v1', http=http)
+    resp = chat.spaces().messages().create(parent=user, body=body).execute()
+
+    print(resp)
 
 def text_format(message):
     return {"text": message}

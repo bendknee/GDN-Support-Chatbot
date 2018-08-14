@@ -1,7 +1,7 @@
 from .base_states import TextState, ChoiceState
 
 from hangouts.cards import generate_edit_work_item, generate_choices, generate_fields_dict, generate_saved_work_item, \
-                            text_format, generate_signin_card, generate_update_response
+                            text_format, generate_signin_card, generate_update_response, send_message
 from hangouts.models import HardwareSupport, SoftwareSupport
 
 from vsts.views import create_work_item, token_expired_or_refresh
@@ -23,7 +23,7 @@ class InitialState(TextState):
                 user_object.save()
                 return generate_choices("Choose work item type", available_types, ItemTypeState.STATE_LABEL)
         else:
-            message = "I'm not sure what you mean. Type /help to see available commands."
+            message = "I'm not sure what you mean. Type `/help` to see available commands."
             return text_format(message)
 
     @staticmethod
@@ -126,7 +126,9 @@ class HardwareChoice(ChoiceState):
         else:
             card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        return generate_update_response(card, text="You have chosen `%s`" % message)
+        send_message(card)
+
+        return generate_update_response("You have chosen `%s`" % message)
 
     @staticmethod
     def where():
