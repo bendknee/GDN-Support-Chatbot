@@ -45,8 +45,9 @@ class ItemTypeState(ChoiceState):
         user_object.state = TitleState.STATE_LABEL
         user_object.save()
 
+        # For every card clicked event, update card with "You have chosen..." message and send
+        # the next instruction asynchronously using the send_message() function
         send_message(text_format("Please enter your issue Title."), user_object.name)
-
         return generate_update_response(text_format("You have chosen `%s`" % message))
 
     @staticmethod
@@ -110,8 +111,6 @@ class HardwareChoice(ChoiceState):
 
     @staticmethod
     def action(user_object, message, event):
-        # views.delete_message(event['message']['name'])
-
         work_item = user_object.get_work_item()
         work_item.hardware_type = message
         work_item.save()
@@ -138,8 +137,6 @@ class SoftwareChoice(ChoiceState):
 
     @staticmethod
     def action(user_object, message, event):
-        # views.delete_message(event['message']['name'])
-
         work_item = user_object.get_work_item()
         user_email = str(event['user']['email'])
         user_email = user_email.split("@")[0] + '@staff.gramedia.com'

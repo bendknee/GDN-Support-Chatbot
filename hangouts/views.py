@@ -80,28 +80,3 @@ def receive_message(payload):
     print(response)
     # send_message(response, event['space']['name'])
     return JsonResponse(response, content_type='application/json')
-
-
-# ----------------------- send message asynchronously -----------------------#
-def send_message(body, user):
-    scopes = ['https://www.googleapis.com/auth/chat.bot']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        'GDN Support Bot service key.json', scopes)
-    http = Http()
-    credentials.authorize(http)
-    chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().create(parent=user, body=body).execute()
-
-    print(resp)
-
-
-def delete_message(name):
-    scopes = ['https://www.googleapis.com/auth/chat.bot']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        'GDN Support Bot service key.json', scopes)
-    http = Http()
-    credentials.authorize(http)
-    chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().delete(name=name).execute()
-
-    print(resp)
