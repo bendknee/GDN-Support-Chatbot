@@ -126,9 +126,9 @@ class HardwareChoice(ChoiceState):
         else:
             card = generate_choices("How severe is this issue?", work_item.severities_list, SeverityChoice.STATE_LABEL)
 
-        send_message(card)
+        send_message(card, user_object.name)
 
-        return generate_update_response("You have chosen `%s`" % message)
+        return generate_update_response(text_format("You have chosen `%s`" % message))
 
     @staticmethod
     def where():
