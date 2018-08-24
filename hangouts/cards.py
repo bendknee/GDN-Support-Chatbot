@@ -1,39 +1,12 @@
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.forms.models import model_to_dict
 
-from googleapiclient.discovery import build
-from httplib2 import Http
-from oauth2client.service_account import ServiceAccountCredentials
+from hangouts.helpers import generate_fields_dict
 
 
 def text_format(message):
     return {"text": message}
 
-
-# ----------------------- send message asynchronously -----------------------#
-def send_message(body, user):
-    scopes = ['https://www.googleapis.com/auth/chat.bot']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        'GDN Support Bot service key.json', scopes)
-    http = Http()
-    credentials.authorize(http)
-    chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().create(parent=user, body=body).execute()
-
-    print(resp)
-
-
-def delete_message(name):
-    scopes = ['https://www.googleapis.com/auth/chat.bot']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        'GDN Support Bot service key.json', scopes)
-    http = Http()
-    credentials.authorize(http)
-    chat = build('chat', 'v1', http=http)
-    resp = chat.spaces().messages().delete(name=name).execute()
-
-    print(resp)
 
 # ----------------------- card template generators -----------------------#
 def generate_card_layout(num_of_sections):
@@ -102,8 +75,6 @@ def generate_work_item(work_item):
 
     # remove fields that does not need to be displayed
     temp_dict = generate_fields_dict(work_item)
-    if "requested_by" in temp_dict:
-        del temp_dict["requested_by"]
     del temp_dict["title"]
 
     # capitalize field names
@@ -203,7 +174,7 @@ def generate_edit_work_item(work_item, state):
     return card
 
 
-def generate_saved_work_item(work_item):
+def generate_saved_work_item(work_item, url_href):
     card, work_item_dict = generate_work_item(work_item)
 
     # add widgets
@@ -214,7 +185,7 @@ def generate_saved_work_item(work_item):
                     "text": "MORE",
                     "onClick": {
                         "openLink": {
-                            "url": work_item.saved_url
+                            "url": url_href
                         }
                     }
                 }
@@ -327,14 +298,3 @@ def generate_signin_card(user):
     card['cards'][0]['sections'][0]['widgets'].append(buttons_widget)
 
     return card
-
-
-def generate_fields_dict(work_item):
-    model_dict = model_to_dict(work_item)
-
-    key_filter = ["id", "workitem_ptr", "saved_url"]
-    for key in list(model_dict):
-        if key in key_filter:
-            del model_dict[key]
-
-    return model_dict

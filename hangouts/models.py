@@ -7,7 +7,6 @@ class WorkItem(models.Model):
 
     title = models.CharField(max_length=50)
     description = models.TextField()
-    saved_url = models.TextField(null=True)
 
 
 class HardwareSupport(WorkItem):

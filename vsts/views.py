@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 from .models import CreatedWorkItems
-from hangouts.cards import generate_updated_work_item, text_format, send_message
+from hangouts.cards import generate_updated_work_item, text_format
+from hangouts.helpers import send_message
 from hangouts.models import User
 
 from datetime import datetime, timezone
@@ -32,7 +33,6 @@ def create_work_item(work_item_dict, url, user):
         payload.append(field)
 
     req = requests.post(url, headers=headers, data=json.dumps(payload))
-    print(req)
 
     CreatedWorkItems.objects.create(id=req.json()['id'], user=user)
 
@@ -41,10 +41,9 @@ def create_work_item(work_item_dict, url, user):
 
 # ----------------------- receive webhook from VSTS -----------------------#
 @csrf_exempt
-def notification(request):
+def notification(payload):
     try:
-        event = json.loads(request.body)
-        print(event)
+        event = json.loads(payload.body)
 
         body = generate_updated_work_item(event['resource'])
 
@@ -63,10 +62,10 @@ def notification(request):
 
 # ----------------------- authorize VSTS -----------------------#
 @csrf_exempt
-def authorize(request):
+def authorize(payload):
     try:
-        code = request.GET.get('code')
-        user_pk = request.GET.get('state')
+        code = payload.GET.get('code')
+        user_pk = payload.GET.get('state')
 
         url = "https://app.vssps.visualstudio.com/oauth2/token"
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -86,7 +85,7 @@ def authorize(request):
         body = text_format("Sign in successful. Type `support` to begin issuing new Work Item.")
         send_message(body, user_object.name)
 
-        return render(request, "oauth_callback.html")
+        return render(payload, "oauth_callback.html")
 
     except:
         traceback.print_exc()

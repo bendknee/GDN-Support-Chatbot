@@ -16,7 +16,6 @@ import json
 @csrf_exempt
 def receive_message(payload):
     event = json.loads(payload.body)
-    print(event)
     if event['token'] == settings.HANGOUTS_CHAT_API_TOKEN:
         user_object, created = User.objects.get_or_create(name=event['space']['name'])
         state = states_list[user_object.state]
@@ -33,10 +32,11 @@ def receive_message(payload):
             else:
                 message = event['message']['argumentText']
             if message == '/help':
-                response = text_format('Type `support` to start issuing new Work Item!\n\n'
-                                       + 'Type `/where` to know where you are on issuing a new Work Item\n'
-                                       + 'Type `/reset` to abort all progress on issuing a new Work Item\n'
-                                       + 'Type `/help` to see available commands')
+                reply_message = 'Type `/where` to know where you are on issuing a new Work Item\n' + \
+                                'Type `/reset` to abort all progress on issuing a new Work Item\n'
+                if isinstance(state, InitialState):
+                    reply_message += '\nType `support` to start issuing new Work Item!'
+                response = text_format(reply_message)
             elif message == '/reset':
                 user_object.is_finished = False
                 user_object.state = InitialState.STATE_LABEL

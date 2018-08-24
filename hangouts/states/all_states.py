@@ -1,7 +1,8 @@
 from .base_states import TextState, ChoiceState
 
-from hangouts.cards import generate_edit_work_item, generate_choices, generate_fields_dict, generate_saved_work_item, \
-                            text_format, generate_signin_card, generate_update_response, send_message
+from hangouts.cards import generate_edit_work_item, generate_choices, generate_saved_work_item, \
+                            text_format, generate_signin_card, generate_update_response
+from hangouts.helpers import generate_fields_dict, send_message
 from hangouts.models import HardwareSupport, SoftwareSupport
 
 from vsts.views import create_work_item, token_expired_or_refresh
@@ -239,14 +240,11 @@ class EndState(ChoiceState):
 
             req = create_work_item(work_item_dict, work_item.url, user_object)
 
-            work_item.saved_url = str(req['_links']['html']['href'])
-            work_item.save()
-
             user_object.state = InitialState.STATE_LABEL
             user_object.save()
             work_item.delete()
 
-            card = generate_saved_work_item(work_item)
+            card = generate_saved_work_item(work_item, req['_links']['html']['href'])
 
             send_message(card, user_object.name)
             return generate_update_response(text_format("Your work item has been saved."))
