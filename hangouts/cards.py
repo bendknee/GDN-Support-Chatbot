@@ -269,7 +269,7 @@ def generate_updated_work_item(work_item):
 def generate_signin_card(user):
     signin_url = "app.vssps.visualstudio.com/oauth2/authorize?client_id=" + settings.VSTS_OAUTH_ID + \
                  "&response_type=Assertion&state=" + str(user.pk) + "&scope=vso.work_full&redirect_" \
-                                                                   "uri=" + settings.WEBHOOK_URL + "/api/vsts/oauth"
+                                                                   "uri=" + settings.WEBHOOK_URL + "/api/vsts/oauth/"
 
     card = generate_card_layout(1)
 
