@@ -2,7 +2,7 @@ from .base_states import TextState, ChoiceState
 
 from hangouts.cards import generate_edit_work_item, generate_choices, generate_saved_work_item, \
                             text_format, generate_signin_card, generate_update_response
-from hangouts.helpers import generate_fields_dict, send_message
+from hangouts.helpers import create_url_of_work_item, generate_fields_dict, send_message
 from hangouts.models import HardwareSupport, SoftwareSupport
 
 from vsts.views import create_work_item, token_expired_or_refresh
@@ -238,7 +238,7 @@ class EndState(ChoiceState):
             for key, value in path_dict.items():
                 work_item_dict[value] = fields_dict[key]
 
-            req = create_work_item(work_item_dict, work_item.url, user_object)
+            req = create_work_item(work_item_dict, create_url_of_work_item(work_item), user_object)
 
             user_object.state = InitialState.STATE_LABEL
             user_object.save()

@@ -20,7 +20,7 @@ import traceback
 
 # ----------------------- post work item to VSTS -----------------------#
 def create_work_item(work_item_dict, url, user):
-    url = 'https://quickstartbot.visualstudio.com/' + 'Support/_apis/wit/workitems/$' + url + '?api-version=4.1'
+    url = 'https://gramediadigital.visualstudio.com/Support/_apis/wit/workitems/$' + url + '?api-version=4.1'
     headers = {'Authorization': 'Bearer ' + user.jwt_token, "Content-Type": "application/json-patch+json"}
     payload = []
 

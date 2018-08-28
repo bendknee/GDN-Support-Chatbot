@@ -10,9 +10,8 @@ class WorkItem(models.Model):
 
 
 class HardwareSupport(WorkItem):
-    path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Support.HardwareType",
+    path_dict = dict(WorkItem.path_dict, **{"hardware_type": "Ticketing.HardwareType",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
-    url = "Hardware%20Support"
     severities_list = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
     hardware_list = ["Internet/Wifi", "Laptop/Computer", "Mobile Device", "Other", "Printer"]
 
@@ -22,10 +21,9 @@ class HardwareSupport(WorkItem):
 
 
 class SoftwareSupport(WorkItem):
-    path_dict = dict(WorkItem.path_dict, **{"third_party": "Support.3rdPartyApp",
-                                            "requested_by": "Support.RequestedBy",
+    path_dict = dict(WorkItem.path_dict, **{"third_party": "Ticketing.3rdPartyApp",
+                                            "requested_by": "Ticketing.RequestedBy",
                                             "severity": "Microsoft.VSTS.Common.Severity"})
-    url = "Software%20Support"
     severities_list = ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"]
     software_list = ["GSuite", "Power BI", "VSTS", "Fill your own.."]
 

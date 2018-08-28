@@ -3,6 +3,7 @@ from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 
+import re
 
 # ----------------------- send message asynchronously -----------------------#
 def send_message(body, user):
@@ -33,3 +34,9 @@ def generate_fields_dict(work_item):
             del model_dict[key]
 
     return model_dict
+
+
+def create_url_of_work_item(work_item_object):
+    name = type(work_item_object).__name__
+    splitted = re.sub('(?!^)([A-Z][a-z]+)', r' \1', name).split()
+    return "%20".join(splitted)

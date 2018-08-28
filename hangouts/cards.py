@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 
-from hangouts.helpers import generate_fields_dict
+from hangouts.helpers import generate_fields_dict, create_url_of_work_item
 
 
 def text_format(message):
@@ -89,7 +89,7 @@ def generate_work_item(work_item):
         "keyValue": {
             "content": work_item.title,
             "iconUrl": settings.WEBHOOK_URL +
-                       static('png/' + work_item.url + '.png')
+                       static('png/' + create_url_of_work_item(work_item) + '.png')
         }
     }
 
