@@ -73,7 +73,7 @@ def authorize(payload):
                 "client_assertion": settings.VSTS_OAUTH_SECRET,
                 "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
                 "assertion": code,
-                "redirect_uri": settings.WEBHOOK_URL + "/vsts/oauth"}
+                "redirect_uri": settings.WEBHOOK_URL + "/api/vsts/oauth"}
         response = requests.post(url, headers=headers, data=body).json()
 
         user_object = User.objects.get(pk=int(user_pk))
@@ -101,7 +101,7 @@ def token_expired_or_refresh(user_object):
                 "client_assertion": settings.VSTS_OAUTH_SECRET,
                 "grant_type": "refresh_token",
                 "assertion": user_object.refresh_token,
-                "redirect_uri": settings.WEBHOOK_URL + "/vsts/oauth"}
+                "redirect_uri": settings.WEBHOOK_URL + "/api/vsts/oauth"}
         response = requests.post(url, headers=headers, data=body).json()
 
         user_object.jwt_token = response["access_token"]
